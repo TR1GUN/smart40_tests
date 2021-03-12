@@ -181,13 +181,14 @@ class GET:
         # Замереем время
         time_start = time.time()
         # Теперь его отправляем на нужную нам в космос
-        # JSON_Setup = Setup(JSON)
-        # answer_JSON = JSON_Setup.answer_JSON
 
         # Сделаем запуск
         JSON_Setup = Setup(JSON=JSON, API='meter_db_data_api', type_connect= self.type_connect)
         answer_JSON = JSON_Setup.answer_JSON
 
+
+        print('JSON' , JSON)
+        print('answer_JSON', answer_JSON)
         # Получаем время
         time_finis = time.time()
 
@@ -196,7 +197,7 @@ class GET:
 
         # Навсякий случай печатаем JSON ответа и что отправляли
         # print('JSON\n', JSON)
-        # print('answer_JSON\n', answer_JSON)
+        print('answer_JSON\n', answer_JSON)
         # Теперь пихаем это все в обработчик ошибок
         if answer_JSON['res'] != 0:
             result.append({'error': 'Ошибка в полученном JSON', 'JSON': JSON, 'answer_JSON': answer_JSON})
@@ -231,7 +232,6 @@ class POST:
     type_connect: str = 'virtualbox'
 
     def __init__(self, type_connect: str = 'virtualbox'):
-        name_table = ""
         self.type_connect = type_connect
 
     # Делаем общий обработчик что дальше делать с JSON
@@ -258,8 +258,8 @@ class POST:
         time_finis = time.time()
         print('JSON Обрабабатывался:', time_finis - time_start)
         # Навсякий случай печатаем JSON ответа и что отправляли
-        # print('JSON\n', JSON)
-        # print('answer_JSON\n', answer_JSON)
+        print('JSON\n', JSON)
+        print('answer_JSON\n', answer_JSON)
 
         # Теперь пихаем это все в обработчик ошибок
         if answer_JSON['res'] != 0:
@@ -271,9 +271,14 @@ class POST:
             data_base_after_recording = select_db.get_result()
 
             # И селектим в БД только записи что мы сделали
+
+            print('JSON_dict' , JSON_dict)
+
             select_db = ReceivingDataAccordingToJSON(JSON=JSON_dict, Select_all=False)
             data_base_was_recorded = select_db.get_result()
 
+
+            print('JSON_for_compare_to_data_base' , JSON_for_compare_to_data_base)
             # Теперь пихаем это все в обработчик
             result = CheckUP().checkup_post(database_before=data_base_before_recording,
                                             database_after=data_base_after_recording,
@@ -335,10 +340,6 @@ class POST:
 
 # -------------------------------------------------------------------------------------------------------------------
 
-meterdata = POST(type_connect='virtualbox').Сustom_measures(list_measure=['ElMomentEnergy'],
-                                                                count_id=1,
-                                                                count_ts=1,
-                                                                generate_unicale_id=True,
-                                                                generate_unicale_ts=True)
+meterdata = POST(type_connect='virtualbox').Сustom_measures(list_measure=['ElConfig','ElMomentEnergy', 'ElMomentQuality'] , count_id=2,count_ts=3 )
 
 print(meterdata)

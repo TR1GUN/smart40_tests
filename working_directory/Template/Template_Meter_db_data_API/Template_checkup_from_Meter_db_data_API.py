@@ -167,30 +167,30 @@ class CheckUP:
         return error_collector
 
     # ---------------------------------------------------------------------------------------------------------------------
-    # для начала получим наши данные - нам нужны БД до , БД после , БД что было записанно , и контент джейсона в формате бд
-    def checkup_post_old(self, database_before: list, database_after: list, database_was_recording: list,
-                         json_content: list):
-        # Обновим значение сборщика ошибок - теперь это пустой массив
-        self.error_collector = []
-        # Теперь надо проверить их длину - их длина должна быть одинакова - потому что нам нужны все archtypes name
-
-        if (len(json_content) == len(database_before)) and \
-                (len(json_content) == len(database_after)) and \
-                (len(json_content) == len(database_was_recording)):
-            # Если они одинаковы , то тогда надо проходится по каждому из списка
-            #     определяем тэги
-            self.tags = ['Name', 'id', 'ts']
-
-            self.error_collector = self.__checkup_list_element_value_ArchType_Name(database_before=database_before,
-                                                                                   database_after=database_after,
-                                                                                   database_was_recording=database_was_recording,
-                                                                                   json_content=json_content)
-
-        else:
-            # Если они не раавны то добавляем ошибку
-
-            self.error_collector.append({'error': 'Нет соответсвия archtypes name'})
-        return self.error_collector
+    # # для начала получим наши данные - нам нужны БД до , БД после , БД что было записанно , и контент джейсона в формате бд
+    # def checkup_post_old(self, database_before: list, database_after: list, database_was_recording: list,
+    #                      json_content: list):
+    #     # Обновим значение сборщика ошибок - теперь это пустой массив
+    #     self.error_collector = []
+    #     # Теперь надо проверить их длину - их длина должна быть одинакова - потому что нам нужны все archtypes name
+    #
+    #     if (len(json_content) == len(database_before)) and \
+    #             (len(json_content) == len(database_after)) and \
+    #             (len(json_content) == len(database_was_recording)):
+    #         # Если они одинаковы , то тогда надо проходится по каждому из списка
+    #         #     определяем тэги
+    #         self.tags = ['Name', 'id', 'ts']
+    #
+    #         self.error_collector = self.__checkup_list_element_value_ArchType_Name(database_before=database_before,
+    #                                                                                database_after=database_after,
+    #                                                                                database_was_recording=database_was_recording,
+    #                                                                                json_content=json_content)
+    #
+    #     else:
+    #         # Если они не раавны то добавляем ошибку
+    #
+    #         self.error_collector.append({'error': 'Нет соответсвия archtypes name'})
+    #     return self.error_collector
 
     # ----------------------------------------------------------------------------------------------------------------
     #                             все хуйня миша , давай по новой
@@ -212,7 +212,7 @@ class CheckUP:
             self.tags = ['Name', 'id', 'ts']
 
             # Если все ок - отправляем в следующую функцию стравнивания
-            self.__measures_iteration_over_each_element(
+            self.error_collector = self.__measures_iteration_over_each_element(
                 database_before=database_before,
                 database_after=database_after,
                 database_was_recording=database_was_recording,
@@ -234,11 +234,11 @@ class CheckUP:
         # Теперь берем расчет по каждому из элементов
         for i in range(len(json_content)):
             # а теперь каждый элемент пихаем в сравниватель
-            self.__measure_checkup_by_element(
+            result.append(self.__measure_checkup_by_element(
                 database_before=database_before[i],
                 database_after=database_after[i],
                 database_was_recording=database_was_recording[i],
-                json_content=json_content[i])
+                json_content=json_content[i]))
 
         return result
 
@@ -252,6 +252,7 @@ class CheckUP:
         result = []
         # Первое что должны сделать - определиться с тэгом что лежит  в Name
         # и исходя из него составляем лист тэгов что содержится в нем
+
         archtype_name = json_content[0]['Name']
 
         if archtype_name in Template_list_ArchTypes.ElectricConfig_ArchType_name_list:
@@ -315,7 +316,6 @@ class CheckUP:
                 from_subtract=database_before,
                 subtract=database_after)
             # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!НАдо ДОПИСАТЬ проверку валидности!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            print(database_expect_was_recording)
             for i in range(len(database_expect_was_recording)):
                 if database_expect_was_recording[i]['Valid'] == 0:
                     tags_name_valid = tags_name[:2]
@@ -342,12 +342,17 @@ class CheckUP:
         json_content_list_of_dict = self.__sorted_for_keys(list_dictionaries=json_content,
                                                            list_name_keys=tags_name)
 
+
+        print(json_content_list_of_dict)
         # Теперь можно сделать сравнение
         # Первое что делаем -  складываем JSON и БД до записи должен быть равен БД после записи
         # Если нет - то делаем отлов ошибки
-        if (database_after_list_of_dict != database_before_list_of_dict + json_content_list_of_dict) and \
+
+        if (database_after_list_of_dict != database_before_list_of_dict + json_content_list_of_dict) or \
                 (len(database_after_list_of_dict) != len(database_before_list_of_dict) + len(
                     json_content_list_of_dict)):
+
+
 
             # для начала посмотрим что есть добавленного в БД по факту
             database_expect_was_recording_list_of_dict = self.__finding_discrepancy(
@@ -572,3 +577,81 @@ class GETCheckUP:
                 })
 
         return self.error_collector
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
+# -----------------------------Напишем здесь сравниватель для запроса POST---------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
+
+class POSTCheckUP:
+    """
+        Класс для проверки для POST запроса
+
+    """
+    dublicate = []
+    error_collector = []
+    JSON_deconstruct = []
+    DataBase_before = []
+    DataBase_after = []
+    DataBase_was_recording = []
+    tags = ['Name', 'id', 'ts']
+    def __init__(self, JSON_deconstruct: list,
+                 DataBase_before: list,
+                 DataBase_after: list ,
+                 DataBase_was_recording: list):
+        # Итак - Переопределяем Поля - ЕТО ВАЖНО
+        self.JSON_deconstruct = JSON_deconstruct
+        self.DataBase_before = DataBase_before
+        self.DataBase_after = DataBase_after
+        self.DataBase_was_recording = DataBase_was_recording
+
+
+
+
+    def __checkup_archtype_name(self):
+        '''Стадия проверки - 1  - проверяем что мы получили все типы данных в наборах'''
+        # Теперь надо проверить их длину - их длина должна быть одинакова - потому что нам нужны все archtypes name
+        if (len(self.JSON_deconstruct) == len(self.DataBase_before)) and \
+                (len(self.JSON_deconstruct) == len(self.DataBase_after)) and \
+                (len(self.JSON_deconstruct) == len(self.DataBase_was_recording)):
+        # Если все ок - отправляем в следующую функцию стравнивания
+
+        else:
+
+        self.error_collector.append({'error': 'Нет соответсвия archtypes name'})
+    def __checkup_element_measures(self):
+
+
+
+
+# ----------------------------------------------------------------------------------------------------------------
+
+        def checkup_post(self,
+                         database_before: list,
+                         database_after: list,
+                         database_was_recording: list,
+                         json_content: list):
+            # Обновим значение сборщика ошибок - теперь это пустой массив
+            self.error_collector = []
+            # Теперь надо проверить их длину - их длина должна быть одинакова - потому что нам нужны все archtypes name
+            if (len(json_content) == len(database_before)) and \
+                    (len(json_content) == len(database_after)) and \
+                    (len(json_content) == len(database_was_recording)):
+                # Если они одинаковы , то тогда надо проходится по каждому из списка
+                #     определяем тэги
+                self.tags = ['Name', 'id', 'ts']
+
+                # Если все ок - отправляем в следующую функцию стравнивания
+                self.error_collector = self.__measures_iteration_over_each_element(
+                    database_before=database_before,
+                    database_after=database_after,
+                    database_was_recording=database_was_recording,
+                    json_content=json_content)
+            else:
+                # Если они не раавны то добавляем ошибку
+                self.error_collector.append({'error': 'Нет соответсвия archtypes name'})
+            return self.error_collector
+
+        # ---------------------------------------------------------------------------------------------------------------------

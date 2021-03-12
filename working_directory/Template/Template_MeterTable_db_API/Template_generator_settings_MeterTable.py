@@ -3,61 +3,87 @@ from random import randint
 from working_directory import sqlite
 
 
-class GeneratorForSettingsMeterTable():
+class GeneratorForSettingsMeterTable:
 
-    def __init__(self, count_settings:int = 3):
+    MeterId = 0
+
+    def __init__(self,
+                 # Число настроек
+                 count_settings: int = 1,
+                 # Парент - корневой или связываем - по умолчанию связываем
+                 pId: int = 0,
+                 # Первичный пароль - на чтение
+                 passRd: str = 'asd',
+                 # вторичный пароль - на запись
+                 passWr: str = '432',
+                 # адрес
+                 addr: str = 'asd',
+                 Interface=None,
+                 MeterTypes=None ,
+                 InterfaceConfig = None):
         """
         Генератор Конструктор для MeterTable
         В конструкторе Генерируем нужные поля
 
         :param count_settings: Сюда передавать сколько JSON мы хотим получить , по умолчанию получаем 3
         """
+        if InterfaceConfig is None:
+            InterfaceConfig = ['9600,8n1', 'qwe']
+            InterfaceConfig = InterfaceConfig[randint(0, 1)]
 
-        self.InterfaceConfig = ['9600,8n1','qwe']
-        self.total_settings_list =[]
+        self.InterfaceConfig = InterfaceConfig
+        self.total_settings_list = []
         select_max = self.__select_max()
         if type(select_max) == int:
             select_max = self.__select_max() + 1
-        else :
-            select_max = 1000
+        else:
+            select_max = 1001
         # мы генерируем n количесиво раз dict который будет содержать нужные поля
         for i in range(count_settings):
             settings_dict = {}
             # нам понадобится :
-            Interface = self.__get_random_dict(self.__get_Interface())
-            MeterTypes = self.__get_random_dict(self.__get_MeterTypes())
+            if Interface is None:
+                Interface = self.__get_random_dict(self.__get_Interface())
+
+            if MeterTypes is None:
+                MeterTypes = self.__get_random_dict(self.__get_MeterTypes())
+
+            # Теперь делаеи поле последнего MeterID
+            self.MeterId = select_max + i
             # Индекс - Первичный ключ - не парсится
             settings_dict['index'] = 'None'
             # MeterId - уникальная
-            settings_dict['id'] = select_max + i
+            settings_dict['id'] = self.MeterId
             # ParentId
-            settings_dict['pId'] = 0
+            settings_dict['pId'] = pId
             # Селектим
             settings_dict['type'] = MeterTypes['Id']
             # Селектим
             settings_dict['typeName'] = MeterTypes['Type']
             # Address -
-            settings_dict['addr'] = 'asd'
+            settings_dict['addr'] = addr
             # ReadPassword
-            settings_dict['passRd'] = 'asd'
+            settings_dict['passRd'] = passRd
             # WritePassword
-            settings_dict['passWr'] = '432'
+            settings_dict['passWr'] = passWr
             # Name  - InterfaceID  Селектим
             settings_dict['InterfaceID'] = Interface['Id']
             settings_dict['ifaceName'] = Interface['Name']
             # Поле InterfaceConfig
-            settings_dict['ifaceCfg'] = self.InterfaceConfig[randint(0,1)]
+            settings_dict['ifaceCfg'] = self.InterfaceConfig
             # РТУ - НАдо потом допилить - пока выставляем значения по умолчанию
             settings_dict['rtuObjType'] = 1
             settings_dict['rtuFider'] = 0
             settings_dict['rtuObjNum'] = 0
 
-        # И в самом конце берем - и добавляем нужное нам
+            # И в самом конце берем - и добавляем нужное нам
             self.total_settings_list.append(settings_dict)
+
+
 
     def __get_Interface(self):
         # селектим всю базу
-        MeterIfaces_dict  = sqlite.readtable_return_dict(table_name='MeterIfaces')
+        MeterIfaces_dict = sqlite.readtable_return_dict(table_name='MeterIfaces')
         return MeterIfaces_dict
 
     def __get_random_dict(self, Meter_list):
@@ -68,14 +94,14 @@ class GeneratorForSettingsMeterTable():
         :return: получем рандомный жэлемент словаря
         '''
 
-        Meter_list_len = len(Meter_list)-1
+        Meter_list_len = len(Meter_list) - 1
         # рандомим нужный нам dict
         Meter_dict = Meter_list[randint(0, Meter_list_len)]
         return Meter_dict
 
     def __get_MeterTypes(self):
         # селектим всю базу
-        MeterTypes_dict  = sqlite.readtable_return_dict(table_name='MeterTypes')
+        MeterTypes_dict = sqlite.readtable_return_dict(table_name='MeterTypes')
         return MeterTypes_dict
 
     def get_dict(self):
@@ -85,7 +111,7 @@ class GeneratorForSettingsMeterTable():
         """
         # Проходимся по всему массиву и удаляем лишние ключи
         total_settings_list = self.total_settings_list
-        settings_list =[]
+        settings_list = []
         for i in range(len(total_settings_list)):
             settings_dict = {
                 'id': total_settings_list[i]['id'],
@@ -100,10 +126,11 @@ class GeneratorForSettingsMeterTable():
                 'rtuObjType': total_settings_list[i]['rtuObjType'],
                 'rtuFider': total_settings_list[i]['rtuFider'],
                 'rtuObjNum': total_settings_list[i]['rtuObjNum'],
-                            }
+            }
             settings_list.append(settings_dict)
 
         return settings_list
+
     def get_tuple(self):
         """
         Получить список кортежей для того чтоб можно было инсертить в БД
@@ -140,14 +167,14 @@ class GeneratorForSettingsMeterTable():
         return total_ids_list_new
 
     def __select_max(self):
-        max_value = sqlite.readtable_return_dict(collum='max(MeterId)' , table_name='MeterTable')
+        max_value = sqlite.readtable_return_dict(collum='max(MeterId)', table_name='MeterTable')
         if len(max_value) > 0:
             max_value = max_value[0]['max(MeterId)']
         else:
             max_value = 0
         return max_value
 
-    def get_id_to_delete(self, count:int = 0):
+    def get_id_to_delete(self, count: int = 0):
         """
         Здесь мы делаем выборку из тех ID которые хотим удалить
         :param count: Кушает число ID которые летят в удаление
@@ -167,7 +194,7 @@ class GeneratorForSettingsMeterTable():
             if count <= ids_set_len:
                 # теперь делаем из них рандомную выборку
                 for i in range(count):
-                    x = randint(0, (len(ids_set)-1))
+                    x = randint(0, (len(ids_set) - 1))
                     element = ids_set.pop(x)
                     ids_list.append(element)
 
@@ -184,22 +211,22 @@ class GeneratorForSettingsMeterTable():
         total_settings_list_new = []
         for i in range(len(total_settings_list)):
             total_settings_dict = {
-                                    'MeterId': total_settings_list[i]['id'],
-                                    'ParentId': total_settings_list[i]['pId'],
-                                    'TypeId': total_settings_list[i]['type'],
+                'MeterId': total_settings_list[i]['id'],
+                'ParentId': total_settings_list[i]['pId'],
+                'TypeId': total_settings_list[i]['type'],
 
-                                    'Type': total_settings_list[i]['typeName'],
-                                    'Address': total_settings_list[i]['addr'],
-                                    'ReadPassword': total_settings_list[i]['passRd'],
-                                    'WritePassword': total_settings_list[i]['passWr'],
+                'Type': total_settings_list[i]['typeName'],
+                'Address': total_settings_list[i]['addr'],
+                'ReadPassword': total_settings_list[i]['passRd'],
+                'WritePassword': total_settings_list[i]['passWr'],
 
-                                    'Name': total_settings_list[i]['ifaceName'],
-                                    'InterfaceID': total_settings_list[i]['InterfaceID'],
-                                    'InterfaceConfig': total_settings_list[i]['ifaceCfg'],
-                                    'RTUObjType': total_settings_list[i]['rtuObjType'],
-                                    'RTUFeederNum': total_settings_list[i]['rtuFider'],
-                                    'RTUObjNum': total_settings_list[i]['rtuObjNum']
+                'Name': total_settings_list[i]['ifaceName'],
+                'InterfaceID': total_settings_list[i]['InterfaceID'],
+                'InterfaceConfig': total_settings_list[i]['ifaceCfg'],
+                'RTUObjType': total_settings_list[i]['rtuObjType'],
+                'RTUFeederNum': total_settings_list[i]['rtuFider'],
+                'RTUObjNum': total_settings_list[i]['rtuObjNum']
 
-                                    }
+            }
             total_settings_list_new.append(total_settings_dict)
         return total_settings_list_new

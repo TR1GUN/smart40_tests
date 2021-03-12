@@ -388,6 +388,8 @@ class POST:
             # Замереем время
             time_start = time.time()
 
+            print(JSON)
+
             JSON_Setup = Setup(JSON, API='meter_db_settings', type_connect=self.type_connect)
             answer_JSON = JSON_Setup.answer_JSON
 

@@ -245,7 +245,6 @@ class SetupVirtualBox:
     def __connect_to_virtual_machine(self):
 
         # получаем нашу машину , и инициализируем ссесию гостевого доступа к ней
-        print('lol')
         guest_session = self.session.console.guest.create_session(user="smart", password="root",
                                                                   domain='smart-VirtualBox')
 

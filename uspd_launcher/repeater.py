@@ -137,6 +137,6 @@ def write_response(client_sock, response, cid):
 # run_server(port=777)
 
 from working_directory.Template.Template_Meter_devices_API.Template_socket_in_meters import SocketMeters
-server = SocketMeters(conect_port=777)
+server = SocketMeters(conect_port=7777)
 
 

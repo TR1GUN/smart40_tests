@@ -7,6 +7,7 @@ import time
 import os
 from xml.dom import minidom
 import json
+from Emulator.DataBase_SimulatorMeter import Meter_DataBase
 
 # Для начала пропишем наш файл со значениями
 path = '/'.join((os.path.abspath(__file__).replace('\\', '/')).split('/')[:-1])
@@ -14,7 +15,7 @@ times = 1
 
 # Получаем файл с параметрами
 valuesbank = xmltree.parse(path + '/values.xml').getroot()
-
+path_db = path
 
 def parse_values():
     """Итак у нас есть функция чтения знаачений - Это ваажно"""
@@ -161,6 +162,9 @@ class SimulatorMeterEnergomera:
             b'ACCES': 'Journal'
         }
 
+        # ЗАгружаем нашу БД архивных записей
+        self.Meter_DataBase = Meter_DataBase(path = path_db)
+
         # Определяем наш словарь который содержит значения данных
         self.valuesbank = \
             {
@@ -216,7 +220,7 @@ class SimulatorMeterEnergomera:
         # Серийный порт - ПОКА ФУНКЦИОНАЛ ВЫРЕЗАН
         # self._serial = ser
 
-        # Переопределяем перемсенные оссновных команд
+        # Переопределяем перемсенные основных команд
         self.start = b''
         self.address = b''
         self.exclam = b''
@@ -870,6 +874,8 @@ class SimulatorMeterEnergomera:
             # --
             # values_dict = self.values_dict_with_timestamp[find_date]
             # --
+
+            print('!!!!!!!!!ДАТА ЧТО ИИИИЩЕМ', find_date)
             values_dict = self.valuesbank.get(find_date)
             # --
             if values_dict is not None:
@@ -880,6 +886,138 @@ class SimulatorMeterEnergomera:
 
                 # После чего обновляем наш список
                 self.valuesbank['NOW'].update(correct_values_dict)
+            # Итак - если у нас пустые значения - То обнуляем все значения - Для получения пустых значений
+            else:
+                print('\n&&&&&&&&&&&&&&&&&&&&&& ПРОВАЛИЛИС')
+                # Если не находим нужный таймштамп - ставим пометкуу что измерения не проводились
+                no_measurements_were_taken_dict = \
+                    {
+                        # Срез по дням
+                        'd':
+                        {
+                            'dA+0': '0.0',
+                            'dA+1': '0.0',
+                            'dA+2': '0.0',
+                            'dA+3': '0.0',
+                            'dA+4': '0.0',
+                            'dA+5': '0.0',
+                            'dA-0': '0.0',
+                            'dA-1': '0.0',
+                            'dA-2': '0.0',
+                            'dA-3': '0.0',
+                            'dA-4': '0.0',
+                            'dA-5': '0.0',
+                            'dR+0': '0.0',
+                            'dR+1': '0.0',
+                            'dR+2': '0.0',
+                            'dR+3': '0.0',
+                            'dR+4': '0.0',
+                            'dR+5': '0.0',
+                            'dR-0': '0.0',
+                            'dR-1': '0.0',
+                            'dR-2': '0.0',
+                            'dR-3': '0.0',
+                            'dR-4': '0.0',
+                            'dR-5': '0.0'
+                        },
+                        # Срез по месяцам
+                        'M':
+                        {
+                            'MA+0': '0.0',
+                            'MA+1': '0.0',
+                            'MA+2': '0.0',
+                            'MA+3': '0.0',
+                            'MA+4': '0.0',
+                            'MA+5': '0.0',
+                            'MA-0': '0.0',
+                            'MA-1': '0.0',
+                            'MA-2': '0.0',
+                            'MA-3': '0.0',
+                            'MA-4': '0.0',
+                            'MA-5': '0.0',
+                            'MR+0': '0.0',
+                            'MR+1': '0.0',
+                            'MR+2': '0.0',
+                            'MR+3': '0.0',
+                            'MR+4': '0.0',
+                            'MR+5': '0.0',
+                            'MR-0': '0.0',
+                            'MR-1': '0.0',
+                            'MR-2': '0.0',
+                            'MR-3': '0.0',
+                            'MR-4': '0.0',
+                            'MR-5': '0.0'
+                        },
+                        # Срез по дням потребление
+                        'dC':
+                        {
+                            'dCA+0': '0.0',
+                            'dCA+1': '0.0',
+                            'dCA+2': '0.0',
+                            'dCA+3': '0.0',
+                            'dCA+4': '0.0',
+                            'dCA+5': '0.0',
+                            'dCA-0': '0.0',
+                            'dCA-1': '0.0',
+                            'dCA-2': '0.0',
+                            'dCA-3': '0.0',
+                            'dCA-4': '0.0',
+                            'dCA-5': '0.0',
+                            'dCR+0': '0.0',
+                            'dCR+1': '0.0',
+                            'dCR+2': '0.0',
+                            'dCR+3': '0.0',
+                            'dCR+4': '0.0',
+                            'dCR+5': '0.0',
+                            'dCR-0': '0.0',
+                            'dCR-1': '0.0',
+                            'dCR-2': '0.0',
+                            'dCR-3': '0.0',
+                            'dCR-4': '0.0',
+                            'dCR-5': '0.0',
+                        },
+                        # Срез по месяцам потребление
+                        'MC':
+                        {
+                            'MCA+0': '0.0',
+                            'MCA+1': '0.0',
+                            'MCA+2': '0.0',
+                            'MCA+3': '0.0',
+                            'MCA+4': '0.0',
+                            'MCA+5': '0.0',
+                            'MCA-0': '0.0',
+                            'MCA-1': '0.0',
+                            'MCA-2': '0.0',
+                            'MCA-3': '0.0',
+                            'MCA-4': '0.0',
+                            'MCA-5': '0.0',
+                            'MCR+0': '0.0',
+                            'MCR+1': '0.0',
+                            'MCR+2': '0.0',
+                            'MCR+3': '0.0',
+                            'MCR+4': '0.0',
+                            'MCR+5': '0.0',
+                            'MCR-0': '0.0',
+                            'MCR-1': '0.0',
+                            'MCR-2': '0.0',
+                            'MCR-3': '0.0',
+                            'MCR-4': '0.0',
+                            'MCR-5': '0.0',
+                        },
+                        # профили мощности первого архива электросчетчика - те что каждые пол часа
+                        'DP':
+                        {
+                            'DPP+':'0.0',
+                            'DPP-':'0.0',
+                            'DPQ+':'0.0',
+                            'DPQ-':'0.0'
+                        },
+                    }
+                # Теперь - Получаем наши значения
+                correct_values_dict = no_measurements_were_taken_dict[type_date]
+                # После чего обновляем наш список
+                self.valuesbank['NOW'].update(correct_values_dict)
+                print(self.valuesbank['NOW'])
 
         except KeyError:
             print('   ***ERROR НЕ УДАЛОСЬ НАЙТИ ВРЕМЯ ***\n', find_date)
@@ -942,9 +1080,11 @@ class SimulatorMeterEnergomera:
             # Берем тэг что нам нужен
             tag = str(self.tags.get(self.data)) + str(t - 1)
             # Теперь по значению этого тэга ищем значение в нашем словаре
-            var = float(self.valuesbank['NOW'][tag]) / 1000
-            # Теперь берем и округляем
-            var = float('{:.6f}'.format(var))
+            var = self.valuesbank['NOW'][tag]
+            if ',' not in var:
+                var = float(var) / 1000
+                # Теперь берем и округляем
+                var = float('{:.6f}'.format(var))
             var = str(var)
             # Если ломается - то идем по старому сценарию
         return var.encode()
@@ -980,7 +1120,9 @@ class SimulatorMeterEnergomera:
             # Берем тэг что нам нужен
             tag = str(self.tags.get(self.data)) + str(t - 1)
             # Теперь по значению этого тэга ищем значение в нашем словаре
-            var = float(self.valuesbank['NOW'][tag])
+            var = self.valuesbank['NOW'][tag]
+            if ',' not in var:
+                var = float(var)
             var = str(var)
             # Если ломается - то идем по старому сценарию
         return var.encode()
@@ -996,7 +1138,9 @@ class SimulatorMeterEnergomera:
             # Берем тэг что нам нужен
             tag = str(self.tags.get(self.data))
             # Теперь по значению этого тэга ищем значение в нашем словаре
-            var = float(self.valuesbank['NOW'][tag]) / 1000
+            var = self.valuesbank['NOW'][tag]
+            if ',' not in var:
+                var = float(var) / 1000
             var = str(var)
             # Если ломается - то идем по старому сценарию
         return var.encode()
@@ -1012,7 +1156,9 @@ class SimulatorMeterEnergomera:
             # Берем тэг что нам нужен
             tag = str(self.tags.get(self.data))
             # Теперь по значению этого тэга ищем значение в нашем словаре
-            var = float(self.valuesbank['NOW'][tag]) / 1000
+            var = self.valuesbank['NOW'][tag]
+            if ',' not in var:
+                var = float(var) / 1000
             var = str(var)
             # Если ломается - то идем по старому сценарию
         return var.encode()
@@ -1031,7 +1177,10 @@ class SimulatorMeterEnergomera:
             tag = str(self.tags.get(self.data)) + str(tag_dict[t - 1])
             # tag = str(self.tags.get(self.data)) + str(t - 1)
             # Теперь по значению этого тэга ищем значение в нашем словаре
-            var = float(self.valuesbank['NOW'][tag]) / 1000
+
+            var = self.valuesbank['NOW'][tag]
+            if ',' not in var:
+                var = float(self.valuesbank['NOW'][tag]) / 1000
             var = str(var)
             # Если ломается - то идем по старому сценарию
         return var.encode()
@@ -1050,7 +1199,10 @@ class SimulatorMeterEnergomera:
             tag = str(self.tags.get(self.data)) + str(tag_dict[t - 1])
             # tag = str(self.tags.get(self.data)) + str(t - 1)
             # Теперь по значению этого тэга ищем значение в нашем словаре
-            var = float(self.valuesbank['NOW'][tag]) / 1000
+
+            var = self.valuesbank['NOW'][tag]
+            if ',' not in var:
+                var = float(self.valuesbank['NOW'][tag]) / 1000
             var = str(var)
             # Если ломается - то идем по старому сценарию
         return var.encode()
@@ -1070,7 +1222,10 @@ class SimulatorMeterEnergomera:
             tag_dict = {0: 'A', 1: 'B', 2: 'C'}
             tag = str(self.tags.get(self.data)) + str(tag_dict[t - 1])
             # Теперь по значению этого тэга ищем значение в нашем словаре
-            var = float(self.valuesbank['NOW'][tag])
+
+            var = self.valuesbank['NOW'][tag]
+            if ',' not in var:
+                var = float(self.valuesbank['NOW'][tag])
             var = str(var)
             # Если ломается - то идем по старому сценарию
 
@@ -1090,7 +1245,10 @@ class SimulatorMeterEnergomera:
             # Берем тэг что нам нужен
             tag = str(self.tags.get(self.data)) + str(tag_dict[t - 1])
             # Теперь по значению этого тэга ищем значение в нашем словаре
-            var = float(self.valuesbank['NOW'][tag])
+
+            var = self.valuesbank['NOW'][tag]
+            if ',' not in var:
+                var = float(self.valuesbank['NOW'][tag])
             var = str(var)
             # Если ломается - то идем по старому сценарию
 
@@ -1110,7 +1268,9 @@ class SimulatorMeterEnergomera:
             tag = str(self.tags.get(self.data)) + str(key_dict[t - 1])
             # Теперь по значению этого тэга ищем значение в нашем словаре
 
-            var = float(self.valuesbank['NOW'][tag])
+            var = self.valuesbank['NOW'][tag]
+            if ',' not in var:
+                var = float(self.valuesbank['NOW'][tag])
             var = str(var)
 
         return var.encode()
@@ -1127,7 +1287,10 @@ class SimulatorMeterEnergomera:
 
             tag = str(self.tags.get(self.data))
             # Теперь по значению этого тэга ищем значение в нашем словаре
-            var = float(self.valuesbank['NOW'][tag]) / 1000
+
+            var = self.valuesbank['NOW'][tag]
+            if ',' not in var:
+                var = float(self.valuesbank['NOW'][tag]) / 1000
             var = str(var)
         return var.encode()
 
@@ -1178,7 +1341,10 @@ class SimulatorMeterEnergomera:
         else:
             tag = str(self.tags.get(self.data))
             # Теперь по значению этого тэга ищем значение в нашем словаре
-            var = float(self.valuesbank['NOW'][tag])
+
+            var = self.valuesbank['NOW'][tag]
+            if ',' not in var:
+                var = float(self.valuesbank['NOW'][tag])
             var = str(var)
 
             return var.encode()

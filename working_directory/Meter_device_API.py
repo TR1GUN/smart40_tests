@@ -47,7 +47,6 @@ class JOB:
     КЛАСС ШАБЛОН ДЛЯ СВЯЗИ С НАШЕЙ АПИ
     """
 
-    docker = False
     API = 'meterdev'
     type_connect = 'virtualbox'
 
@@ -295,7 +294,7 @@ class VirtualMeter(JOB):
 
         # Итак - определяем наш JSON_dict
         JSON = code_JSON(JSON_dict)
-        # print('JSON', JSON)
+        print('JSON', JSON)
 
         # Теперь запускаем имитатор отдельным потоком
         server = threading.Thread(target=self.__EmulatorMeter)
@@ -384,5 +383,5 @@ class VirtualMeter(JOB):
 # ]
 
 
-# test = VirtualMeter(type_connect='virtualbox').iface_Ethernet(job_type='GetSerial')
-#
+test = VirtualMeter(type_connect='virtualbox').iface_Ethernet(job_type='ElConfig')
+

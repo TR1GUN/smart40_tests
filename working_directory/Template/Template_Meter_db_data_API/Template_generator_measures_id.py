@@ -18,7 +18,7 @@ class GeneratorDeviceIdx:
         self.id = self.__generate_ids(count_id=count_id)
 
     # Ищем максимальное значение и возвращаем его
-    def __find_max(self):
+    def _find_max(self):
         # итак - сначала надо заселектить максимальные значения всех таблиц чтоб не пересекаться
         find_max = [self.__select_max(table_name='MeterData', collum='DeviceIdx'),
                     self.__select_max(table_name='ElectricConfig', collum='DeviceIdx'),
@@ -62,7 +62,7 @@ class GeneratorDeviceIdx:
     def __generate_ids(self, count_id: int):
         # Теперь надо как то скооперироваться с MeterTable
         # Ищим максимальное значение
-        max_value = self.__find_max()
+        max_value = self._find_max()
 
         #  генерируем значения в базу - settings и ids для JSON , settings для БД
         generate = GeneratorForSettingsMeterTable(count_id)
