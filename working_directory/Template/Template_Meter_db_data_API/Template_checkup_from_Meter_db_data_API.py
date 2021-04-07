@@ -873,7 +873,7 @@ class POSTCheckUP:
         for i in range(len(JSON)):
             for x in range(len(JSON[i])):
                 for keys in JSON[i][x]:
-                    # ТЕПЕРЬ ИЩЕМ ТРИ В РЯД
+                    # ТЕПЕРЬ ИЩЕМ ТРИ В РЯДвуау
                     print(keys)
 
         return []
