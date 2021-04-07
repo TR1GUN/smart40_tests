@@ -8,5 +8,6 @@
     <model>226</model>
 	<random>0</random>
 	<datecheck>0</datecheck>
+    <cTime>30</cTime>
 	<respondtimeout>500</respondtimeout>
 </counter>

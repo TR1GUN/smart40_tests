@@ -70,7 +70,7 @@ class ReceivingDataAccordingToJSON:
     # Конструкторы запроса - конструируем наши запросы
     def __formation_sql_request_select_by_id(self, json_list_devices: list):
         command_str = '''AND
-    	DeviceIdx in  '''
+    	                    DeviceIdx in  '''
         command_str_len = []
         for i in range(len(json_list_devices)):
             command_str_len.append(json_list_devices[i]['id'])
@@ -146,6 +146,7 @@ class ReceivingDataAccordingToJSON:
         command = self.__formation_sql_request_select(sql_request=sql_command_to_table_select,
                                                       json_list_devices=measures['devices'],
                                                       Select_all=Select_all)
+
         # Теперь отправляем нашу команду куда надо
 
         result_select = sqlite.execute_command_to_read_return_dict(command=command)
@@ -1348,13 +1349,14 @@ class RecordDataToDB:
             for x in range(len(keys_list_full)):
                 data_insert_element.append(devices_list[i][keys_list_full[x]])
             data_insert_full = data_insert_full + str((tuple(data_insert_element))) + ','
-
         # После того как сформировали команду - отправляем ее в космос
         # ормируем команду
         command_insert_full = command_insert + str(data_insert_full)
         # Обрезаем последнюю запятую
         command_insert_full = command_insert_full[:-1]
         # отправляем в космос
+
+
         result = sqlite.execute_command_to_write_return_dict(command_insert_full)
         return result
 
@@ -1451,9 +1453,15 @@ class RecordDataToDB:
         result = sqlite.execute_command_to_write_return_dict(command_insert_full)
 
         # Далее мы селектим нужные нам ID
-        command_select_ids = 'SELECT Id ,DeviceIdx,Timestamp  FROM MeterData WHERE DeviceIdx IN ' + str(tuple(ids))
+        # command_select_ids = 'SELECT Id ,DeviceIdx,Timestamp  FROM MeterData WHERE DeviceIdx IN' + str(tuple(ids))
 
-        return sqlite.execute_command_to_read_return_dict(command_select_ids)
+        # return sqlite.execute_command_to_read_return_dict(command_select_ids)
+
+
+        command_select_ids = 'SELECT Id ,DeviceIdx,Timestamp  FROM MeterData WHERE DeviceIdx IN (' + (len(tuple(ids)) * ', ? ')[1:] + ')'
+
+        return sqlite.execute_command_values_to_write_return_dict(command=command_select_ids, values=tuple(ids))
+
 
     # ----------------------------------------------------------------------------------------------------------------------
     # Insert ElecticEnergyValues

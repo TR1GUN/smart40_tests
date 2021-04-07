@@ -1,6 +1,5 @@
 # Здесь расположим класс который будет записывать нужные данные в MeterTable
 
-from working_directory.Template.Template_Meter_db_data_API.Template_generator_measures_id import GeneratorDeviceIdx
 from working_directory.Template.Template_MeterTable_db_API.Template_generator_settings_MeterTable import \
     GeneratorForSettingsMeterTable
 from working_directory import sqlite
@@ -114,7 +113,6 @@ class RecordingParentTreeMeterTable:
                  InterfaceConfig: str = uart_tag):
 
         self.count_tree = count_tree
-
         # Переопределяем Поля
         self.InterfaceConfig = InterfaceConfig
         self.address_meter = address_meter
@@ -134,7 +132,6 @@ class RecordingParentTreeMeterTable:
 
         """"Эта функция НУЖНА чтоб построить дерево зависимостей """
         i = self.count_tree
-
         if i > 1:
             # ПУНКТ ПЕРВЫЙ : Ставим ХАБ
             self.__record_recording_hub_in_MeterTable()
@@ -155,6 +152,7 @@ class RecordingParentTreeMeterTable:
         """Здесь делаем запись нашего счетчика - Он является верхушкой дерева зависимостей"""
 
         # Вызываем запись - возвращаем значение meterid для постороения зависимостей
+
         Record_Meter = RecordingLineMeterTable(ParentId=self.MeterId,
                                                Addres=self.address_meter,
                                                Password1=password_dict[str(self.MeterTypes_Meter['Id'])],
@@ -173,8 +171,8 @@ class RecordingParentTreeMeterTable:
         # Вызываем запись - возвращаем значение meterid для постороения зависимостей
         Record_Meter = RecordingLineMeterTable(ParentId=self.MeterId,
                                                Addres=self.adress,
-                                               Password1='stone',
-                                               Password2='island',
+                                               Password1='Meter be away',
+                                               Password2='Meter be away',
                                                Interface=self.type_connect_hub_dict,
                                                MeterTypes=self.MeterTypes_Hub,
                                                InterfaceConfig=self.InterfaceConfig)
@@ -232,7 +230,7 @@ class RecordingParentTreeMeterTable:
 
         # Иначе - Ставим его
         else:
-            self.__get_Interface_types(type=self.type_connect)
+            self.type_connect_meter_dict = self.__get_Interface_types(type=self.type_connect)
 
     def __define_type_Meter(self):
         """
@@ -250,7 +248,7 @@ class RecordingParentTreeMeterTable:
 
 
 # ---------------------------------------------------------------------------------------------------------------------
-#                                 КЛАСС Генерации нужного количество записей
+#                                 КЛАСС Генерации нужного количество записей в METER TABLE
 # ---------------------------------------------------------------------------------------------------------------------
 class GenerateRecordMeterTable:
     """Данный класс генерирует нужное количество записей в MeterTable"""
@@ -293,6 +291,8 @@ class GenerateRecordMeterTable:
         # Запускаем Генератор
         self.__generate_record_metertable()
 
+
+
         self.DeviceIdx_list = self.get_select_deviceidx()
 
     def __generate_record_metertable(self):
@@ -307,9 +307,11 @@ class GenerateRecordMeterTable:
                 adress=self.adress,
                 InterfaceConfig=self.InterfaceConfig
             )
+
+
             # Итак - Если мы добавили счетчик и он не пустота - Добавляем в массив
             if Record.Meter_MeterId is not None:
-                self.MeterId_list.append(Record.Meter_MeterId)
+                self.MeterId_list = self.MeterId_list + [Record.Meter_MeterId]
 
     def get_select_deviceidx(self):
         '''
@@ -319,8 +321,8 @@ class GenerateRecordMeterTable:
         command = 'SELECT DeviceIdx FROM MeterTable WHERE MeterId in ' + str(tuple(self.MeterId_list))
 
         command = command[:-2] + ')'
-        print(command)
         # Селектим их через нашу БД
+
         result_list = sqlite.execute_command_to_read_return_dict(command=command)
         result = []
         for i in result_list:

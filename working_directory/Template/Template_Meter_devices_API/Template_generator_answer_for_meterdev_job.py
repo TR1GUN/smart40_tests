@@ -50,20 +50,5 @@ class CompletionSupposedAnswer:
         if self.measure in self.measure_moment_list:
             # Достраиваем тайм штамп
             self.JSON_supposed['data']['measures'][0]['devices'][0]['vals'][0]['time'] = self.instant_time
-        # текущие ПКЭ электросчетчика Достраиваем до нужного значения
-        if self.measure in Template_list_ArchTypes.ElectricQualityValues_ArchType_name_list:
 
-            vals = self.JSON_supposed['data']['measures'][0]['devices'][0]['vals']
-            for i in range(len(vals)):
-                tags = vals[i]["tags"]
-                # Переопределяем значения :
-                for x in range(len(tags)):
-                    # Для начала переопределяем знак угла - Это важно
-                    if self.JSON_supposed['data']['measures'][0]['devices'][0]['vals'][i]["tags"][x]["tag"] == 'AngAC':
-                        self.JSON_supposed['data']['measures'][0]['devices'][0]['vals'][i]["tags"][x]["val"] =\
-                            self.JSON_supposed['data']['measures'][0]['devices'][0]['vals'][i]["tags"][x]["val"] * -1
-
-                    # # Далее заменяем значения полной мощности на нон
-                    # if self.JSON_supposed['data']['measures'][0]['devices'][0]['vals'][i]["tags"][x]["tag"] in ['SA', 'SB', 'SC', 'SS']:
-                    #     self.JSON_supposed['data']['measures'][0]['devices'][0]['vals'][i]["tags"][x]["val"] = None
         return self.JSON_supposed

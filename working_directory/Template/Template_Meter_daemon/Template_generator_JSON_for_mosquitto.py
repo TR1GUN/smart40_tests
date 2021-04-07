@@ -1,8 +1,15 @@
 # Здесь Собираем наш JSON для задания в mosquitto
-from working_directory.Template.Template_Meter_daemon.Template_Record_MeterTable import GenerateRecordMeterTable
+from working_directory.Template.Template_MeterJSON.Template_Record_MeterTable import GenerateRecordMeterTable
 
 
-class GenerateForMosquittoJSON:
+# # -------------------------------------------------------------------------------------------------------------------
+#                           Класс генерации задания топика - НА СОВСЕМ ЧИСТУЮ БД
+# # -------------------------------------------------------------------------------------------------------------------
+
+class GenerateOnClearDataBaseForMosquittoJSON:
+    """
+    Класс генерации задания топика - НА СОВСЕМ ЧИСТУЮ БД
+    """
     job_type = None
     generate_count = 1
     count_tree = None
@@ -14,6 +21,7 @@ class GenerateForMosquittoJSON:
 
     jobs = {}
     DeviceIdx_list = []
+
     def __init__(self,
                  job_type: list = ['ElConfig'],
                  # Количество добавляемых записей
@@ -58,19 +66,47 @@ class GenerateForMosquittoJSON:
     def __generate_meter_list(self):
         """Здесь - Генерируем наши АЙДИШНИКИ СЧЕТЧИКОВ ЧТО НУЖНО ОПРОСИТЬ"""
         Generate_Record_Meter = GenerateRecordMeterTable(
-                                                            generate_count=self.generate_count,
-                                                            count_tree=self.count_tree,
-                                                            type_connect=self.type_connect,
-                                                            type_meter=self.type_meter,
-                                                            address_meter=self.address_meter,
-                                                            adress=self.adress,
-                                                            InterfaceConfig=self.InterfaceConfig
-                                                        )
+            generate_count=self.generate_count,
+            count_tree=self.count_tree,
+            type_connect=self.type_connect,
+            type_meter=self.type_meter,
+            address_meter=self.address_meter,
+            adress=self.adress,
+            InterfaceConfig=self.InterfaceConfig
+        )
 
         self.DeviceIdx_list = Generate_Record_Meter.DeviceIdx_list
 
         return Generate_Record_Meter.MeterId_list
 
-# -------------------------------------------------------------------------------------------------------------------
 
+# # -------------------------------------------------------------------------------------------------------------------
+#                           Класс СОЗДАНИЯ ТОПИКА на заранее сгенерированный DeviceId
+# # -------------------------------------------------------------------------------------------------------------------
 
+class GenerateForMosquittoJSON:
+    """
+    Класс СОЗДАНИЯ ТОПИКА на заранее сгенерированный DeviceId
+    """
+    Measure_type_list = []
+    MeterId_list = []
+    jobs = {}
+
+    def __init__(self, Measure_type_list: list = ['ElConfig'], MeterId_list: list = [1000]):
+        # переопределяем тэги
+        self.Measure_type_list = Measure_type_list
+        self.MeterId_list = MeterId_list
+
+        # Получаем нащ словарь JSON
+        self.jobs = self.__generate_JSON()
+
+    def __generate_JSON(self):
+        '''Здесь генерируем наш JSON'''
+
+        JSON_dict = \
+            {
+                "jobs": self.Measure_type_list,
+                "meters": self.MeterId_list
+            }
+
+        return JSON_dict

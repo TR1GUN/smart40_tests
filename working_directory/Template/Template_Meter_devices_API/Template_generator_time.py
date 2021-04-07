@@ -72,6 +72,9 @@ class GeneratorTime:
     time = None
     __count_time = 0
 
+    deep_moment_time = 1
+    deep_Journal = 30
+
     def __init__(self, count_time: int = 1, measure: str = 'ElConfig'):
         self.time = []
         self.__count_time = count_time
@@ -92,15 +95,15 @@ class GeneratorTime:
             # или просто срез по месяцам
             else:
                 self.time = GeneratorTimestampDepthMonth(before_month=False).Timestamp
-        # Генерация на глубину по пол часа на сутки
+        # Генерация на глубину по пол часа на сутки ------ПРОФИЛЬ МОЩНОСТИ
         elif measure in measure_containin_half_hour_list:
-            self.time = GeneratorTimestampByParameters(day=1).Timestamp
+            self.time = GeneratorTimestampByPowerProfile(day=1).Timestamp
         # Генерация на глубину по часу на сутки
         elif measure in measure_containin_hour_list:
             self.time = GeneratorTimestampByParameters(day=1).Timestamp
-        # Генерация на глубину в 1 запись
+        # Генерация на глубину в 1 запись - 1 час
         elif measure in measure_moment_list:
-            self.time = GeneratorTimestampByParameters(hour=1).Timestamp
+            self.time = GeneratorTimestampByParameters(hour=self.deep_moment_time).Timestamp
         # Генерация на глубину 30 дней
         elif measure in measure_Journal_list:
             # self.time = GeneratorTimestampDepthMonth().Timestamp
@@ -108,6 +111,7 @@ class GeneratorTime:
         else:
             # Иначе - ставим время по умолчанию
             self.time = [{"start": 1506180007, "end": 1609459200}]
+        self.time = self.time[0]
 
 
 class GeneratorTimestampDepthDay:
@@ -278,6 +282,56 @@ class GeneratorTimestampByParameters:
         start = timedelta(days=self.day, hours=self.hour)
         # После чего ее вычитаем
         start = end - start
+        # Теперь переводим все это в юнекс тайм
+        unix_start = time.mktime(start.timetuple())
+        unix_end = time.mktime(end.timetuple())
+        self.Timestamp = [{"start": int(unix_start), "end": int(unix_end)}]
+
+
+# # -----------------------------------------------------------------------------------------------------
+#                             Генератор даты запроса ДЛЯ ПРОФИЛЯ МОЩНОСТИ
+#                                       СТАНДАПТНАЯ ГЛУБИНА - СУТКИ
+# # -----------------------------------------------------------------------------------------------------
+
+class GeneratorTimestampByPowerProfile:
+    """
+
+        Генератор времени для ПРОФИЛЯ МОЩНОСТИ
+                ДА ЭТИ САМЫЕ ПОЛУЧАСОВКИ
+
+    """
+    Timestamp = []
+
+    def __init__(self, hour: int = 0, day: int = 0):
+        self.hour = hour
+        self.day = day
+        self.__generate_ts()
+
+    def __generate_ts(self):
+        """
+        Функция для генерации двух отрезков времени - от текущей даты , на указанную глубину
+
+        Значения переводятся в UNIX time
+
+        :return:  Возвращает рандомное время в заданом диапазоне
+        """
+
+        # Генерируем сегодняшяшнюю дату-время
+        end = datetime.now()
+        # Ставим ПОСЛЕДНИЕ ПОЛ ЧАСА
+        minute = end.minute
+        if minute >= 30:
+            minute = 30
+        else:
+            minute = 0
+        end = end.replace(minute=minute, second=0, microsecond=0)
+        # Берем дельту времени
+        start = timedelta(days=self.day, hours=self.hour)
+        # После чего ее вычитаем
+        start = end - start
+        # А поскольку ЭТО ПОУЛЧАСОВКИ - добавляем пол часа
+        half_hour = timedelta(minutes=1)
+        start = start + half_hour
         # Теперь переводим все это в юнекс тайм
         unix_start = time.mktime(start.timetuple())
         unix_end = time.mktime(end.timetuple())

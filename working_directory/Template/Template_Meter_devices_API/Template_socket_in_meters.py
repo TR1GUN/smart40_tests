@@ -27,12 +27,8 @@ class SocketMeters:
         self.serv_port = None
         self.port = conect_port
 
-
-
         # Создаем сокет сервера
         serv_sock = self.__create_serv_sock()
-
-
 
 
         self.cid = 0
@@ -181,16 +177,16 @@ class SocketMeters:
         self.client_socket.close()
 
     def log(self, chunk, type_packet: str):
-        # print('\n!!!!!!!!!!', '!!!!!!!!!!!\n')
-        # print(type_packet + 'пакет : ', chunk, ' ')
-        # print(' Его длина : ', len(chunk), '')
-        # print('Байт код\n', chunk.hex(), '\n')
-        # print('ДАМП : ', dump(chunk), '')
+        print('\n!!!!!!!!!!', '!!!!!!!!!!!\n')
+        print(type_packet + 'пакет : ', chunk, ' ')
+        print(' Его длина : ', len(chunk), '')
+        print('Байт код\n', chunk.hex(), '\n')
+        print('ДАМП : ', dump(chunk), '')
 
-        # try:
-        #     print('Расшифровка :', chunk.decode('ascii'), '\n')
-        # except UnicodeDecodeError:
-        #     print('Не Удалось расшифровать :', chunk, '\n')
+        try:
+            print('Расшифровка :', chunk.decode('ascii'), '\n')
+        except UnicodeDecodeError:
+            print('Не Удалось расшифровать :', chunk, '\n')
 
         print1 = str(type_packet) + 'пакет : ' + str(chunk) + '\n'
         print2 = ' Его длина : ' + str(len(chunk)) + '\n'

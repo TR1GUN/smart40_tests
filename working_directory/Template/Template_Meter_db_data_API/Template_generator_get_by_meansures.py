@@ -1,6 +1,5 @@
 # Здесь класс который будет генерировать JSON get Запроса исходя из тех данных которые мы сгенерировали в классе выше
-from working_directory.Template.Template_Meter_db_data_API.Template_generator_measures_tags import DefineTagsByMeasure
-from working_directory.Template.Template_Meter_db_data_API import Template_list_ArchTypes
+from working_directory.Template.Template_Meter_db_data_API.Template_define_tags_by_measure import DefineTagsByMeasure
 from working_directory import sqlite
 from random import randint
 
@@ -41,7 +40,7 @@ class GeneratorGetRequest:
         Генератор для get запроса
 
         :param JSON: - JSON с помощью которого вставили данные в БД
-        :param count_tags: -int, list  Количество тэгов или список тэгов которые попадут в JSON
+        :param count_tags: - int, list  Количество тэгов или список тэгов которые попадут в JSON
         :param select_device_idx: -bool Маркер селекта по device_idx - внутрений айдишник -
         :param select_meter_id: -bool Маркер селекта по meter_id - внешний айдишник
         :param select_id_all: -bool Маркер селекта всего что есть.
@@ -428,34 +427,34 @@ class LeadUpDataForGetRequest:
 
         return meter_id_list
 
-
-class DeleteAddedConfig:
-    """
-    Класс Который обрезает добавленные конфиги
-
-    """
-
-
-    JSON = None
-    added_config = None
-
-    def __init__(self, JSON, added_config: bool = False):
-
-        self.added_config = added_config
-
-        # Теперь что делаем - берем список measure_list и Прогоняем его
-        self.JSON = self.__delete_added_config(measure_list=JSON)
-
-    # -------------------------------------------------------------Добавленно-----------------------------------------------
-    def __delete_added_config(self, measure_list):
-        # Смотрим - добавляли или нет мы конфиг
-        if self.added_config:
-            # Берем JSON что нам нужен
-            for i in range(len(measure_list)):
-                if (measure_list[i]['measure'] in Template_list_ArchTypes.ElectricConfig_ArchType_name_list) or \
-                        (measure_list[i]['measure'] in Template_list_ArchTypes.PulseConfig_ArchType_name_list) or \
-                        (measure_list[i]['measure'] in Template_list_ArchTypes.DigitalConfig_ArchType_name_list):
-                    # Если да - то удаляем его из общего списка
-                    measure_list.pop(i)
-        return measure_list
-    # -------------------------------------------------------------
+#
+# class DeleteAddedConfig:
+#     """
+#     Класс Который обрезает добавленные конфиги
+#
+#     """
+#
+#
+#     JSON = None
+#     added_config = None
+#
+#     def __init__(self, JSON, added_config: bool = False):
+#
+#         self.added_config = added_config
+#
+#         # Теперь что делаем - берем список measure_list и Прогоняем его
+#         self.JSON = self.__delete_added_config(measure_list=JSON)
+#
+#     # -------------------------------------------------------------Добавленно-----------------------------------------------
+#     def __delete_added_config(self, measure_list):
+#         # Смотрим - добавляли или нет мы конфиг
+#         if self.added_config:
+#             # Берем JSON что нам нужен
+#             for i in range(len(measure_list)):
+#                 if (measure_list[i]['measure'] in Template_list_ArchTypes.ElectricConfig_ArchType_name_list) or \
+#                         (measure_list[i]['measure'] in Template_list_ArchTypes.PulseConfig_ArchType_name_list) or \
+#                         (measure_list[i]['measure'] in Template_list_ArchTypes.DigitalConfig_ArchType_name_list):
+#                     # Если да - то удаляем его из общего списка
+#                     measure_list.pop(i)
+#         return measure_list
+#     # -------------------------------------------------------------

@@ -169,8 +169,8 @@ class SimulatorMeterEnergomera:
         self.valuesbank = \
             {
                 "const": 1.0,
-                "kI": 0.99,
-                "kU": 0.99,
+                # "kI": 0.99,
+                # "kU": 0.99,
                 "isAm": True,
                 "isClock": True,
                 "isCons": True,
@@ -311,9 +311,8 @@ class SimulatorMeterEnergomera:
                 element = vals[0]["tags"][0]["tag"]
 
                 # ТЕПЕРЬ НАДО ПОНЯТЬ МЫ ПОЛУЧИЛИ ЖУРНАЛЫ ИЛИ НЕТ
-                if element in ['event', 'eventId', 'journalID']:
+                if element in ['event', 'eventId', 'journalId']:
                     # если получили журналы , то записываем их в буффер журналов
-
                     self.__adding_journal_values(vals)
                 # иначе - опускаем в перезапись по таймштапам
                 else:
@@ -346,10 +345,16 @@ class SimulatorMeterEnergomera:
             # а не - лучше использовать юникс тайм
             unix_time = vals[i]["time"]
             valuesbank_dict[unix_time] = tags_dict
+
         # СТАВИМ ПОСЛЕДНЫЙ ТАЙМШТАМП В КАЧЕСТВЕ ЗНАЧЕНЯИ ПО УМОЛЧАНИЮ
         self.valuesbank['time'] = unix_time
-        # ПОСЛЕДНИЙ ТАЙМШТАМП обновляем ключ NOW
-        self.valuesbank['NOW'].update(valuesbank_dict[unix_time])
+        # ПОСЛЕДНИЙ ТАЙМШТАМП обновляем ключ NOW или с таймштампом 0
+        # ЕСли таймштамп со значением 0 есть - то его загружаем в текущие
+        if valuesbank_dict.get(0) is not None:
+            self.valuesbank['NOW'].update(valuesbank_dict[0])
+        # Если нет - То ставим в текущие послений таймштамп
+        else:
+            self.valuesbank['NOW'].update(valuesbank_dict[unix_time])
         # остальные таймштампы записываем в основной словарь
         self.valuesbank.update(valuesbank_dict)
 
@@ -383,12 +388,13 @@ class SimulatorMeterEnergomera:
                 3: 5,
 
             }
-
         # Создаем буффер определенной длины - а именно количеству таймштампов в JSON
         journal_buffer = [None] * len(json_values)
+
         # Теперь - берем и правильно его заполняем
         for i in range(len(json_values)):
             # Сначала берем время
+
             timestamp = datetime.fromtimestamp(json_values[i]['time'])
             # Теперь делаем из него запис
             timestamp = str(timestamp.day) + '-' + str(timestamp.month) + '-' + str(timestamp.year)[-2:] + '-' + \
@@ -404,9 +410,9 @@ class SimulatorMeterEnergomera:
             # Теперь можно делать с ними разные манипуляции
 
             # Буффер - Выход за пределы минимального\максимального значения напряжения фазы
-            if tags_dict['journalID'] in [20, 21, 22, 23, 24, 25]:
+            if tags_dict['journalId'] in [20, 21, 22, 23, 24, 25]:
                 # Берем позицию байта
-                position = byte_position[tags_dict['journalID']]
+                position = byte_position[tags_dict['journalId']]
                 # упаковываем наш байт
                 value_bytes = ''
                 for byte in range(6):
@@ -425,10 +431,10 @@ class SimulatorMeterEnergomera:
                 # После чего добавляем ее по индексу в массив
 
             # Буффер - Включение/выключение фазы , включение выключения счетчика
-            elif tags_dict['journalID'] in [1, 9, 10, 11]:
+            elif tags_dict['journalId'] in [1, 9, 10, 11]:
 
                 # Берем позицию байта
-                position = byte_position[tags_dict['journalID']]
+                position = byte_position[tags_dict['journalId']]
                 # упаковываем наш байт
                 value_bytes = ''
                 for byte in range(8):
@@ -447,25 +453,26 @@ class SimulatorMeterEnergomera:
                 # После чего добавляем ее по индексу в массив
 
             # Буффер - Корекция времени
-            elif tags_dict['journalID'] in [2]:
+            elif tags_dict['journalId'] in [2]:
                 # Берем значение времени - изменяем
                 timestamp = timestamp.replace('-', '/')
                 # Добавляем к нему цифру на которую изменили
-                value_bytes = tags_dict['event']
+                # value_bytes = tags_dict['event']
+                value_bytes = 1
                 journal_record = timestamp + str(value_bytes)
                 # После чего добавляем ее по индексу в массив
             # Буффер - Несанкционированный доступ (вскрытие/закрытие заводской крышки)
-            elif tags_dict['journalID'] in [8]:
+            elif tags_dict['journalId'] in [8]:
                 # Здесь все просто - добавляем время
                 journal_record = timestamp[:-1]
 
             # Журнал тарифов
-            elif tags_dict['journalID'] in [6]:
+            elif tags_dict['journalId'] in [6]:
                 journal_record = timestamp + '8'
 
 
             # Журнал Сброса накопленных параметров
-            elif tags_dict['journalID'] in [3]:
+            elif tags_dict['journalId'] in [3]:
                 journal_record = timestamp + '32'
 
             # ИНАЧЕ - ЗАПОЛНЯЕМ НАШ БуФЕР ошибкой
@@ -473,7 +480,7 @@ class SimulatorMeterEnergomera:
                 journal_record = 'ERR12'
 
             # после чего заполянем буффер
-            journal_buffer[tags_dict['eventId'] - 1] = journal_record
+            journal_buffer[tags_dict['eventId']] = journal_record
         Journal = {'Journal': journal_buffer}
         self.valuesbank.update(Journal)
 
@@ -642,13 +649,18 @@ class SimulatorMeterEnergomera:
                     self.__definion_datetime()
 
                     self.dataargs = self.args.get(self.data, self.get_random_bytes)(self, 1)
+
                 except Exception as e:
                     print('ОШИБКА',e)
+                    self.dataargs = b''
                 self.lbrace = struct.pack('b', self._response[9])
                 self.readen_args = bytes(self._response[10:len(self._response) - 3])
                 self.rbrace = struct.pack('b', self._response[len(self._response) - 3])
+
+
                 # проверяем, нужно ли использовать дополнительные аргументы
                 if len(self.readen_args) == 0:  # check if we have to use additional arguments
+
                     tmp += bytes(self.data + self.lbrace + self.dataargs + self.rbrace + self.cr + self.lf)
                     t = 2
                     self.answerbank['CMD'] = tmp + self.etx + calcbcc(tmp[1:] + self.etx)
@@ -661,6 +673,10 @@ class SimulatorMeterEnergomera:
                         tmp += bytes(self.data + self.lbrace + self.dataargs + self.rbrace + self.cr + self.lf)
                         self.answerbank['CMD'] = tmp + self.etx + calcbcc(tmp[1:] + self.etx)
                         t += 1
+                # Если значения нет , то отвечаем пустотой - нужно для архивных записей
+                elif self.dataargs == b'':
+                    self.answerbank['CMD'] = self.stx + self.etx + self.dataargs + self.etx
+
                 else:
                     t = 2
                     tmp += bytes(
@@ -875,7 +891,7 @@ class SimulatorMeterEnergomera:
             # values_dict = self.values_dict_with_timestamp[find_date]
             # --
 
-            print('!!!!!!!!!ДАТА ЧТО ИИИИЩЕМ', find_date)
+            # print('!!!!!!!!!ДАТА ЧТО ИИИИЩЕМ', find_date)
             values_dict = self.valuesbank.get(find_date)
             # --
             if values_dict is not None:
@@ -888,136 +904,136 @@ class SimulatorMeterEnergomera:
                 self.valuesbank['NOW'].update(correct_values_dict)
             # Итак - если у нас пустые значения - То обнуляем все значения - Для получения пустых значений
             else:
-                print('\n&&&&&&&&&&&&&&&&&&&&&& ПРОВАЛИЛИС')
+
                 # Если не находим нужный таймштамп - ставим пометкуу что измерения не проводились
                 no_measurements_were_taken_dict = \
                     {
                         # Срез по дням
                         'd':
                         {
-                            'dA+0': '0.0',
-                            'dA+1': '0.0',
-                            'dA+2': '0.0',
-                            'dA+3': '0.0',
-                            'dA+4': '0.0',
-                            'dA+5': '0.0',
-                            'dA-0': '0.0',
-                            'dA-1': '0.0',
-                            'dA-2': '0.0',
-                            'dA-3': '0.0',
-                            'dA-4': '0.0',
-                            'dA-5': '0.0',
-                            'dR+0': '0.0',
-                            'dR+1': '0.0',
-                            'dR+2': '0.0',
-                            'dR+3': '0.0',
-                            'dR+4': '0.0',
-                            'dR+5': '0.0',
-                            'dR-0': '0.0',
-                            'dR-1': '0.0',
-                            'dR-2': '0.0',
-                            'dR-3': '0.0',
-                            'dR-4': '0.0',
-                            'dR-5': '0.0'
+                            'dA+0': None,
+                            'dA+1': None,
+                            'dA+2': None,
+                            'dA+3': None,
+                            'dA+4': None,
+                            'dA+5': None,
+                            'dA-0': None,
+                            'dA-1': None,
+                            'dA-2': None,
+                            'dA-3': None,
+                            'dA-4': None,
+                            'dA-5': None,
+                            'dR+0': None,
+                            'dR+1': None,
+                            'dR+2': None,
+                            'dR+3': None,
+                            'dR+4': None,
+                            'dR+5': None,
+                            'dR-0': None,
+                            'dR-1': None,
+                            'dR-2': None,
+                            'dR-3': None,
+                            'dR-4': None,
+                            'dR-5': None
                         },
                         # Срез по месяцам
                         'M':
                         {
-                            'MA+0': '0.0',
-                            'MA+1': '0.0',
-                            'MA+2': '0.0',
-                            'MA+3': '0.0',
-                            'MA+4': '0.0',
-                            'MA+5': '0.0',
-                            'MA-0': '0.0',
-                            'MA-1': '0.0',
-                            'MA-2': '0.0',
-                            'MA-3': '0.0',
-                            'MA-4': '0.0',
-                            'MA-5': '0.0',
-                            'MR+0': '0.0',
-                            'MR+1': '0.0',
-                            'MR+2': '0.0',
-                            'MR+3': '0.0',
-                            'MR+4': '0.0',
-                            'MR+5': '0.0',
-                            'MR-0': '0.0',
-                            'MR-1': '0.0',
-                            'MR-2': '0.0',
-                            'MR-3': '0.0',
-                            'MR-4': '0.0',
-                            'MR-5': '0.0'
+
+                            'MA+0': None,
+                            'MA+1': None,
+                            'MA+2': None,
+                            'MA+3': None,
+                            'MA+4': None,
+                            'MA+5': None,
+                            'MA-0': None,
+                            'MA-1': None,
+                            'MA-2': None,
+                            'MA-3': None,
+                            'MA-4': None,
+                            'MA-5': None,
+                            'MR+0': None,
+                            'MR+1': None,
+                            'MR+2': None,
+                            'MR+3': None,
+                            'MR+4': None,
+                            'MR+5': None,
+                            'MR-0': None,
+                            'MR-1': None,
+                            'MR-2': None,
+                            'MR-3': None,
+                            'MR-4': None,
+                            'MR-5': None
                         },
                         # Срез по дням потребление
                         'dC':
                         {
-                            'dCA+0': '0.0',
-                            'dCA+1': '0.0',
-                            'dCA+2': '0.0',
-                            'dCA+3': '0.0',
-                            'dCA+4': '0.0',
-                            'dCA+5': '0.0',
-                            'dCA-0': '0.0',
-                            'dCA-1': '0.0',
-                            'dCA-2': '0.0',
-                            'dCA-3': '0.0',
-                            'dCA-4': '0.0',
-                            'dCA-5': '0.0',
-                            'dCR+0': '0.0',
-                            'dCR+1': '0.0',
-                            'dCR+2': '0.0',
-                            'dCR+3': '0.0',
-                            'dCR+4': '0.0',
-                            'dCR+5': '0.0',
-                            'dCR-0': '0.0',
-                            'dCR-1': '0.0',
-                            'dCR-2': '0.0',
-                            'dCR-3': '0.0',
-                            'dCR-4': '0.0',
-                            'dCR-5': '0.0',
+                            'dCA+0': None,
+                            'dCA+1': None,
+                            'dCA+2': None,
+                            'dCA+3': None,
+                            'dCA+4': None,
+                            'dCA+5': None,
+                            'dCA-0': None,
+                            'dCA-1': None,
+                            'dCA-2': None,
+                            'dCA-3': None,
+                            'dCA-4': None,
+                            'dCA-5': None,
+                            'dCR+0': None,
+                            'dCR+1': None,
+                            'dCR+2': None,
+                            'dCR+3': None,
+                            'dCR+4': None,
+                            'dCR+5': None,
+                            'dCR-0': None,
+                            'dCR-1': None,
+                            'dCR-2': None,
+                            'dCR-3': None,
+                            'dCR-4': None,
+                            'dCR-5': None,
                         },
                         # Срез по месяцам потребление
                         'MC':
                         {
-                            'MCA+0': '0.0',
-                            'MCA+1': '0.0',
-                            'MCA+2': '0.0',
-                            'MCA+3': '0.0',
-                            'MCA+4': '0.0',
-                            'MCA+5': '0.0',
-                            'MCA-0': '0.0',
-                            'MCA-1': '0.0',
-                            'MCA-2': '0.0',
-                            'MCA-3': '0.0',
-                            'MCA-4': '0.0',
-                            'MCA-5': '0.0',
-                            'MCR+0': '0.0',
-                            'MCR+1': '0.0',
-                            'MCR+2': '0.0',
-                            'MCR+3': '0.0',
-                            'MCR+4': '0.0',
-                            'MCR+5': '0.0',
-                            'MCR-0': '0.0',
-                            'MCR-1': '0.0',
-                            'MCR-2': '0.0',
-                            'MCR-3': '0.0',
-                            'MCR-4': '0.0',
-                            'MCR-5': '0.0',
+                            'MCA+0': None,
+                            'MCA+1': None,
+                            'MCA+2': None,
+                            'MCA+3': None,
+                            'MCA+4': None,
+                            'MCA+5': None,
+                            'MCA-0': None,
+                            'MCA-1': None,
+                            'MCA-2': None,
+                            'MCA-3': None,
+                            'MCA-4': None,
+                            'MCA-5': None,
+                            'MCR+0': None,
+                            'MCR+1': None,
+                            'MCR+2': None,
+                            'MCR+3': None,
+                            'MCR+4': None,
+                            'MCR+5': None,
+                            'MCR-0': None,
+                            'MCR-1': None,
+                            'MCR-2': None,
+                            'MCR-3': None,
+                            'MCR-4': None,
+                            'MCR-5': None,
                         },
                         # профили мощности первого архива электросчетчика - те что каждые пол часа
                         'DP':
                         {
-                            'DPP+':'0.0',
-                            'DPP-':'0.0',
-                            'DPQ+':'0.0',
-                            'DPQ-':'0.0'
+                            'DPP+':None,
+                            'DPP-':None,
+                            'DPQ+':None,
+                            'DPQ-':None
                         },
                     }
                 # Теперь - Получаем наши значения
                 correct_values_dict = no_measurements_were_taken_dict[type_date]
                 # После чего обновляем наш список
                 self.valuesbank['NOW'].update(correct_values_dict)
-                print(self.valuesbank['NOW'])
 
         except KeyError:
             print('   ***ERROR НЕ УДАЛОСЬ НАЙТИ ВРЕМЯ ***\n', find_date)
@@ -1081,10 +1097,9 @@ class SimulatorMeterEnergomera:
             tag = str(self.tags.get(self.data)) + str(t - 1)
             # Теперь по значению этого тэга ищем значение в нашем словаре
             var = self.valuesbank['NOW'][tag]
-            if ',' not in var:
-                var = float(var) / 1000
+            var = float(var) / 1000
                 # Теперь берем и округляем
-                var = float('{:.6f}'.format(var))
+            var = float('{:.6f}'.format(var))
             var = str(var)
             # Если ломается - то идем по старому сценарию
         return var.encode()
@@ -1121,8 +1136,7 @@ class SimulatorMeterEnergomera:
             tag = str(self.tags.get(self.data)) + str(t - 1)
             # Теперь по значению этого тэга ищем значение в нашем словаре
             var = self.valuesbank['NOW'][tag]
-            if ',' not in var:
-                var = float(var)
+            var = float(var)
             var = str(var)
             # Если ломается - то идем по старому сценарию
         return var.encode()
@@ -1139,8 +1153,7 @@ class SimulatorMeterEnergomera:
             tag = str(self.tags.get(self.data))
             # Теперь по значению этого тэга ищем значение в нашем словаре
             var = self.valuesbank['NOW'][tag]
-            if ',' not in var:
-                var = float(var) / 1000
+            var = float(var) / 1000
             var = str(var)
             # Если ломается - то идем по старому сценарию
         return var.encode()
@@ -1157,8 +1170,7 @@ class SimulatorMeterEnergomera:
             tag = str(self.tags.get(self.data))
             # Теперь по значению этого тэга ищем значение в нашем словаре
             var = self.valuesbank['NOW'][tag]
-            if ',' not in var:
-                var = float(var) / 1000
+            var = float(var) / 1000
             var = str(var)
             # Если ломается - то идем по старому сценарию
         return var.encode()
@@ -1178,9 +1190,7 @@ class SimulatorMeterEnergomera:
             # tag = str(self.tags.get(self.data)) + str(t - 1)
             # Теперь по значению этого тэга ищем значение в нашем словаре
 
-            var = self.valuesbank['NOW'][tag]
-            if ',' not in var:
-                var = float(self.valuesbank['NOW'][tag]) / 1000
+            var = float(self.valuesbank['NOW'][tag]) / 1000
             var = str(var)
             # Если ломается - то идем по старому сценарию
         return var.encode()
@@ -1200,9 +1210,7 @@ class SimulatorMeterEnergomera:
             # tag = str(self.tags.get(self.data)) + str(t - 1)
             # Теперь по значению этого тэга ищем значение в нашем словаре
 
-            var = self.valuesbank['NOW'][tag]
-            if ',' not in var:
-                var = float(self.valuesbank['NOW'][tag]) / 1000
+            var = float(self.valuesbank['NOW'][tag]) / 1000
             var = str(var)
             # Если ломается - то идем по старому сценарию
         return var.encode()
@@ -1223,9 +1231,7 @@ class SimulatorMeterEnergomera:
             tag = str(self.tags.get(self.data)) + str(tag_dict[t - 1])
             # Теперь по значению этого тэга ищем значение в нашем словаре
 
-            var = self.valuesbank['NOW'][tag]
-            if ',' not in var:
-                var = float(self.valuesbank['NOW'][tag])
+            var = float(self.valuesbank['NOW'][tag])
             var = str(var)
             # Если ломается - то идем по старому сценарию
 
@@ -1243,12 +1249,15 @@ class SimulatorMeterEnergomera:
 
             tag_dict = {0: 'AB', 1: 'BC', 2: 'AC'}
             # Берем тэг что нам нужен
+
             tag = str(self.tags.get(self.data)) + str(tag_dict[t - 1])
             # Теперь по значению этого тэга ищем значение в нашем словаре
+            var = float(self.valuesbank['NOW'][tag])
 
-            var = self.valuesbank['NOW'][tag]
-            if ',' not in var:
-                var = float(self.valuesbank['NOW'][tag])
+            # ЗДЕСЬ ОЧЕНЬ ВАЖНО AngAC - Надо реверснуть
+            if tag == 'AngAC':
+                var = var * -1
+
             var = str(var)
             # Если ломается - то идем по старому сценарию
 
@@ -1268,9 +1277,7 @@ class SimulatorMeterEnergomera:
             tag = str(self.tags.get(self.data)) + str(key_dict[t - 1])
             # Теперь по значению этого тэга ищем значение в нашем словаре
 
-            var = self.valuesbank['NOW'][tag]
-            if ',' not in var:
-                var = float(self.valuesbank['NOW'][tag])
+            var = float(self.valuesbank['NOW'][tag])
             var = str(var)
 
         return var.encode()
@@ -1288,9 +1295,7 @@ class SimulatorMeterEnergomera:
             tag = str(self.tags.get(self.data))
             # Теперь по значению этого тэга ищем значение в нашем словаре
 
-            var = self.valuesbank['NOW'][tag]
-            if ',' not in var:
-                var = float(self.valuesbank['NOW'][tag]) / 1000
+            var = float(self.valuesbank['NOW'][tag]) / 1000
             var = str(var)
         return var.encode()
 
@@ -1342,9 +1347,7 @@ class SimulatorMeterEnergomera:
             tag = str(self.tags.get(self.data))
             # Теперь по значению этого тэга ищем значение в нашем словаре
 
-            var = self.valuesbank['NOW'][tag]
-            if ',' not in var:
-                var = float(self.valuesbank['NOW'][tag])
+            var = float(self.valuesbank['NOW'][tag])
             var = str(var)
 
             return var.encode()
@@ -1458,6 +1461,7 @@ class SimulatorMeterEnergomera:
     # -----------------------------------------------------------------------------------------------------------------
     # текущая дата
     def __datenow(self, t):  # current date
+
         time.sleep(self.respondtimeout)
         global times
         times = 1
@@ -1476,12 +1480,16 @@ class SimulatorMeterEnergomera:
                 self.datecheckcount = 0
         else:
             today = date.today()
+            today = self.time_now.date()
+
         self.datecheckcount += 1
 
         return str(today.strftime("0%w.%d.%m.%y")).encode()
 
     # Текущее время
     def __timenow(self, t):  # current time
+
+
         global times
         times = 1
         time.sleep(self.respondtimeout)
@@ -1491,13 +1499,13 @@ class SimulatorMeterEnergomera:
             now = datetime.fromtimestamp(1)
         else:
 
-            self.time_now = datetime.now()
+            # self.time_now = datetime.now()
 
             now = self.time_now.time()
-
             # now = datetime.now().time()
 
         # ЗАПИСЫВАЕМ ВРЕМЯ
+
         return str(now.strftime("%H:%M:%S")).encode()
 
     # Запись в файл текущего времени - ЭТО ОЧЕНЬ ВАЖНО

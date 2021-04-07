@@ -23,6 +23,7 @@ class ReadCounters:
     random = None
     datecheckmode = None
     respondtimeout = None
+    cTime = None
 
     def __init__(self, xmlpath):
         self.xmlpath = xmlpath
@@ -37,3 +38,4 @@ class ReadCounters:
         self.random = xmldoc.getElementsByTagName('random')[0].firstChild.data
         self.datecheckmode = xmldoc.getElementsByTagName('datecheck')[0].firstChild.data
         self.respondtimeout = xmldoc.getElementsByTagName('respondtimeout')[0].firstChild.data
+        self.cTime = xmldoc.getElementsByTagName('cTime')[0].firstChild.data

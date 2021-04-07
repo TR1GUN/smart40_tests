@@ -146,4 +146,6 @@
 		<Value code="Q1">0.326</Value>
 		<Value code="Q2">0.336</Value>
 		<Value code="Q3">0.346</Value>
+		<Value code="kU">0.99</Value>
+		<Value code="kI">0.99</Value>
 	</Values>

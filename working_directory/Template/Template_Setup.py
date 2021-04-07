@@ -97,7 +97,7 @@ class Setup:
         :return: Возвращаем наш Способ Конекта
         """
 
-        print(self.type_connect)
+        # print(self.type_connect)
         answer_JSON = self.options_setup.get(self.type_connect)(self)
 
         # Определяем размер в байтах

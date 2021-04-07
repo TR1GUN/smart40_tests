@@ -13,12 +13,18 @@ from working_directory.Template.Template_Meter_db_data_API.Template_list_ArchTyp
     ElecticEnergyValues_tag
 from working_directory.Template.Template_Meter_db_data_API.Template_define_tags_by_measure import DefineTagsByMeasure
 
-
+# ----------------------------------------------------------------------------------------------------------------------
+#                                         ГЕНЕРАТОР МАССИВА ДЛЯ TAGS
+# ----------------------------------------------------------------------------------------------------------------------
 # Здесь зададим Класс генератор для настроек
+
+
 class GeneratorTagsByDevices:
     """
     Класс для генерации массива tags
     """
+    measure = ''
+    tags = []
 
     # Конструктор для генерации тэгов - очень важно - принимает строковые значения
     def __init__(self, measure: str):
@@ -29,7 +35,6 @@ class GeneratorTagsByDevices:
 
     # А это очень важная штука - генерирует список тэгов относительно поля measure - Следовательно - подавать его
     def __generate_list_tags_by_devices(self, measure):
-
         # Получаем нужный набор всех тэгов из специального класса
         tags = DefineTagsByMeasure(measure).tag
         # После того как Мы определились с тэгами - пропускаем их через генератор значений
@@ -52,10 +57,10 @@ class GeneratorTagsByDevices:
         if tags is None:
             return None
         for i in range(len(tags)):
-            template_tags = {}
-            template_tags["tag"] = tags[i]
+
+            template_tags = {"tag": tags[i], "val": self.__definion_type_val(tags[i])}
+
             # по умолчанию ставим в double - 0.0
-            template_tags["val"] = self.__definion_type_val(tags[i])
 
             tags_json_list.append(template_tags)
 
@@ -86,12 +91,12 @@ class GeneratorTagsByDevices:
             # Итак - тут очень важно начнем витвление
             if self.measure in ['ElJrnlLimUAMax', 'ElJrnlLimUAMin', 'ElJrnlLimUBMax', 'ElJrnlLimUBMin',
                                 'ElJrnlLimUCMax', 'ElJrnlLimUCMin', 'ElJrnlPwrC', 'ElJrnlPwrB', 'ElJrnlPwrA',
-                                "ElJrnlPwr"]:
+                                "ElJrnlPwr", ]:
                 # Если у нас действительно этот тип значений , тогда что делаем - мы ставим либо 1 либо 0
                 # val = int(randint(0, 1))
                 val = 1
 
-            elif self.measure in ['ElJrnlUnAyth',"ElJrnlTrfCorr", 'ElJrnlReset']:
+            elif self.measure in ['ElJrnlUnAyth',"ElJrnlTrfCorr", 'ElJrnlReset', 'ElJrnlTimeCorr']:
                 val = 0
 
             # Иначе -  действуем по обычной схеме
@@ -138,27 +143,12 @@ class GeneratorTagsByDevices:
         """
         return self.tags
 
-    # А теперь очень важный момент - собираем так же к этому список из словарей для обработчика
+    def get_Castrom_Value(self, Castrom_Value:dict):
+        # Сюда спускаем и перезаписываем ТЭГИ которые были заранее Определены - ЭТО ВАЖНО
+        # Перебираем все возможные комбинации
+        for tag_castrom_value in Castrom_Value:
+            for i in range(len(self.tags)):
+                if tag_castrom_value == self.tags[i].get('tag'):
+                    # Если совпадают - То его перезаписываем
+                    self.tags[i]['val'] = Castrom_Value[tag_castrom_value]
 
-    # Здесь массив
-    def get_tags_deconstruct(self):
-        deconstruct = []
-        for i in range(len(self.tags)):
-            deconstruct.append(self.tags[i]['val'])
-
-        return deconstruct
-
-    # А здесь массив из словарей
-    def get_tags_deconstruct_dict(self):
-        deconstruct_dict = {}
-        for i in range(len(self.tags)):
-            if (self.tags[i]['val'] == True) or (self.tags[i]['val'] == False):
-                if self.tags[i]['val'] == True:
-                    deconstruct_dict[self.tags[i]['tag']] = 1
-                elif self.tags[i]['val'] == False:
-                    deconstruct_dict[self.tags[i]['tag']] = 0
-
-            else:
-                deconstruct_dict[self.tags[i]['tag']] = self.tags[i]['val']
-
-        return deconstruct_dict

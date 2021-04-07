@@ -5,12 +5,16 @@ from working_directory.Template.Template_Meter_devices_API.Template_json_archtyp
 from working_directory.Template.Template_Meter_devices_API.Template_generator_time import GeneratorTime
 
 
+from working_directory.Template.Template_Meter_devices_API.Template_generate_Timestamp_list import GenerateTimestamp
+
+
 class GenerateAnswer:
     """
     Генервтор ответа JSON для апи
     """
     JSON = {}
     type_job = ''
+    model = 'CE303'
     timestamp_of_request = None
 
     def __init__(self, job: str):
@@ -18,7 +22,7 @@ class GenerateAnswer:
         self.type_job = job
 
         # Сначала генерим отрезок времени который будем юзать -
-        self.timestamp_of_request = GeneratorTime(measure=job).time[0]
+        self.timestamp_of_request = GeneratorTime(measure=job).time
 
         # Теперь смотрим - какой тип ответа будем генерировать
         self.JSON = self.__definition_type_answer()
@@ -75,7 +79,7 @@ class GenerateAnswer:
         JSON = {
             'data': JSON_data,
             'res': 0
-        }
+                }
 
         return JSON
 
@@ -86,12 +90,32 @@ class GenerateAnswer:
         """
         # Переопределяем переменые
         measure = self.type_job
-        # Определяеем количество таймштампов для конкретного коллинечтва времени
+        # Определяеем количество таймштампов для конкретного коллинечтва времени - И генерируем их
 
-        count_ts = self.timestamp_of_request
+        # Генерируем нужные ts
+        Generate_Time = GenerateTimestamp(measure=self.type_job, Time=self.timestamp_of_request)
+        Generate_Time.cTime = 30
+        self.timestamp_list = Generate_Time.Generate_Timestamp_list()
+
         # Делаем заготовку -
 
         # Генерируем JSON
-        JSON_data = ArchTypesNameJSON(measure=measure, count_ts=count_ts).JSON
+        JSON_data = ArchTypesNameJSON(measure=measure, count_ts=self.timestamp_list).JSON
 
         return JSON_data
+
+    def __parse_xml(self):
+
+        from Emulator.Counters import Config_settings
+        from Emulator.ParserXML import ReadCounters
+
+        """
+        # Здесь парсим наш xml c настройками
+
+        """
+        path = Config_settings.path
+        # Получаем ПУТЬ
+        xmlpath = path + '/' + self.model + '.xml'
+
+        # Открываем
+        self.Settings = ReadCounters(xmlpath=xmlpath)

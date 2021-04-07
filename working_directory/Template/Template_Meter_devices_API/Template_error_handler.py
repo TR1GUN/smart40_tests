@@ -7,7 +7,6 @@ from working_directory.Template.Template_Meter_devices_API.Template_generator_an
     CompletionSupposedAnswer
 
 
-
 class ErrorHeandler:
     """
     Класс обработчик ошибок , чо б нет

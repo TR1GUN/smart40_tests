@@ -15,13 +15,14 @@ class ArchTypesNameJSON:
     Settings = None
     count_ts = None
 
-    def __init__(self, measure: str, count_ts):
+    def __init__(self, measure: str, count_ts, Settings=None):
         # Переопределяем поля
 
         self.measure = measure
         self.count_ts = count_ts
-        # Парсим наш файл с настройками
-        self.__parse_xml()
+        if Settings is None :
+            # Парсим наш файл с настройками
+            self.__parse_xml()
 
         # Собираем скелет json
         self.JSON = self.generator_JSON()
@@ -74,11 +75,13 @@ class ArchTypesNameJSON:
 
         # Пропишем условия генерации для параметра модели для команды получения серийника
         if self.measure in GetSerial_list:
-            model = {"model": ''}
+            # model = {"model": ''}
+            model = {}
         else:
             model = {"model": self.Settings.name}
 
         json_dict.update(model)
+
         return [json_dict]
 
     def __generate_vals(self):
@@ -104,6 +107,7 @@ class ArchTypesNameJSON:
                                             Settings=self.Settings).JSON_vals
             # Вытаскиваем нужное поле
             JSON_vals = JSON_vals["vals"]
+
         return JSON_vals
 
     def __generate_serial(self):

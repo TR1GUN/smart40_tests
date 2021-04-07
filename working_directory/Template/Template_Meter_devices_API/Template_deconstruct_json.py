@@ -155,7 +155,7 @@ class DeconstructGetSerial(Deconstruct):
     """
     Класс для валидации JSON + Его деконструктор до состояния набора масивов из ключей
 
-    ЗДЕСЬ НЕ УЧИТЫВАЕТСЯ TS
+    ЗДЕСЬ НЕ УЧИТЫВАЕТСЯ TS И ПОЛЕ MODEL
     """
 
     def parse_key_tags(self, vals):
@@ -181,6 +181,28 @@ class DeconstructGetSerial(Deconstruct):
 
         except:
             self.error.append('Ошибка при валидации поля tags')
+
+    def parse_key_vals(self, devices):
+        """
+        Проваливаемся в vals забирая все ключи что должны быть
+        :return:
+        """
+        try:
+            # Забираем все ключи , что насобирали
+            self.json_deconstruct_devices = {}
+
+
+            self.json_deconstruct_devices.update(self.json_deconstruct_measures)
+            # Добавляем все ключи что тут будут
+            # self.json_deconstruct_devices["devices_model"] = devices["model"]
+            self.json_deconstruct_devices["devices_serial"] = devices["serial"]
+            vals = devices["vals"]
+            # Теперь перебираем все возможные комбинации
+            for i in range(len(vals)):
+                self.parse_key_tags(vals[i])
+
+        except:
+            self.error.append('Ошибка при валидации поля vals')
 
 
 class DecostructSetType:

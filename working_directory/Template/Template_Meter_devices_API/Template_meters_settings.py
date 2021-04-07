@@ -13,7 +13,7 @@ ipconfig = '192.168.202.146:777'
 uart_tag = "9600,8n1"
 
 
-Meter_Types_Hub = {'Id' :'94'  ,'Type':'MILUR IC' , 'Class':'Hub' }
+Meter_Types_Hub = {'Id' :'94' ,'Type':'MILUR IC' , 'Class':'Hub' }
 
 
 uart_list = \

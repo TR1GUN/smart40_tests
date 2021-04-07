@@ -43,7 +43,7 @@ class Meter_DataBase:
 
         # При инициализации - смотрим - существует ли наша БД
         self.path_db = path + '/values.db'
-        print(self.path_db)
+        # print(self.path_db)
         # инициализируем нашу БД
         self.__initialization_database()
 
