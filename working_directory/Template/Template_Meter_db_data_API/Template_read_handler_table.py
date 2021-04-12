@@ -1809,12 +1809,19 @@ class SelectToDataBase:
                      'Valid': result[i]['Valid'],
                      'ts': result[i]['Timestamp']}
             # ЕСЛИ У НАС ВАЛИДНАЯ ЗАПИСЬ , ТО СЕЛЕКТИМ сопусттчвующие таблицы
-            if result[i]['Valid'] == 1:
+            # if result[i]['Valid'] == 1:
+            #     # Теперь для каждой команды -
+            #     for x in range(len(Command_table_list)):
+            #         command = Command_table_list[x] + ' AND Id = ' + str(result[i]['Id'])
+            #         select_result = sqlite.execute_command_to_read_return_dict(command)
+            #         if len(select_result) > 0:
+            #             Value.update(select_result[0])
+
                 # Теперь для каждой команды -
-                for x in range(len(Command_table_list)):
-                    command = Command_table_list[x] + ' AND Id = ' + str(result[i]['Id'])
-                    select_result = sqlite.execute_command_to_read_return_dict(command)
-                    if len(select_result) > 0:
-                        Value.update(select_result[0])
+            for x in range(len(Command_table_list)):
+                command = Command_table_list[x] + ' AND Id = ' + str(result[i]['Id'])
+                select_result = sqlite.execute_command_to_read_return_dict(command)
+                if len(select_result) > 0:
+                    Value.update(select_result[0])
             # Далее обновляем этим наш список селекта
             self.result.append(Value)
