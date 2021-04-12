@@ -1,5 +1,6 @@
 # Здесь расположем наш обработчик для уже сформированного JSON чтоб прочитать нужные таблицы
 from working_directory import sqlite
+from copy import deepcopy
 from working_directory.Template.Template_Meter_db_data_API import Template_SQL_request, Template_list_ArchTypes
 from working_directory.Template.Template_Meter_db_data_API.Template_list_ArchTypes import \
     ElectricConfig_ArchType_name_list, \
@@ -47,7 +48,7 @@ class ReceivingDataAccordingToJSON:
         self.result = self.__method_definition(JSON=JSON, Select_all=Select_all)
 
     def get_result(self):
-        return self.result
+        return deepcopy(self.result)
 
     def __method_definition(self, JSON: dict, Select_all: bool = True):
         """
@@ -83,7 +84,7 @@ class ReceivingDataAccordingToJSON:
     #     Конструктор простой - селект
     def __formation_sql_request_select(self, sql_request: str, json_list_devices: list, Select_all: bool):
         # Сначала проверяем надо ли нам селектить по ИД
-        if Select_all == False:
+        if not Select_all:
             select_by_id = self.__formation_sql_request_select_by_id(json_list_devices=json_list_devices)
 
             final_command = sql_request + " " + select_by_id
@@ -124,20 +125,27 @@ class ReceivingDataAccordingToJSON:
     # ElectricEnergyValues , ElectricQualityValues
     def __selected_with_view(self, Select_all: bool,
                              measures: dict,
-                             sql_command_to_table_select: str,
+                             sql_command_to_table_select: list,
                              sql_command_to_table_create_view: list,
                              sql_command_to_table_delete_view: list
                              ):
 
-        command = self.__formation_sql_request_select(sql_request=sql_command_to_table_select,
-                                                      json_list_devices=measures['devices'],
-                                                      Select_all=Select_all)
-        # Теперь отправляем нашу команду куда надо
-        result_select = sqlite.execute_selected_to_view_return_dict(command_select=command,
-                                                                    command_create_view=sql_command_to_table_create_view,
-                                                                    command_delete_view=sql_command_to_table_delete_view)
+        # command = self.__formation_sql_request_select(sql_request=sql_command_to_table_select,
+        #                                               json_list_devices=measures['devices'],
+        #                                               Select_all=Select_all)
+        #
+        # # Теперь отправляем нашу команду куда надо
+        # result_select = sqlite.execute_selected_to_view_return_dict(command_select=command,
+        #                                                             command_create_view=sql_command_to_table_create_view,
+        #                                                             command_delete_view=sql_command_to_table_delete_view)
 
-        return result_select
+        # Итак - все хуйня - начнем по новой - Получаем данные из MeterDadata
+        result = deepcopy(SelectToDataBase(JSON_measure=measures, select_all=Select_all,
+                                           Command_table_list=sql_command_to_table_select).result)
+
+        print('-----------------------------------------------')
+
+        return result
 
     def __selected_with_meterdata_and_another_table(self, Select_all: bool, measures: dict,
                                                     sql_command_to_table_select: str):
@@ -183,60 +191,101 @@ class ReceivingDataAccordingToJSON:
 
         # ElecticEnergyValues
         elif measure in ElecticEnergyValues_ArchType_name_list:
-            # здесь аккуратнее - надо все делать в несколько команд
-            sql_command_to_table_select = Template_SQL_request.ElectricEnergyValues_select
-            sql_command_to_table_create_view = Template_SQL_request.ElectricEnergyValues_create_rate_views
-            sql_command_to_table_delete_view = Template_SQL_request.ElectricEnergyValues_delete_rate_views
-            result_select = self.__selected_with_view(Select_all=Select_all,
-                                                      measures=JSON_measures_dict,
-                                                      sql_command_to_table_select=sql_command_to_table_select,
-                                                      sql_command_to_table_create_view=sql_command_to_table_create_view,
-                                                      sql_command_to_table_delete_view=sql_command_to_table_delete_view)
+            # # здесь аккуратнее - надо все делать в несколько команд
+            # sql_command_to_table_select = Template_SQL_request.ElectricEnergyValues_select
+            # sql_command_to_table_create_view = Template_SQL_request.ElectricEnergyValues_create_rate_views
+            # sql_command_to_table_delete_view = Template_SQL_request.ElectricEnergyValues_delete_rate_views
+
+            command = Template_SQL_request.ElectricEnergyValues_select_list
+
+            result_select = deepcopy(SelectToDataBase(JSON_measure=JSON_measures_dict,
+                                                      select_all=Select_all,
+                                                      Command_table_list=command).result)
+
+            # result_select = self.__selected_with_view(Select_all=Select_all,
+            #                                           measures=JSON_measures_dict,
+            #                                           sql_command_to_table_select=command,
+            #                                           sql_command_to_table_create_view=sql_command_to_table_create_view,
+            #                                           sql_command_to_table_delete_view=sql_command_to_table_delete_view)
 
         # ElectricQualityValues
         elif measure in ElectricQualityValues_ArchType_name_list:
             # здесь аккуратнее - надо все делать в несколько команд
-            sql_command_to_table_select = Template_SQL_request.ElectricQualityValues_select
-            sql_command_to_table_create_view = Template_SQL_request.ElectricQualityValues_create_rate_views
-            sql_command_to_table_delete_view = Template_SQL_request.ElectricQualityValues_delete_rate_views
+            # sql_command_to_table_select = Template_SQL_request.ElectricQualityValues_select
+            # sql_command_to_table_create_view = Template_SQL_request.ElectricQualityValues_create_rate_views
+            # sql_command_to_table_delete_view = Template_SQL_request.ElectricQualityValues_delete_rate_views
+            #
+            # result_select = self.__selected_with_view(Select_all=Select_all,
+            #                                           measures=JSON_measures_dict,
+            #                                           sql_command_to_table_select=sql_command_to_table_select,
+            #                                           sql_command_to_table_create_view=sql_command_to_table_create_view,
+            #                                           sql_command_to_table_delete_view=sql_command_to_table_delete_view)
 
-            result_select = self.__selected_with_view(Select_all=Select_all,
-                                                      measures=JSON_measures_dict,
-                                                      sql_command_to_table_select=sql_command_to_table_select,
-                                                      sql_command_to_table_create_view=sql_command_to_table_create_view,
-                                                      sql_command_to_table_delete_view=sql_command_to_table_delete_view)
+            command = Template_SQL_request.ElectricQualityValues_select_list
+
+            result_select = deepcopy(SelectToDataBase(JSON_measure=JSON_measures_dict,
+                                                      select_all=Select_all,
+                                                      Command_table_list=command).result)
+
         # ElectricPowerValues
         elif measure in ElectricPowerValues_ArchType_name_list:
-            sql_command_to_table = Template_SQL_request.ElectricPowerValues_select
+            # sql_command_to_table = Template_SQL_request.ElectricPowerValues_select
+            #
+            #
+            # result_select = self.__selected_with_meterdata_and_another_table(Select_all=Select_all,
+            #                                                                  measures=JSON_measures_dict,
+            #                                                                  sql_command_to_table_select=sql_command_to_table
+            #                                                                  )
 
-            result_select = self.__selected_with_meterdata_and_another_table(Select_all=Select_all,
-                                                                             measures=JSON_measures_dict,
-                                                                             sql_command_to_table_select=sql_command_to_table
-                                                                             )
+            command = Template_SQL_request.ElectricPowerValues_select_list
+
+            result_select = deepcopy(SelectToDataBase(JSON_measure=JSON_measures_dict,
+                                                      select_all=Select_all,
+                                                      Command_table_list=command).result)
+
         # PulseValues
         elif measure in PulseValues_ArchType_name_list:
-            sql_command_to_table = Template_SQL_request.PulseValues_select
+            # sql_command_to_table = Template_SQL_request.PulseValues_select
+            #
+            # result_select = self.__selected_with_meterdata_and_another_table(Select_all=Select_all,
+            #                                                                  measures=JSON_measures_dict,
+            #                                                                  sql_command_to_table_select=sql_command_to_table
+            #                                                                  )
 
-            result_select = self.__selected_with_meterdata_and_another_table(Select_all=Select_all,
-                                                                             measures=JSON_measures_dict,
-                                                                             sql_command_to_table_select=sql_command_to_table
-                                                                             )
+            command = Template_SQL_request.PulseValues_select_list
+
+            result_select = deepcopy(SelectToDataBase(JSON_measure=JSON_measures_dict,
+                                                      select_all=Select_all,
+                                                      Command_table_list=command).result)
+
         # DigitalValues
         elif measure in DigitalValues_ArchType_name_list:
-            sql_command_to_table = Template_SQL_request.DigitalValues_select
+            # sql_command_to_table = Template_SQL_request.DigitalValues_select
+            #
+            # result_select = self.__selected_with_meterdata_and_another_table(Select_all=Select_all,
+            #                                                                  measures=JSON_measures_dict,
+            #                                                                  sql_command_to_table_select=sql_command_to_table
+            #                                                                  )
 
-            result_select = self.__selected_with_meterdata_and_another_table(Select_all=Select_all,
-                                                                             measures=JSON_measures_dict,
-                                                                             sql_command_to_table_select=sql_command_to_table
-                                                                             )
+            command = Template_SQL_request.DigitalValues_select_list
+
+            result_select = deepcopy(SelectToDataBase(JSON_measure=JSON_measures_dict,
+                                                      select_all=Select_all,
+                                                      Command_table_list=command).result)
         # JournalValues
         elif measure in JournalValues_ArchType_name_list:
-            sql_command_to_table = Template_SQL_request.JournalValues_select
+            # sql_command_to_table = Template_SQL_request.JournalValues_select
+            #
+            # result_select = self.__selected_with_meterdata_and_another_table(Select_all=Select_all,
+            #                                                                  measures=JSON_measures_dict,
+            #                                                                  sql_command_to_table_select=sql_command_to_table
+            #                                                                  )
 
-            result_select = self.__selected_with_meterdata_and_another_table(Select_all=Select_all,
-                                                                             measures=JSON_measures_dict,
-                                                                             sql_command_to_table_select=sql_command_to_table
-                                                                             )
+            command = Template_SQL_request.JournalValues_select_list
+
+            result_select = deepcopy(SelectToDataBase(JSON_measure=JSON_measures_dict,
+                                                      select_all=Select_all,
+                                                      Command_table_list=command).result)
 
         else:
             result_select = [None]
@@ -248,9 +297,9 @@ class ReceivingDataAccordingToJSON:
     def __select_to_database_by_JSON_POST(self, JSON_measures: list, Select_all: bool):
         select_to_database = []
         for i in range(len(JSON_measures)):
+            # # Старый способ
             result_select = self.__table_qualifier(JSON_measures_dict=JSON_measures[i], Select_all=Select_all)
             select_to_database.append(result_select)
-
         return select_to_database
 
     # ----------------------------------------------GET----------------------------------------------------------------
@@ -265,7 +314,6 @@ class ReceivingDataAccordingToJSON:
         # определяем таблицы
         for i in range(len(self.JSON['measures'])):
             result = self.__get_define_table(self.JSON['measures'][i])
-
             result_full = result_full + result
 
         return result_full
@@ -714,7 +762,7 @@ class ReceivingDataAccordingToJSON:
                                   str(self.where_Timestamp)
                     else:
                         command = 'SELECT  ' + ' MeterData.Timestamp AS ts , ArchTypes.Name AS measure FROM ' + \
-                                  table + " AND ArchTypes.Name = \'" + str(self.__measure) +\
+                                  table + " AND ArchTypes.Name = \'" + str(self.__measure) + \
                                   "\'" + ' AND MeterData.DeviceIdx IN (' + \
                                   str(result_select_of_MeterTable_where_DeviceIdx[i]['deviceIdx']) + ' )   ' + \
                                   str(self.where_Timestamp)
@@ -760,7 +808,7 @@ class ReceivingDataAccordingToJSON:
                                   str(self.where_Timestamp)
                     else:
                         command = 'SELECT  ' + ' MeterData.Timestamp AS ts , ArchTypes.Name AS measure FROM ' + \
-                                  table + " AND ArchTypes.Name = \'" + str(self.__measure) +\
+                                  table + " AND ArchTypes.Name = \'" + str(self.__measure) + \
                                   "\'" + ' AND MeterData.DeviceIdx IN (' + \
                                   str(result_select_of_MeterTable_where_MeterId[i]['deviceIdx']) + ' )   ' + \
                                   str(self.where_Timestamp)
@@ -814,7 +862,7 @@ class ReceivingDataAccordingToJSON:
                                   str(self.where_Timestamp)
                     else:
                         command = 'SELECT  ' + ' MeterData.Timestamp AS ts , ArchTypes.Name AS measure FROM ' + \
-                                  table + " AND ArchTypes.Name = \'" + str(self.__measure) +\
+                                  table + " AND ArchTypes.Name = \'" + str(self.__measure) + \
                                   "\'" + ' AND MeterData.DeviceIdx IN ( ' + \
                                   str(idx_list[i]['deviceIdx']) + ' )   ' + \
                                   str(self.where_Timestamp)
@@ -933,9 +981,7 @@ class ReceivingDataAccordingToJSON:
                                   str(result_select_of_MeterTable_where_DeviceIdx[i]['deviceIdx']) + ' )   ' + \
                                   str(self.where_Timestamp)
 
-
                     # Опускаем это  в функцию обработчик
-
 
                     result_where_DeviceIdx = sqlite.execute_selected_to_view_return_dict(
                         command_create_view=create_view,
@@ -1356,7 +1402,6 @@ class RecordDataToDB:
         command_insert_full = command_insert_full[:-1]
         # отправляем в космос
 
-
         result = sqlite.execute_command_to_write_return_dict(command_insert_full)
         return result
 
@@ -1422,8 +1467,6 @@ class RecordDataToDB:
         ids = []
 
         for device_element in devices_list:
-
-
             data_insert_element = []
             data_insert_element.append(device_element['id'])
             ids.append(device_element['id'])
@@ -1438,8 +1481,6 @@ class RecordDataToDB:
 
             RecordTypeId = result_select_RecordTypeId[0]['Id']
             data_insert_element.append(RecordTypeId)
-
-
 
             data_insert_full = data_insert_full + str((tuple(data_insert_element))) + ','
 
@@ -1457,11 +1498,10 @@ class RecordDataToDB:
 
         # return sqlite.execute_command_to_read_return_dict(command_select_ids)
 
-
-        command_select_ids = 'SELECT Id ,DeviceIdx,Timestamp  FROM MeterData WHERE DeviceIdx IN (' + (len(tuple(ids)) * ', ? ')[1:] + ')'
+        command_select_ids = 'SELECT Id ,DeviceIdx,Timestamp  FROM MeterData WHERE DeviceIdx IN (' + (len(
+            tuple(ids)) * ', ? ')[1:] + ')'
 
         return sqlite.execute_command_values_to_write_return_dict(command=command_select_ids, values=tuple(ids))
-
 
     # ----------------------------------------------------------------------------------------------------------------------
     # Insert ElecticEnergyValues
@@ -1701,3 +1741,80 @@ class RecordDataToDB:
             result = sqlite.execute_command_values_to_write_return_dict(values=tuple(command_insert_full_list),
                                                                         command=command_insert)
         return result
+
+
+class SelectToMeterDataDataBase:
+    JSON_measure = {}
+    Select_all = None
+    result = [None]
+    Arch_Type_Id = 0
+
+    def __init__(self, JSON_measure, select_all):
+        self.JSON_measure = JSON_measure
+        # Итак - Первое что делаем - Определяем тип данных
+        self.Arch_Type_Id = self.__define_arch_type_id()
+        self.Select_all = select_all
+        # Теперь селектим нужные нам вещи - ИЩЕМ МЕТЕР ДАТУ
+        self.result = self.__define_MeterData()
+
+    def __define_arch_type_id(self):
+
+        command = 'SELECT Id , Name FROM ArchTypes WHERE Name == ' + '\'' + str(self.JSON_measure['measure']) + '\''
+        Arch_Type_Id = sqlite.execute_command_to_read_return_dict(command)
+        # Теперь очищаем от мусора - берем первый Элемент , и в нем айдишник
+        Arch_Type_Id = Arch_Type_Id[0]['Id']
+
+        return Arch_Type_Id
+
+    def __define_MeterData(self):
+        # ЕСЛИ СЕЛЕКТИМ ВСЕ :
+
+        command = 'SELECT * FROM MeterData ' + ' WHERE ' + ' RecordTypeId = ' + str(self.Arch_Type_Id)
+
+        # СЕЛЕКТИМ ТОЛЬКО ТЕ АЙДИШНИКИ ЧТО У НАС ЕСТЬ
+        if not self.Select_all:
+            IDx_list = []
+            for i in range(len(self.JSON_measure["devices"])):
+                IDx_list.append(deepcopy(self.JSON_measure["devices"][i]["id"]))
+
+            idx = '( '
+            for i in range(len(IDx_list)):
+                idx = idx + ' ' + str(IDx_list[i]) + ' ,'
+            idx = idx[:-1] + ' ) '
+            # Добавляем наш айдишник
+            command = command + ' AND ' + ' DeviceIdx in ' + idx
+
+        result = sqlite.execute_command_to_read_return_dict(command)
+
+        return result
+
+
+class SelectToDataBase:
+    JSON_measure = {}
+    Select_all = None
+    result = []
+
+    def __init__(self, JSON_measure, select_all, Command_table_list):
+        self.result = []
+        # переопрелеляем
+        self.JSON_measure = JSON_measure
+        # Теперь селектим метер дату
+        result = SelectToMeterDataDataBase(JSON_measure=JSON_measure, select_all=select_all).result
+
+        for i in range(len(result)):
+            # Проверяем поле валид
+
+            Value = {'Name': self.JSON_measure['measure'],
+                     'id': result[i]['DeviceIdx'],
+                     'Valid': result[i]['Valid'],
+                     'ts': result[i]['Timestamp']}
+            # ЕСЛИ У НАС ВАЛИДНАЯ ЗАПИСЬ , ТО СЕЛЕКТИМ сопусттчвующие таблицы
+            if result[i]['Valid'] == 1:
+                # Теперь для каждой команды -
+                for x in range(len(Command_table_list)):
+                    command = Command_table_list[x] + ' AND Id = ' + str(result[i]['Id'])
+                    select_result = sqlite.execute_command_to_read_return_dict(command)
+                    if len(select_result) > 0:
+                        Value.update(select_result[0])
+            # Далее обновляем этим наш список селекта
+            self.result.append(Value)

@@ -14,7 +14,6 @@ from working_directory.Template.Template_Meter_db_data_API.Template_read_handler
     ReceivingDataAccordingToJSON
 from working_directory.Connect.JSON_format_coding_decoding import decode_JSON, code_JSON
 
-
 from working_directory.Template.Template_Meter_db_data_API.Template_parse_answer_JSON import ParseAnswerMeterDataJSON
 import time
 from working_directory.log import log
@@ -518,25 +517,25 @@ class POST(MeterData):
             # селектим БД после записи
             data_base_after_recording = ReceivingDataAccordingToJSON(JSON=self.JSON_dict, Select_all=True).get_result()
 
-
             # И селектим в БД только записи что мы сделали
 
             data_base_was_recorded = ReceivingDataAccordingToJSON(JSON=self.JSON_dict, Select_all=False).get_result()
-
-
 
             result = POSTCheckUP(DataBase_before=data_base_before_recording,
                                  DataBase_after=data_base_after_recording,
                                  DataBase_was_recording=data_base_was_recorded,
                                  JSON_deconstruct=JSON_deconstruct).error_collector
+            print('result', result)
 
             result = self.__write_log(result)
 
         return result
 
+
 # # -------------------------------------------------------------------------------------------------------------------
 # Сделаем список из всех возможных ArchType
 from working_directory.Template.Template_Meter_db_data_API import Template_list_ArchTypes
+
 ArchTypes_full_list = \
     Template_list_ArchTypes.JournalValues_ArchType_name_list + \
     Template_list_ArchTypes.DigitalValues_ArchType_name_list + \
@@ -558,12 +557,15 @@ sleep(2)
 # # -------------------------------------------------------------------------------------------------------------------
 
 meterdata = POST(type_connect='virtualbox').Сustom_measures(
-                                                            list_measure=['ElDayEnergy'],
-                                                            count_id=1, count_ts=2,
-                                                            tags={
-                                                                  'A-0':None,'R+0':None,'R-0':None,'A+0':None,
-                                                                  'A+1':None, 'A+2':None, 'A+3':None, 'A+4':None}
-                                                            )
+    list_measure=['ElDayEnergy'],
+    count_id=1, count_ts=2,
+    tags={
+        'A-0': None, 'R+0': None, 'R-0': None, 'A+0': None,
+        'A-1': None, 'R+1': None, 'A+1': None, 'R-1': None,
+        'A+2': None, 'A-2': None, 'R+2': None, 'R-2': None,
+        'A+3': None, 'A-3': None, 'R+3': None, 'R-3': None,
+        'A+4': None, 'A-4': None, 'R+4': None, 'R-4': None, }
+)
 
 print(meterdata)
 

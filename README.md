@@ -70,7 +70,7 @@
 	pip install virtualbox
 	```
 	
-	- Так же для работы этой библиотеки необходимо установить SDK VirtualBox [Ссылка на скачивание SDK](https://download.virtualbox.org/virtualbox/6.1.18/VirtualBoxSDK-6.1.18-142142.zip)
+	- Так же для работы этой библиотеки необходимо установить SDK VirtualBox [Ссылка на скачивание SDK](https://download.virtualbox.org/virtualbox/6.1.18/VirtualBoxSDK-6.1.18-142142.zip) . Подробнее описанно в [инструцкции](https://pypi.org/project/virtualbox/)
 	
 
 - Библиотека эмитатора счетчика уже вшита в проект

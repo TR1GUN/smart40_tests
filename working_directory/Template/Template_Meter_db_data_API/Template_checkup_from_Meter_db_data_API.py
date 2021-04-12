@@ -602,10 +602,14 @@ class POSTCheckUP:
         # Итак - Переопределяем Поля - ЕТО ВАЖНО
         self.JSON_deconstruct = JSON_deconstruct
         self.DataBase_before = DataBase_before
+
         self.DataBase_after = DataBase_after
         self.DataBase_was_recording = DataBase_was_recording
 
-        self.error_collector = self.error_collector + self.__checkup_to_void()
+        # self.error_collector = self.error_collector + self.__checkup_to_void()
+        # self.JSON_deconstruct = self.__checkup_to_void()
+
+
         # Првоеряем валидность
         self.error_collector = self.error_collector + self.__checkup_field_valid()
 
@@ -635,11 +639,11 @@ class POSTCheckUP:
         for i in range(len(self.JSON_deconstruct)):
             # Теперь сюда пихаем ошибки на конкретный тип данных
             error_collector = error_collector + self.__checkup_element_certain_measure(
-                    JSON_deconstruct=self.JSON_deconstruct[i],
-                    DataBase_before=self.DataBase_before[i],
-                    DataBase_after=self.DataBase_after[i],
-                    DataBase_was_recording=self.DataBase_was_recording[i]
-                                                                                        )
+                JSON_deconstruct=self.JSON_deconstruct[i],
+                DataBase_before=self.DataBase_before[i],
+                DataBase_after=self.DataBase_after[i],
+                DataBase_was_recording=self.DataBase_was_recording[i]
+            )
 
         return error_collector
 
@@ -655,16 +659,16 @@ class POSTCheckUP:
                                           DataBase_was_recording):
         """Стадия проверки конкретного типа данных"""
         error = []
-        # print('\n--------------------------')
-        # print(JSON_deconstruct)
-        # print(DataBase_before)
-        # print(DataBase_after)
-        # print(DataBase_was_recording)
+        print('\n--------------------------')
+        print('JSON_deconstruct', JSON_deconstruct)
+        print('DataBase_before', DataBase_before)
+        print('DataBase_after', DataBase_after)
+        print('DataBase_was_recording', DataBase_was_recording)
 
         # Теперь первое что делаем - Получаем разницу что записалось по факту
         DataBase_after_the_fact = self.__getting_recording_record_after_fact(DataBase_after=DataBase_after,
                                                                              DataBase_before=DataBase_before)
-        # print('----------------------')
+        print('----------------------')
         # print(DataBase_after_the_fact)
         # print(len(DataBase_after_the_fact))
         # Сравниваем по длине того что получили
@@ -854,7 +858,8 @@ class POSTCheckUP:
         for i in range(len(database_was_recording)):
 
             for x in range(len(database_was_recording[i])):
-                if database_was_recording[i][x].get('Name') not in (Template_list_ArchTypes.ElectricConfig_ArchType_name_list + Template_list_ArchTypes.DigitalConfig_ArchType_name_list + Template_list_ArchTypes.PulseConfig_ArchType_name_list):
+                if database_was_recording[i][x].get('Name') not in (
+                        Template_list_ArchTypes.ElectricConfig_ArchType_name_list + Template_list_ArchTypes.DigitalConfig_ArchType_name_list + Template_list_ArchTypes.PulseConfig_ArchType_name_list):
                     if database_was_recording[i][x].get('Valid') != 1:
                         error = error + [
                             {
@@ -863,17 +868,50 @@ class POSTCheckUP:
                             }
                         ]
         return error
-# ----------------------------------------------------------------------------------------------------------------
+
+    # ----------------------------------------------------------------------------------------------------------------
     def __checkup_to_void(self):
         """Здесб проверяем наш JSON на наличие пустоты"""
-    # итак - первое что делаем - берем JSON и определяем - Есть ли что то ТРИ в ряд
+        # итак - первое что делаем - берем JSON и определяем - Есть ли что то ТРИ в ряд
+
         JSON = self.JSON_deconstruct
         # создаем список пустых возможных комбинаций
         # Теперь перебираем JSON на наличие пустоты
         for i in range(len(JSON)):
             for x in range(len(JSON[i])):
-                for keys in JSON[i][x]:
-                    # ТЕПЕРЬ ИЩЕМ ТРИ В РЯДвуау
-                    print(keys)
 
-        return []
+                for keys in JSON[i][x]:
+                    # Здесь расположим группы тэгов
+                    none_dict = {
+                        'tarif0': ['A+0', 'A-0', 'R+0', 'R-0'],
+                        'tarif1': ['A+1', 'A-1', 'R+1', 'R-1'],
+                        'tarif2': ['A+2', 'A-2', 'R+2', 'R-2'],
+                        'tarif3': ['A+3', 'A-3', 'R+3', 'R-3'],
+                        'tarif4': ['A+4', 'A-4', 'R+4', 'R-4'],
+                    }
+                    # Здесь их счет ПУТОСТЫ
+                    find_void = {
+                        'tarif0': 0,
+                        'tarif1': 0,
+                        'tarif2': 0,
+                        'tarif3': 0,
+                        'tarif4': 0,
+                    }
+
+                    # ТЕПЕРЬ ИЩЕМ ТРИ В РЯД
+                    if JSON[i][x][keys] is None:
+                        # ЕСли получили пустоту то смотрим ее вхождение в одну из категорий
+                        for katigory in none_dict:
+
+                            if keys in none_dict[katigory]:
+                                find_void[katigory] = find_void.get(katigory) + 1
+                        print(find_void)
+                # Если у нас накопилось по итогу больше 3 , то удаляем всю категорию
+                for tag in find_void:
+                    if find_void[tag] >= 3:
+                        tag_to_delete = none_dict[tag]
+                        for element in range(len(tag_to_delete)):
+                            print('--------eeeeeeeeee-')
+                            JSON[i][x].pop(tag_to_delete[element])
+                            print(JSON[i][x].pop(tag_to_delete[element]))
+        return JSON

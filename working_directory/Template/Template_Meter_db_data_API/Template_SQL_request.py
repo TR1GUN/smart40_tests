@@ -7,6 +7,66 @@
 #                                                 ElectricEnergyValues
 # ----------------------------------------------------------------------------------------------------------------------
 # Создание временных таблиц для ElectricEnergyValues
+ElectricEnergyValues_select_list = \
+    [
+        """
+        SELECT 
+        Am AS 'A-0' ,
+        Ap AS 'A+0' ,
+        Rm AS 'R-0' ,
+        Rp AS 'R+0' 
+        
+        FROM ElectricEnergyValues
+        WHERE
+        ElectricEnergyValues.Tariff == 0  
+        """,
+        """
+        SELECT 
+        Am AS 'A-1' ,
+        Ap AS 'A+1' ,
+        Rm AS 'R-1' ,
+        Rp AS 'R+1' 
+        
+        FROM ElectricEnergyValues
+        WHERE
+        ElectricEnergyValues.Tariff == 1  
+        """,
+
+        """
+        SELECT 
+        Am AS 'A-2' ,
+        Ap AS 'A+2' ,
+        Rm AS 'R-2' ,
+        Rp AS 'R+2' 
+        
+        FROM ElectricEnergyValues
+        WHERE
+        ElectricEnergyValues.Tariff == 2  
+        """,
+        """
+        SELECT 
+        Am AS 'A-3' ,
+        Ap AS 'A+3' ,
+        Rm AS 'R-3' ,
+        Rp AS 'R+3' 
+        
+        FROM ElectricEnergyValues
+        WHERE
+        ElectricEnergyValues.Tariff == 3  
+        """,
+        """
+        SELECT 
+        Am AS 'A-4' ,
+        Ap AS 'A+4' ,
+        Rm AS 'R-4' ,
+        Rp AS 'R+4' 
+        
+        FROM ElectricEnergyValues
+        WHERE
+        ElectricEnergyValues.Tariff == 4  
+        """,
+
+    ]
 
 ElectricEnergyValues_create_rate_views = ['''
     CREATE VIEW TARIF0 AS SELECT 
@@ -339,6 +399,78 @@ WHERE
 	MeterData.Id = Phase_C.Id AND 
 	MeterData.Id = Phase_Summ.Id
 '''
+ElectricQualityValues_select_list = \
+    [
+        """
+        SELECT 
+        U AS UA,
+        I AS IA ,
+        P AS  PA,
+        Q AS  QA,
+        S AS  SA,
+        KP AS  kPA,
+        Angle AS AngAB
+
+        FROM
+        ElectricQualityValues
+        
+        WHERE
+        ElectricQualityValues.Phase == 'A'
+        """,
+
+        """
+        SELECT
+         
+        U AS UB,
+	    I AS  IB,
+	    P AS  PB,
+	    Q AS  QB,
+	    S AS  SB,
+	    KP AS  kPB,
+	    Angle AS AngBC
+
+        FROM
+        ElectricQualityValues
+        
+        WHERE
+        ElectricQualityValues.Phase == 'B'
+        """,
+
+        """
+        SELECT 
+        U AS UC,
+	    I AS  IC,
+	    P AS  PC,
+	    Q AS  QC,
+	    S AS  SC,
+	    KP AS  kPC,
+	    Angle AS AngAC
+        
+
+        FROM
+        ElectricQualityValues
+
+        WHERE
+        ElectricQualityValues.Phase == 'C'
+        """,
+
+        """
+        SELECT 
+        
+        P  AS PS,
+	    Q AS QS,
+	    S AS SS,
+	    KP AS kPS,
+	    F AS Freq
+        
+        FROM
+        ElectricQualityValues
+        
+        WHERE
+        ElectricQualityValues.Phase == 'Summ'
+        """,
+
+    ]
 
 # Удаление этих временных представлений для ElectricEnergyValues
 
@@ -387,6 +519,23 @@ WHERE
 	DeviceIdx > 0
 
 """
+
+ElectricPowerValues_select_list = ["""
+SELECT	
+
+	Period AS cTime,
+	Pp AS 'P+' ,
+	Pm AS 'P-',
+	Qp AS 'Q+',
+	Qm AS 'Q-',
+	Partial AS isPart,
+	Overflow AS isOvfl ,
+	Season AS isSummer
+
+FROM ElectricPowerValues
+WHERE
+	Id > 0
+"""]
 
 ElectricPowerValues_insert = 'INSERT INTO ElectricPowerValues(Id , Period, Pp, Qp , Pm, Qm ,Partial, Overflow, Season ) VALUES (?, ?,?, ?,?, ?,?, ?, ?)'
 
@@ -440,6 +589,48 @@ WHERE
 	ArchTypes.Id = MeterData.RecordTypeId AND 
 	PulseValues.Id = MeterData.Id AND 
 	DeviceIdx > 0
+"""
+
+PulseValues_select_list = """
+SELECT 
+
+    Channels ,
+    Chnl1     AS   Pls1    ,
+    Chnl2     AS   Pls2    ,
+    Chnl3     AS   Pls3    ,
+    Chnl4     AS   Pls4    ,
+    Chnl5     AS   Pls5    ,
+    Chnl6     AS   Pls6    ,
+    Chnl7     AS   Pls7    ,
+    Chnl8     AS   Pls8    ,
+    Chnl9     AS   Pls9    ,
+    Chnl10    AS   Pls10    ,
+    Chnl11    AS   Pls11    ,
+    Chnl12    AS   Pls12    ,
+    Chnl13    AS   Pls13    ,
+    Chnl14    AS   Pls14    ,
+    Chnl15    AS   Pls15    ,
+    Chnl16    AS   Pls16    ,
+    Chnl17    AS   Pls17    ,
+    Chnl18    AS   Pls18    ,
+    Chnl19    AS   Pls19    ,
+    Chnl20    AS   Pls20    ,
+    Chnl21    AS   Pls21    ,
+    Chnl22    AS   Pls22    ,
+    Chnl23    AS   Pls23    ,
+    Chnl24    AS   Pls24    ,
+    Chnl25    AS   Pls25    ,
+    Chnl26    AS   Pls26    ,
+    Chnl27    AS   Pls27    ,
+    Chnl28    AS   Pls28    ,
+    Chnl29    AS   Pls29    ,
+    Chnl30    AS   Pls30    ,
+    Chnl31    AS   Pls31    ,
+    Chnl32    AS   Pls32
+
+FROM  PulseValues
+WHERE
+	Id  > 0
 """
 
 PulseValues_insert = 'INSERT INTO PulseValues (Id,Channels,  Chnl1 ,  Chnl2 ,  Chnl3 ,  Chnl4 ,  Chnl5 ,  Chnl6 ,  ' \
@@ -505,6 +696,52 @@ WHERE
 
 """
 
+DigitalValues_select_list = ["""
+SELECT 
+
+	Channels       ,
+    Chnl1         ,
+    Chnl2         ,
+    Chnl3         ,
+    Chnl4         ,
+    Chnl5         ,
+    Chnl6         ,
+    Chnl7         ,
+    Chnl8         ,
+    Chnl9         ,
+    Chnl10        ,
+    Chnl11        ,
+    Chnl12        ,
+    Chnl13        ,
+    Chnl14        ,
+    Chnl15        ,
+    Chnl16        ,
+    Chnl17        ,
+    Chnl18        ,
+    Chnl19        ,
+    Chnl20        ,
+    Chnl21        ,
+    Chnl22        ,
+    Chnl23        ,
+    Chnl24        ,
+    Chnl25        ,
+    Chnl26        ,
+    Chnl27        ,
+    Chnl28        ,
+    Chnl29        ,
+    Chnl30        ,
+    Chnl31        ,
+    Chnl32    
+
+
+
+
+FROM  DigitalValues
+WHERE
+	Id > 0
+
+"""]
+
 DigitalValues_insert = 'INSERT INTO DigitalValues (Id,Channels,  Chnl1 ,  Chnl2 ,  Chnl3 ,  Chnl4 ,  Chnl5 ,  Chnl6 ,  Chnl7 ,  Chnl8 ,  Chnl9 ,  Chnl10 ,  Chnl11 ,  Chnl12 ,  Chnl13 ,  Chnl14 ,  Chnl15 ,  Chnl16 ,  Chnl17 ,  Chnl18 ,  Chnl19 ,  Chnl20 ,  Chnl21 ,  Chnl22 ,  Chnl23 ,  Chnl24 ,  Chnl25 ,  Chnl26 ,  Chnl27 ,  Chnl28 ,  Chnl29 ,  Chnl30 ,  Chnl31 ,  Chnl32) VALUES (? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ?)'
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -534,6 +771,18 @@ WHERE
 	JournalValues.Id = MeterData.Id AND 
 	DeviceIdx > 0
 """
+
+
+JournalValues_select_list = ["""
+SELECT 
+    Event     AS  event ,
+    EventId    AS eventId
+
+FROM  JournalValues
+WHERE
+	Id  > 0
+"""]
+
 
 JournalValues_insert = """
                         INSERT INTO    JournalValues (          Id ,
