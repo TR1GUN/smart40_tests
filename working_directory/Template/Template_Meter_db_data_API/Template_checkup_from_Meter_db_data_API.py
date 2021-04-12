@@ -1,5 +1,6 @@
 # А здесь расположим обработчик , да да  да
 from working_directory.Template.Template_Meter_db_data_API import Template_list_ArchTypes
+from copy import deepcopy
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -595,7 +596,8 @@ class POSTCheckUP:
     DataBase_was_recording = []
     tags = ['Name', 'id', 'ts']
 
-    def __init__(self, JSON_deconstruct: list,
+    def __init__(self,
+                 JSON_deconstruct: list,
                  DataBase_before: list,
                  DataBase_after: list,
                  DataBase_was_recording: list):
@@ -607,8 +609,7 @@ class POSTCheckUP:
         self.DataBase_was_recording = DataBase_was_recording
 
         # self.error_collector = self.error_collector + self.__checkup_to_void()
-        # self.JSON_deconstruct = self.__checkup_to_void()
-
+        self.JSON_deconstruct = self.__checkup_to_void()
 
         # Првоеряем валидность
         self.error_collector = self.error_collector + self.__checkup_field_valid()
@@ -841,26 +842,23 @@ class POSTCheckUP:
         error = []
         database_was_recording = self.DataBase_was_recording
 
-        # print(database_was_recording)
-        # if (database_was_recording[0][0]['Name'] not in (Template_list_ArchTypes.ElectricConfig_ArchType_name_list +
-        #                                                 Template_list_ArchTypes.DigitalConfig_ArchType_name_list +
-        #                                                 Template_list_ArchTypes.PulseConfig_ArchType_name_list)):
-        #     for i in range(len(database_was_recording)):
-        #         print('ЗДЕСЬ', database_was_recording[i])
-        #         for x in range(len(database_was_recording[i])):
-        #             if database_was_recording[i][x]['Valid'] != 1:
-        #                 error = error + [
-        #                     {
-        #                         'error': 'Поле Valid приняло не правильное значение',
-        #                         'Элемент где записанно не правильно - ': database_was_recording[i]
-        #                     }
-        #                 ]
         for i in range(len(database_was_recording)):
 
             for x in range(len(database_was_recording[i])):
                 if database_was_recording[i][x].get('Name') not in (
-                        Template_list_ArchTypes.ElectricConfig_ArchType_name_list + Template_list_ArchTypes.DigitalConfig_ArchType_name_list + Template_list_ArchTypes.PulseConfig_ArchType_name_list):
+                        Template_list_ArchTypes.ElectricConfig_ArchType_name_list +
+                        Template_list_ArchTypes.DigitalConfig_ArchType_name_list +
+                        Template_list_ArchTypes.PulseConfig_ArchType_name_list
+                                                                    ):
                     if database_was_recording[i][x].get('Valid') != 1:
+                        # Так - Поле Валид не равно 1 , то проверяем  что у нас в JSON
+
+
+                        # print(self.JSON_deconstruct)
+                        # Проверяем набор элементарных ключей
+                        # for keys in database_was_recording[i][x]:
+                        #     if database_was_recording[i][x].get(keys) not in ['Name', 'id', 'Valid', 'ts'] :
+
                         error = error + [
                             {
                                 'error': 'Поле Valid приняло не правильное значение',
@@ -871,47 +869,41 @@ class POSTCheckUP:
 
     # ----------------------------------------------------------------------------------------------------------------
     def __checkup_to_void(self):
-        """Здесб проверяем наш JSON на наличие пустоты"""
-        # итак - первое что делаем - берем JSON и определяем - Есть ли что то ТРИ в ряд
+        """Здесб проверяем наш JSON на наличие пустоты - и удаляем то что не должно было записываться"""
+        # Определяем Тэги категорий
+        none_dict_etalon = {
+            'tarif0': ['A+0', 'A-0', 'R+0', 'R-0'],
+            'tarif1': ['A+1', 'A-1', 'R+1', 'R-1'],
+            'tarif2': ['A+2', 'A-2', 'R+2', 'R-2'],
+            'tarif3': ['A+3', 'A-3', 'R+3', 'R-3'],
+            'tarif4': ['A+4', 'A-4', 'R+4', 'R-4'],
+        }
 
-        JSON = self.JSON_deconstruct
-        # создаем список пустых возможных комбинаций
-        # Теперь перебираем JSON на наличие пустоты
-        for i in range(len(JSON)):
-            for x in range(len(JSON[i])):
+        # Теперь перебираем все возможные комбинации по типам данных
+        for i in range(len(self.JSON_deconstruct)):
+            # Перебираем по айдишникам и их таймштампам
+            for x in range(len(self.JSON_deconstruct[i])):
+                # Теперь перебираем нащи КЛЮЧИ ОПРЕДЕЛЕННОГО СЛОВАРЯ
 
-                for keys in JSON[i][x]:
-                    # Здесь расположим группы тэгов
-                    none_dict = {
-                        'tarif0': ['A+0', 'A-0', 'R+0', 'R-0'],
-                        'tarif1': ['A+1', 'A-1', 'R+1', 'R-1'],
-                        'tarif2': ['A+2', 'A-2', 'R+2', 'R-2'],
-                        'tarif3': ['A+3', 'A-3', 'R+3', 'R-3'],
-                        'tarif4': ['A+4', 'A-4', 'R+4', 'R-4'],
-                    }
-                    # Здесь их счет ПУТОСТЫ
-                    find_void = {
-                        'tarif0': 0,
-                        'tarif1': 0,
-                        'tarif2': 0,
-                        'tarif3': 0,
-                        'tarif4': 0,
-                    }
+                none_dict = deepcopy(none_dict_etalon)
+                for keys_for_tag in self.JSON_deconstruct[i][x]:
 
-                    # ТЕПЕРЬ ИЩЕМ ТРИ В РЯД
-                    if JSON[i][x][keys] is None:
-                        # ЕСли получили пустоту то смотрим ее вхождение в одну из категорий
-                        for katigory in none_dict:
+                    # Игнорируем наши тэги по умолчанию
+                    if keys_for_tag not in ['Name', 'id', 'Valid', 'ts']:
 
-                            if keys in none_dict[katigory]:
-                                find_void[katigory] = find_void.get(katigory) + 1
-                        print(find_void)
-                # Если у нас накопилось по итогу больше 3 , то удаляем всю категорию
-                for tag in find_void:
-                    if find_void[tag] >= 3:
-                        tag_to_delete = none_dict[tag]
-                        for element in range(len(tag_to_delete)):
-                            print('--------eeeeeeeeee-')
-                            JSON[i][x].pop(tag_to_delete[element])
-                            print(JSON[i][x].pop(tag_to_delete[element]))
-        return JSON
+                        # Теперь Ищем НУЛЛ значения в нашем тэге
+                        if self.JSON_deconstruct[i][x][keys_for_tag] is None:
+                            # Если он пустой - то ищем его в нашей копии
+                            for category in none_dict:
+                                if keys_for_tag in none_dict[category]:
+                                    # Удаляем его
+                                    none_dict[category].pop(none_dict[category].index(keys_for_tag))
+                # ТЕПЕРЬ - смотрим - какие из категорий остались пустые
+                for category in none_dict:
+                    # Если категория пуста - то получаем все тэги категории
+                    if len(none_dict[category]) == 0:
+                        tags_list = none_dict_etalon[category]
+                        # Теперь проходимся по листу - и удаляем все эти тэги из элемента JSON
+                        for name_tag in tags_list:
+                            self.JSON_deconstruct[i][x].pop(name_tag)
+        return self.JSON_deconstruct
