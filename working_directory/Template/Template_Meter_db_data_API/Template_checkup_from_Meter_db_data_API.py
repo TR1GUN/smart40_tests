@@ -8,456 +8,272 @@ from copy import deepcopy
 # ---------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------------------------
+class CheckUp:
 
-class CheckUP:
+    # //////
+    def _checkup_element_certain_measure(self,
+                                         # Наш JSON
+                                         JSON_deconstruct,
+                                         # Наша БД что записалось согласно JSON
+                                         DataBase_was_recording
+                                         ):
+        """Стадия проверки конкретного типа данных"""
+        error_list = []
+
+        # Делаем коприю бд для проверки на нулевые значения
+        self.database_for_checkup_NULL = deepcopy(DataBase_was_recording)
+        for i in range(len(JSON_deconstruct)):
+            # сравниваем ПОЭЛЕМЕНТНО
+            error = self._checkup_json_with_database(JSON_Element=JSON_deconstruct[i],
+                                                     database=DataBase_was_recording)
+            error_list = error_list + error
+        if len(error_list) == 0:
+            # После чего очищаем нашу скоророванную БД от значений которые проверили
+
+            error = self._check_up_null_values(database=self.database_for_checkup_NULL)
+            error_list = error_list + error
+        return error_list
+
+    # ///--------------------------         ПОНИЖАЕМ УРОВЕНЬ АБСТРАКЦИИ     -------------------------------------------
+    # ///--------------------------         ИЩЕМ ЭЛЕМЕНТ JSON ВО ВСЕЙ БД    -------------------------------------------
+    def _checkup_json_with_database(self, JSON_Element, database):
+        '''Итак - Здесь приводим сравнивание JSON по ключаем '''
+        # Итак = Перебираем нашу БД
+        error_list = []
+        element_id = None
+        element_ts = None
+
+        # Делаем коприю бд для проверки на нулевые значения
+
+        for i in range(len(database)):
+            # Ищем здесь две связки - таймштамп и айди
+            JSON_Element['id'] = int(JSON_Element['id'])
+            database[i]['id'] = int(database[i]['id'])
+            JSON_Element['ts'] = int(JSON_Element['ts'])
+            database[i]['ts'] = int(database[i]['ts'])
+
+            if (int(JSON_Element['id']) == int(database[i]['id'])) and (
+                    int(JSON_Element['ts']) == int(database[i]['ts'])):
+                # Если мы нашли нужный таймштамп нужного айдишника - Продолжаем
+
+                # здесь сравниваем уже конкретные значения нашего полученного JSON c Записью
+                error = self._check_up_element_keys(data_base_element=database[i], JSON_element=JSON_Element)
+
+                self.database_for_checkup_NULL.remove(database[i])
+                error_list = error_list + error
+
+            if JSON_Element['id'] == database[i]['id']:
+                element_id = i
+
+            if JSON_Element['ts'] == database[i]['ts']:
+                element_ts = i
+
+            # Если не нашли нужный Элемент
+        if element_id is None:
+            error_list = error_list + [{'Не удалось найти Элемент JSON id ': JSON_Element['id'],
+                                        'JSON_Element': JSON_Element,
+                                        'То что записали в БД': database}]
+        if element_ts is None:
+            error_list = error_list + [{'Не удалось найти Элемент JSON ts ': JSON_Element['ts'],
+                                        'JSON_Element': JSON_Element,
+                                        'То что записали в БД': database}]
+        # Теперь првоеряем что все показатели стоят в null
+
+        return error_list
+
+    # ///--------------------------         ПОНИЖАЕМ УРОВЕНЬ АБСТРАКЦИИ     -------------------------------------------
+    # ///--------------------------      СРАВНИВАЕМ ЭЛЕМЕННТ JSON и ЭЛЕМЕНТ БД    -------------------------------------
+
+    def _check_up_element_keys(self, data_base_element: dict, JSON_element: dict):
+        """Сравнивание поэлементно """
+        error = []
+        error_keys = []
+        # Сначала проверяем значения ответа
+        for keys in data_base_element:
+            # отбрасываем ключ diff
+            if keys not in ['diff', 'Valid']:
+                # Теперь сравниваем значения
+                if keys in JSON_element:
+                    data_base_value = data_base_element.get(keys)
+                    JSON_value = JSON_element.get(keys)
+
+                    # Теперь проверяем их равнество
+
+                    if (type(JSON_value) == float) and (type(data_base_value) == float):
+
+                        epsilon = 5.96e-08
+
+                        # if abs(normal_value / answer_value - 1) > epsilon:
+                        if abs(JSON_value - data_base_value) > epsilon:
+                            error_string = {
+                                'Неравенство значений Ключа': str(keys),
+                                'Значение ключа в БД': data_base_value,
+                                'Значение ключа в   JSON ': JSON_value
+                            }
+
+                            # Добавляем это в ошибку , и добавляем наш ключ
+                            error.append(error_string)
+                            error_keys.append(keys)
+                    else:
+                        if data_base_value != JSON_value:
+                            error_string = {
+                                'Неравенство значений Ключа': str(keys),
+                                'Значение ключа JSON ': JSON_value,
+                                'Значение ключа в БД': data_base_value
+                            }
+                            # Добавляем это в ошибку , и добавляем наш ключ
+                            error.append(error_string)
+                            error_keys.append(keys)
+                else:
+                    error_string = {
+                        'Ключа нет в БД': str(keys),
+                        'Значение БД': data_base_element,
+                        'Значение JSON': JSON_element,
+                    }
+
+                    # Добавляем это в ошибку , и добавляем наш ключ
+                    error.append(error_string)
+
+        for keys in JSON_element:
+            # отбрасываем ключ diff
+            if keys not in ['diff', 'Valid']:
+                if keys not in error_keys:
+                    # Теперь смотрим вхождения в нужный диапазон
+                    if keys in data_base_element:
+                        data_base_value = data_base_element.get(keys)
+                        JSON_value = JSON_element.get(keys)
+
+                        # Теперь проверяем их равнество
+
+                        if (type(JSON_value) == float) or (type(data_base_value) == float):
+                            epsilon = 5.96e-08
+                            # if abs(normal_value / answer_value - 1) > epsilon:
+                            if abs(JSON_value - data_base_value) > epsilon:
+                                error_string = {
+                                    'Неравенство значений Ключа': str(keys),
+                                    'Значение ключа в JSON ': JSON_value,
+                                    'Значение ключа в БД': data_base_value
+                                }
+
+                                # Добавляем это в ошибку , и добавляем наш ключ
+                                error.append(error_string)
+
+                        else:
+                            if data_base_value != JSON_value:
+                                error_string = {
+                                    'Неравенство значений Ключа': str(keys),
+                                    'Значение ключа в JSON ': JSON_value,
+                                    'Значение ключа в БД': data_base_value
+                                }
+
+                                # Добавляем это в ошибку , и добавляем наш ключ
+                                error.append(error_string)
+                    # Иначе отбрасываем ошибку - Не вхождения в нужный диапазон
+                    else:
+                        error_string = {
+                            'Ключа нет в БД': str(keys),
+                            'Значение БД': data_base_element,
+                            'Значение JSON': JSON_element,
+                        }
+
+                        # Добавляем это в ошибку , и добавляем наш ключ
+                        error.append(error_string)
+
+        return error
+
+    # ///--------------------------         ПОНИЖАЕМ УРОВЕНЬ АБСТРАКЦИИ     -------------------------------------------
+    # ///--------------------------      СРАВНИВАЕМ ЭЛЕМЕННТ JSON и ЭЛЕМЕНТ БД    -------------------------------------
+    def _check_up_null_values(self, database):
+        """Здесь должны остаться только значения НУЛЕВЫЕ , ПОЭТОМУ ЕСЛИ ИНАЧЕ - ВЫБРАСЫВАЕМ ОШИБКУ"""
+        error_list = []
+        for i in range(len(database)):
+            for key in database[i].keys():
+                if key not in ['Name', 'id', 'ts', 'Valid']:
+                    # ЕСЛИ ЗНАЧЕНИЕ НЕ НУЛЕВОЕ _ ВЫБРАСЫВАЕМ ОШИБКУ
+                    if database[i][key] is not None:
+                        error = [{'Не None ЗНАЧЕНИЯ КЛЮЧА ' + key: database[i][key], 'Элемент БД - ': database[i],
+                                  "ЭЛЕМЕНТ Time": database['ts']}]
+                        error_list = error_list + error
+        return error_list
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
+# -------------------------------- Служебный класс для переопределения ТЭГОВ JSON -------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
+
+class RedefinitionValuesTags:
     """
-    Класс для проверки что есть в базе данных и что в итоге мы получили
+    В Этом классе переопределяем наши некоторые значения тэгов привендя их к тому значению как обычно записываюся
 
     """
-    dublicate = None
-    error_collector = None
-    tags = None
-
-    def __init__(self):
-        self.error_collector = None
-        self.tags = []
-
-    # ---------------------------------Вспомогательные функции - старые ------------------------------------------------
-    # ------------------------------------------------------------------------------------------------------------------
-    #     Вспомомгательная функция расчета каждого из элементов
-    def __checkup_list_element_value_ArchType_Name(self, database_before: list,
-                                                   database_after: list,
-                                                   database_was_recording: list,
-                                                   json_content: list):
-
-        result_total = []
-        # Теперь берем расчет по каждому из элементов
-        for i in range(len(json_content)):
-            # а теперь каждый элемент пихаем в сравниватель
-            result = self.__checkup_by_element_ArchType_Name(database_after=database_after[i],
-                                                             database_before=database_before[i],
-                                                             database_was_recording=database_was_recording[i],
-                                                             json_content=json_content[i]
-                                                             )
-
-            if len(result) != 0:
-                result_total.append(result)
-
-        return result_total
-
-    # ---------------------------------------------------------------------------------------------------------------------
-    #     В этой функции сравниваем каждый элемент
-    def __checkup_by_element_ArchType_Name(self,
-                                           database_before: list,
-                                           database_after: list,
-                                           database_was_recording: list,
-                                           json_content: list):
-        result = []
-        # Первое что должны сделать - определиться с тэгом что лежит  в Name
-        # и исходя из него составляем лист тэгов что содержится в нем
-        archtype_name = json_content[0]['Name']
-
-        if archtype_name in Template_list_ArchTypes.ElectricConfig_ArchType_name_list:
-            tags_name = Template_list_ArchTypes.ElectricConfig_tag
-        elif archtype_name in Template_list_ArchTypes.PulseConfig_ArchType_name_list:
-            tags_name = Template_list_ArchTypes.PulseConfig_tag
-        elif archtype_name in Template_list_ArchTypes.DigitalConfig_ArchType_name_list:
-            tags_name = Template_list_ArchTypes.DigitalConfig_tag
-        elif archtype_name in Template_list_ArchTypes.ElecticEnergyValues_ArchType_name_list:
-            tags_name = Template_list_ArchTypes.ElecticEnergyValues_tag
-        elif archtype_name in Template_list_ArchTypes.ElectricQualityValues_ArchType_name_list:
-            tags_name = Template_list_ArchTypes.ElectricQualityValues_tag
-        elif archtype_name in Template_list_ArchTypes.ElectricPowerValues_ArchType_name_list:
-            tags_name = Template_list_ArchTypes.ElectricPowerValues_tag
-        elif archtype_name in Template_list_ArchTypes.PulseValues_ArchType_name_list:
-            tags_name = Template_list_ArchTypes.PulseValues_tag
-        elif archtype_name in Template_list_ArchTypes.DigitalValues_ArchType_name_list:
-            tags_name = Template_list_ArchTypes.DigitalValues_tag
-        elif archtype_name in Template_list_ArchTypes.JournalValues_ArchType_name_list:
-            tags_name = Template_list_ArchTypes.JournalValues_tag
-
-        # Иначе - отбрасываем ошибку
-        else:
-            result = [{'error': 'Неправильно сформированно archtypes name'}]
-
-        # После этого - проверяем на дубликаты , и отправляем в сравниватель
-        if len(result) == 0:
-            # Если нет ошибок то Добаввляем нужные тэги
-            tags_name = ['id', 'ts'] + tags_name
-
-            #  запускаем нашу функцию сравнивания
-            result = self.__function_checkup_line(database_after_list=database_after,
-                                                  database_before_list=database_before,
-                                                  database_was_recording_list=database_was_recording,
-                                                  json_content_list=json_content,
-                                                  tags_list=tags_name)
-
-        return result
-
-    # ---------------------------------------------------------------------------------------------------------------------
-    #     функция слепливания нужных значений в единый стринг по ключу
-    def __concatenation_of_key_values_to_str(self, dict_list: list, name_key: list):
-
-        value_str_set = set()
-
-        for i in range(len(dict_list)):
-            # Шаблон слепливания:
-            value_dict = ''
-            for x in range(len(name_key)):
-                value_dict = str(value_dict) + str(' , ') + str(name_key[x]) + str(' : ') + str(
-                    dict_list[i][name_key[x]])
-            # и добавляем в множество
-            value_str_set.add(value_dict)
-        return value_str_set
-
-    # ---------------------------------------------------------------------------------------------------------------------
-    #    А это самая главная функция сравнивания
-    def __function_checkup_line(self,
-                                database_before_list: list,
-                                database_after_list: list,
-                                database_was_recording_list: list,
-                                json_content_list: list,
-                                tags_list: list):
-
-        # Включаем обработчик ошибок
-        error_collector = []
-        # В начале все превращаем в сеты:
-        database_before_set = self.__concatenation_of_key_values_to_str(dict_list=database_before_list,
-                                                                        name_key=tags_list)
-
-        database_after_set = self.__concatenation_of_key_values_to_str(dict_list=database_after_list,
-                                                                       name_key=tags_list)
-
-        database_was_recording_set = self.__concatenation_of_key_values_to_str(dict_list=database_was_recording_list,
-                                                                               name_key=tags_list)
-
-        json_content_set = self.__concatenation_of_key_values_to_str(dict_list=json_content_list,
-                                                                     name_key=tags_list)
-        # Теперь проверяем на дубликаты :
-        if (len(database_before_set) != len(database_before_list)) and \
-                (len(database_after_set) != len(database_after_list)) and \
-                (len(database_was_recording_set) != len(database_was_recording_list)) and \
-                (len(json_content_set) != len(json_content_list)):
-            error_collector.append({"error": 'Записанны дубликаты: '})
-
-        # Теперь начинаем сравнивать эты сеты
-        # Получаем разницу сетов
-
-        database_expect_was_recording_set = database_after_set - database_before_set
-
-        # теперь посмотрим - равно ли то что записали JSON что отправили на запись
-        if (database_was_recording_set == json_content_set):
-
-            if (database_expect_was_recording_set == database_was_recording_set):
-
-                if len(database_expect_was_recording_set - json_content_set) != 0:
-                    result = database_expect_was_recording_set - json_content_set
-                    error_collector.append({"error": 'Записанные значения больше чем значения JSON. Лишние значения: ',
-                                            'numper': result,
-                                            'numper json': json_content_set - database_expect_was_recording_set})
-            else:
-                result = database_expect_was_recording_set - database_was_recording_set
-                error_collector.append({"error": 'Записанные значения не равны запсианным по селекту,значения: ',
-                                        'numper': result})
-        else:
-            result = database_expect_was_recording_set - json_content_set
-            error_collector.append({
-                "error": 'Данные что отправили на запись не равны тому что записались, неправильно записанные значения',
-                'numper': result,
-                'numper jSON': json_content_set - database_expect_was_recording_set})
-        return error_collector
-
-    # ---------------------------------------------------------------------------------------------------------------------
-    # # для начала получим наши данные - нам нужны БД до , БД после , БД что было записанно , и контент джейсона в формате бд
-    # def checkup_post_old(self, database_before: list, database_after: list, database_was_recording: list,
-    #                      json_content: list):
-    #     # Обновим значение сборщика ошибок - теперь это пустой массив
-    #     self.error_collector = []
-    #     # Теперь надо проверить их длину - их длина должна быть одинакова - потому что нам нужны все archtypes name
-    #
-    #     if (len(json_content) == len(database_before)) and \
-    #             (len(json_content) == len(database_after)) and \
-    #             (len(json_content) == len(database_was_recording)):
-    #         # Если они одинаковы , то тогда надо проходится по каждому из списка
-    #         #     определяем тэги
-    #         self.tags = ['Name', 'id', 'ts']
-    #
-    #         self.error_collector = self.__checkup_list_element_value_ArchType_Name(database_before=database_before,
-    #                                                                                database_after=database_after,
-    #                                                                                database_was_recording=database_was_recording,
-    #                                                                                json_content=json_content)
-    #
-    #     else:
-    #         # Если они не раавны то добавляем ошибку
-    #
-    #         self.error_collector.append({'error': 'Нет соответсвия archtypes name'})
-    #     return self.error_collector
-
-    # ----------------------------------------------------------------------------------------------------------------
-    #                             все хуйня миша , давай по новой
-    # ----------------------------------------------------------------------------------------------------------------
-
-    def checkup_post(self,
-                     database_before: list,
-                     database_after: list,
-                     database_was_recording: list,
-                     json_content: list):
-        # Обновим значение сборщика ошибок - теперь это пустой массив
-        self.error_collector = []
-        # Теперь надо проверить их длину - их длина должна быть одинакова - потому что нам нужны все archtypes name
-        if (len(json_content) == len(database_before)) and \
-                (len(json_content) == len(database_after)) and \
-                (len(json_content) == len(database_was_recording)):
-            # Если они одинаковы , то тогда надо проходится по каждому из списка
-            #     определяем тэги
-            self.tags = ['Name', 'id', 'ts']
-
-            # Если все ок - отправляем в следующую функцию стравнивания
-            self.error_collector = self.__measures_iteration_over_each_element(
-                database_before=database_before,
-                database_after=database_after,
-                database_was_recording=database_was_recording,
-                json_content=json_content)
-        else:
-            # Если они не раавны то добавляем ошибку
-            self.error_collector.append({'error': 'Нет соответсвия archtypes name'})
-        return self.error_collector
-
-    # ---------------------------------------------------------------------------------------------------------------------
-    #     вспомомгательная функция - перебор каждого элемента - типов данных приборов учета
-    def __measures_iteration_over_each_element(self,
-                                               database_before: list,
-                                               database_after: list,
-                                               database_was_recording: list,
-                                               json_content: list):
-
-        result = []
-        # Теперь берем расчет по каждому из элементов
-        for i in range(len(json_content)):
-            # а теперь каждый элемент пихаем в сравниватель
-            result.append(self.__measure_checkup_by_element(
-                database_before=database_before[i],
-                database_after=database_after[i],
-                database_was_recording=database_was_recording[i],
-                json_content=json_content[i]))
-
-        return result
-
-    # ----------------------------------------------------------------------------------------------------------------
-    #     вспомогательная функция сравнивания значений именно определенного measure
-    def __measure_checkup_by_element(self,
-                                     database_before: list,
-                                     database_after: list,
-                                     database_was_recording: list,
-                                     json_content: list):
-        result = []
-        # Первое что должны сделать - определиться с тэгом что лежит  в Name
-        # и исходя из него составляем лист тэгов что содержится в нем
-
-        archtype_name = json_content[0]['Name']
-
-        if archtype_name in Template_list_ArchTypes.ElectricConfig_ArchType_name_list:
-            tags_name = Template_list_ArchTypes.ElectricConfig_tag
-        elif archtype_name in Template_list_ArchTypes.PulseConfig_ArchType_name_list:
-            tags_name = Template_list_ArchTypes.PulseConfig_tag
-        elif archtype_name in Template_list_ArchTypes.DigitalConfig_ArchType_name_list:
-            tags_name = Template_list_ArchTypes.DigitalConfig_tag
-        elif archtype_name in Template_list_ArchTypes.ElecticEnergyValues_ArchType_name_list:
-            tags_name = Template_list_ArchTypes.ElecticEnergyValues_tag
-        elif archtype_name in Template_list_ArchTypes.ElectricQualityValues_ArchType_name_list:
-            tags_name = Template_list_ArchTypes.ElectricQualityValues_tag
-        elif archtype_name in Template_list_ArchTypes.ElectricPowerValues_ArchType_name_list:
-            tags_name = Template_list_ArchTypes.ElectricPowerValues_tag
-        elif archtype_name in Template_list_ArchTypes.PulseValues_ArchType_name_list:
-            tags_name = Template_list_ArchTypes.PulseValues_tag
-        elif archtype_name in Template_list_ArchTypes.DigitalValues_ArchType_name_list:
-            tags_name = Template_list_ArchTypes.DigitalValues_tag
-        elif archtype_name in Template_list_ArchTypes.JournalValues_ArchType_name_list:
-            tags_name = Template_list_ArchTypes.JournalValues_tag
-
-        # Иначе - отбрасываем ошибку
-        else:
-            result = [{'error': 'Неправильно сформированно archtypes name'}]
-
-        # После этого - проверяем на дубликаты , и отправляем в сравниватель
-        if len(result) == 0:
-            # Если нет ошибок то Добаввляем нужные тэги
-            tags_name = ['id', 'ts'] + tags_name
-
-            #  запускаем нашу функцию сравнивания
-            result = self.__function_checkup_dict(
-                database_before=database_before,
-                database_after=database_after,
-                database_was_recording=database_was_recording,
-                json_content=json_content,
-                tags_name=tags_name)
-
-        return result
-
-    # ----------------------------------------------------------------------------------------------------------------
-    #    А это самая главная функция сравнивания
-    def __function_checkup_dict(self,
-                                database_before: list,
-                                database_after: list,
-                                database_was_recording: list,
-                                json_content: list,
-                                tags_name: list):
-
-        # Включаем обработчик ошибок
-        error_collector = []
-
-        # Первое что делаем - проверяем поле VALID
-        # проверяем - нужно ли проверять это поле :
-        if (json_content[0]['Name'] not in Template_list_ArchTypes.ElectricConfig_ArchType_name_list) and \
-                (json_content[0]['Name'] not in Template_list_ArchTypes.PulseConfig_ArchType_name_list) and \
-                (json_content[0]['Name'] not in Template_list_ArchTypes.DigitalConfig_ArchType_name_list):
-            # Теперь если это нужно - проверяем поле VALID
-
-            database_expect_was_recording = self.__finding_discrepancy(
-                from_subtract=database_before,
-                subtract=database_after)
-            # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!НАдо ДОПИСАТЬ проверку валидности!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            for i in range(len(database_expect_was_recording)):
-                if database_expect_was_recording[i]['Valid'] == 0:
-                    tags_name_valid = tags_name[:2]
-                    for x in range(tags_name_valid):
-                        if (database_expect_was_recording[i][tags_name[x]] is not None) and \
-                                (json_content[i][tags_name[x]] is not None):
-                            error_collector.append({
-                                'error': 'Поле Valid приняло не правильное значение',
-                                'Расхождение со стороны того что есть в JSON': json_content[i],
-                                'Расхождение со стороны того что есть в БД': database_expect_was_recording[i]
-                            })
-
-        # Приводим все имеющиеся у нас словари в нормальное значение
-
-        database_before_list_of_dict = self.__sorted_for_keys(list_dictionaries=database_before,
-                                                              list_name_keys=tags_name)
-
-        database_after_list_of_dict = self.__sorted_for_keys(list_dictionaries=database_after,
-                                                             list_name_keys=tags_name)
-
-        database_was_recording_list_of_dict = self.__sorted_for_keys(list_dictionaries=database_was_recording,
-                                                                     list_name_keys=tags_name)
-
-        json_content_list_of_dict = self.__sorted_for_keys(list_dictionaries=json_content,
-                                                           list_name_keys=tags_name)
-
-        # Теперь можно сделать сравнение
-        # Первое что делаем -  складываем JSON и БД до записи должен быть равен БД после записи
-        # Если нет - то делаем отлов ошибки
-
-        if (database_after_list_of_dict != database_before_list_of_dict + json_content_list_of_dict) and \
-                (len(database_after_list_of_dict) != len(database_before_list_of_dict) + len(
-                    json_content_list_of_dict)):
-
-            # для начала посмотрим что есть добавленного в БД по факту
-            database_expect_was_recording_list_of_dict = self.__finding_discrepancy(
-                from_subtract=database_before_list_of_dict,
-                subtract=database_after_list_of_dict)
-
-            # Далее проверяем коректность записи jSON в БД
-            # И сравниваем добавленного в БД по факту с тем что мы отправили в JSON
-            if json_content_list_of_dict != database_expect_was_recording_list_of_dict:
-                result1 = self.__finding_discrepancy(from_subtract=database_expect_was_recording_list_of_dict,
-                                                     subtract=json_content_list_of_dict)
-
-                result2 = self.__finding_discrepancy(from_subtract=json_content_list_of_dict,
-                                                     subtract=database_expect_was_recording_list_of_dict)
-                error_collector.append({
-                    'error': 'Записанное по факту не совпадает с тем что отправляли в JSON',
-                    'Расхождение со стороны того что есть в JSON': result1,
-                    'Расхождение со стороны того что есть в БД': result2
-                })
-
-            # Далее после того как получили что есть по факту сравниваем с тем что мы заселектили
-            if database_was_recording_list_of_dict != database_expect_was_recording_list_of_dict:
-                # Находим расхождения
-                result1 = self.__finding_discrepancy(from_subtract=database_expect_was_recording_list_of_dict,
-                                                     subtract=database_was_recording_list_of_dict)
-
-                result2 = self.__finding_discrepancy(from_subtract=database_was_recording_list_of_dict,
-                                                     subtract=database_expect_was_recording_list_of_dict)
-
-                error_collector.append({
-                    'error': 'Записалось лишее: Значения что записали не равны значениям что выдало select по id',
-                    'Расхождение со стороны того что заселектили': result1,
-                    'Расхождение со стороны того что есть в БД': result2
-                })
-            # Есть поврежденные записи
-            database_expect_before_list_of_dict = self.__finding_discrepancy(
-                from_subtract=json_content_list_of_dict,
-                subtract=database_after_list_of_dict)
-
-            if database_expect_before_list_of_dict != database_before_list_of_dict:
-                # Находим расхождения
-                result1 = self.__finding_discrepancy(from_subtract=database_before_list_of_dict,
-                                                     subtract=database_expect_before_list_of_dict)
-
-                result2 = self.__finding_discrepancy(from_subtract=database_expect_before_list_of_dict,
-                                                     subtract=database_before_list_of_dict)
-
-                error_collector.append({
-                    'error': 'Повредились старые записи',
-                    'Запись что была в БД': result2,
-                    'Новое значение записи БД': result1
-                })
-
-            if len(database_after_list_of_dict) != len(database_before_list_of_dict) + len(json_content_list_of_dict):
-                error_collector.append({
-                    'error': 'В БД найдены дубли',
-                    'БД до записи': database_before_list_of_dict,
-                    'БД после записи': database_after_list_of_dict
-                })
-
-            if len(error_collector) == 0:
-                error_collector.append({
-                    'error': 'Неизвестная ошибка',
-                    'БД до записи': database_before,
-                    'БД после записи': database_after,
-                    'Записи что добавлены в БД': database_was_recording,
-                    'JSON': json_content
-                })
-
-        return error_collector
-
-    # ----------------------------------------------------------------------------------------------------------------
-    # Дополнительная функция которая конструирует нужный нам массив со словорями которые имеют нужные ключи
-    def __sorted_for_keys(self, list_dictionaries: list, list_name_keys):
-        """
-        Это вспомомгательная функция ля того чтоб сформировать новый массив из словарей ,
-        которые будут содержать только те значения что сравниваются.
-        По сути - это отчищение от не нужных ключей.
-
-        Возвращает список из словарей только с валидными ключами
-        :param list_diction:
-        :param list_keys:
-        :return:
-        """
-        # Наш валидный список , котоырй будем заполнять
-        valid_list_of_dictionaries = []
-        for i in range(len(list_dictionaries)):
-            # Создаем необходимый словарь
-            valid_dict = {}
-            for x in range(len(list_name_keys)):
-                valid_dict[list_name_keys[x]] = list_dictionaries[i][list_name_keys[x]]
-            # после чего добавляем сформированный список в основной массив
-
-            valid_list_of_dictionaries.append(valid_dict)
-
-        return valid_list_of_dictionaries
-
-    # ----------------------------------------------------------------------------------------------------------------
-    #     Напишим функцию нахождения разности - это важно!!
-    def __finding_discrepancy(self, from_subtract: list, subtract: list):
-        result_subtract = []
-        for i in range(len(subtract)):
-            if subtract[i] not in from_subtract:
-                # Если нет - То сравниваем поэлементно по ключам
-                print(subtract[i])
-                result_subtract.append(subtract[i])
-
-        return result_subtract
+    JSON_deconstruct_original = []
+    JSON_deconstruct_redefinition = []
+
+    def __init__(self, JSON_deconstruct):
+        self.JSON_deconstruct_original = JSON_deconstruct
+        self.JSON_deconstruct_redefinition = self.__Redefinition_values()
+
+    def __Redefinition_values(self):
+        from working_directory.Template.Template_Meter_db_data_API import Template_list_ArchTypes
+
+        JSON_deconstruct_original = deepcopy(self.JSON_deconstruct_original)
+        for i in range(len(JSON_deconstruct_original)):
+            for x in range(len(JSON_deconstruct_original[i])):
+                # Если это профиль мощности , то нулл значения переводим в нужный вид
+                if JSON_deconstruct_original[i][x]['Name'] in Template_list_ArchTypes.ElectricPowerValues_ArchType_name_list:
+                    redefinition_tags = ['cTime', 'isPart', 'isOvfl', 'isSummer']
+                    for tags in redefinition_tags:
+                        # Если какое нибудь из этих значений в None то ставим 0
+                        if JSON_deconstruct_original[i][x][tags] is None:
+                            JSON_deconstruct_original[i][x][tags] = 0
+                elif JSON_deconstruct_original[i][x]['Name'] in Template_list_ArchTypes.ElectricConfig_ArchType_name_list:
+                    redefinition_tags_None = [ 'cArrays', 'isDst', 'isClock', 'isTrf',
+                                            'isAm', 'isRm', 'isRp',]
+                    for tags in redefinition_tags_None:
+                        # Если какое нибудь из этих значений в None то ставим 0
+                        if JSON_deconstruct_original[i][x][tags] is None:
+                            JSON_deconstruct_original[i][x][tags] = 0
+                    redefinition_tags_Void = ['serial', 'model',]
+                    for tags in redefinition_tags_Void:
+                        # Если какое нибудь из этих значений в None то ставим 0
+                        if JSON_deconstruct_original[i][x][tags] is None:
+                            JSON_deconstruct_original[i][x][tags] = ''
+                elif JSON_deconstruct_original[i][x]['Name'] in Template_list_ArchTypes.PulseConfig_ArchType_name_list:
+                    redefinition_tags_None = [ 'chnl', 'isDst']
+                    for tags in redefinition_tags_None:
+                        # Если какое нибудь из этих значений в None то ставим 0
+                        if JSON_deconstruct_original[i][x][tags] is None:
+                            JSON_deconstruct_original[i][x][tags] = 0
+                    redefinition_tags_Void = ['serial', 'model',]
+                    for tags in redefinition_tags_Void:
+                        # Если какое нибудь из этих значений в None то ставим 0
+                        if JSON_deconstruct_original[i][x][tags] is None:
+                            JSON_deconstruct_original[i][x][tags] = ''
+
+                elif JSON_deconstruct_original[i][x]['Name'] in Template_list_ArchTypes.DigitalConfig_ArchType_name_list:
+                    redefinition_tags_None = [ 'chnlOut', 'chnlIn' ,  'isDst']
+                    for tags in redefinition_tags_None:
+                        # Если какое нибудь из этих значений в None то ставим 0
+                        if JSON_deconstruct_original[i][x][tags] is None:
+                            JSON_deconstruct_original[i][x][tags] = 0
+                    redefinition_tags_Void = ['serial', 'model',]
+                    for tags in redefinition_tags_Void:
+                        # Если какое нибудь из этих значений в None то ставим 0
+                        if JSON_deconstruct_original[i][x][tags] is None:
+                            JSON_deconstruct_original[i][x][tags] = ''
+
+                elif JSON_deconstruct_original[i][x]['Name'] in Template_list_ArchTypes.JournalValues_ArchType_name_list:
+                    redefinition_tags = ['event', 'eventId']
+                    for tags in redefinition_tags:
+                        # Если какое нибудь из этих значений в None то ставим 0
+                        if JSON_deconstruct_original[i][x][tags] is None:
+                            JSON_deconstruct_original[i][x][tags] = 0
+
+        return JSON_deconstruct_original
+
+
+# ---------------------------------------------------------------------------------------------------------------------
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -584,7 +400,7 @@ class GETCheckUP:
 # ---------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------------------------
 
-class POSTCheckUP:
+class POSTCheckUP(CheckUp):
     """
         Класс для проверки для POST запроса
     """
@@ -602,21 +418,23 @@ class POSTCheckUP:
                  DataBase_after: list,
                  DataBase_was_recording: list):
         # Итак - Переопределяем Поля - ЕТО ВАЖНО
-        self.JSON_deconstruct = JSON_deconstruct
+
+        self.JSON_deconstruct = deepcopy(RedefinitionValuesTags(JSON_deconstruct).JSON_deconstruct_redefinition)
         self.DataBase_before = DataBase_before
 
         self.DataBase_after = DataBase_after
         self.DataBase_was_recording = DataBase_was_recording
 
-        # self.error_collector = self.error_collector + self.__checkup_to_void()
+        # Пункт Первый - Удаляем из JSON все то что не должног было записаться
         self.JSON_deconstruct = self.__checkup_to_void()
 
-        # Првоеряем валидность
+        # Проверяем валидность
         self.error_collector = self.error_collector + self.__checkup_field_valid()
 
         # после переопределения полей - делаем сравнение
         self.error_collector = self.error_collector + self.__checkup_archtype_name()
 
+    # ---------------------------------- УРОВЕНЬ АБСТРАЦИИ 1 - Проверка всех типов данных ----------------------
     def __checkup_archtype_name(self):
         '''Стадия проверки - 1  - проверяем что мы получили все типы данных в наборах'''
         error_collector = []
@@ -633,6 +451,8 @@ class POSTCheckUP:
 
         return error_collector
 
+    # ---------------------------------Понимажаем уровень абстрацкции -----------------------------------------------------
+    # ---------------------------------- УРОВЕНЬ АБСТРАЦИИ 2 - Проверка конкретного типа данных ----------------------
     def __checkup_element_brute_measures(self):
         """Стадия проверки 2 - Перебираем все типы данных """
         error_collector = []
@@ -648,7 +468,8 @@ class POSTCheckUP:
 
         return error_collector
 
-    # //////
+    # ---------------------------------Понимажаем уровень абстрацкции -----------------------------------------------------
+    # ---------------------------------- УРОВЕНЬ АБСТРАЦИИ 3 - Проверка массива конкретного типа данных -------------------
     def __checkup_element_certain_measure(self,
                                           # Наш jSON Ответа
                                           JSON_deconstruct,
@@ -671,7 +492,10 @@ class POSTCheckUP:
                                                                              DataBase_before=DataBase_before)
         print('----------------------')
         # print(DataBase_after_the_fact)
-        # print(len(DataBase_after_the_fact))
+
+        # Делаем коприю бд для проверки на нулевые значения
+        self.database_for_checkup_NULL = deepcopy(DataBase_after_the_fact)
+
         # Сравниваем по длине того что получили
 
         # НАЧИНАЕМ СРАВНЕНИЕ
@@ -697,25 +521,22 @@ class POSTCheckUP:
         # ТЕПЕРЬ _ СРАВНИВАЕМ НАШ JSON и с тем что заселектили по факту.
         if len(JSON_deconstruct) == len(DataBase_was_recording):
             for i in range(len(JSON_deconstruct)):
-                if JSON_deconstruct[i] not in DataBase_was_recording:
-                    # print('ОШИИИИБКА в JSON')
-                    # ЕСЛИ У НАС НЕТ НИЧЕГО ХОРОШЕГО - То сравниваем ПОЭЛЕМЕНТНО
-                    error = self.__checkup_json_with_database(JSON_Element=JSON_deconstruct[i],
-                                                              database=DataBase_was_recording)
+                error = self._checkup_json_with_database(JSON_Element=JSON_deconstruct[i],
+                                                         database=DataBase_was_recording)
 
-                else:
-                    error = self.__checkup_json_with_database(JSON_Element=JSON_deconstruct[i],
-                                                              database=DataBase_was_recording)
-
+            if len(error) == 0:
+                # После чего очищаем нашу скоророванную БД от значений которые проверили
+                error = error + self._check_up_null_values(database=self.database_for_checkup_NULL)
         else:
             error = error + [{
                 "ОШИБКА": 'Записанное в БД , Не совпадает с JSON по длине. Что то потерялось',
                 'JSON_deconstruct - Наш JSON': JSON_deconstruct,
                 'DataBase_was_recording - То что записанно в БД ': DataBase_was_recording
             }]
+
         return error
 
-    # //////
+    # //------------------СЛУЖЕБНАЯ ФУНКЦИЯ _ ЧТО ЗАПСИАЛОАСЬ ПО ФАКТУ---------------------------------------------------
 
     def __getting_recording_record_after_fact(self, DataBase_after, DataBase_before):
         """Здесь получаем то, что записали по факту в ТАблицу"""
@@ -729,114 +550,9 @@ class POSTCheckUP:
                 DataBase_after_the_fact.remove(DataBase_after[i])
         return DataBase_after_the_fact
 
-    def __check_up_element_keys(self, answer_element: dict, normal_element: dict):
-        """Сравнивание поэлементно """
-        error = []
-        error_keys = []
-        # Сначала проверяем значения ответа
-        for keys in answer_element:
-            # отбрасываем ключ diff
-            if keys not in ['diff', 'Valid']:
-                # Теперь сравниваем значения
-                answer_value = answer_element.get(keys)
-                normal_value = normal_element.get(keys)
-
-                # Теперь проверяем их равнество
-
-                if (type(normal_value) == float) and (type(answer_value) == float):
-                    epsilon = 5.96e-08
-                    if abs(normal_value / answer_value - 1) > epsilon:
-                        error_string = {
-                            'Неравенство значений Ключа': str(keys),
-                            'Значение ключа в  JSON ответа': answer_value,
-                            'Значение ключа в предполагаеммый JSON': normal_value
-                        }
-
-                        # Добавляем это в ошибку , и добавляем наш ключ
-                        error.append(error_string)
-                        error_keys.append(keys)
-                else:
-                    if answer_value != normal_value:
-                        error_string = {
-                            'Неравенство значений Ключа': str(keys),
-                            'Значение ключа в  JSON ответа': answer_value,
-                            'Значение ключа в предполагаеммый JSON': normal_value
-                        }
-                        # Добавляем это в ошибку , и добавляем наш ключ
-                        error.append(error_string)
-                        error_keys.append(keys)
-
-        for keys in normal_element:
-            # отбрасываем ключ diff
-            if keys not in ['diff', 'Valid']:
-                if keys not in error_keys:
-                    # Теперь сравниваем значения
-                    answer_value = answer_element.get(keys)
-                    normal_value = normal_element.get(keys)
-
-                    # Теперь проверяем их равнество
-
-                    if (type(normal_value) == float) or (type(answer_value) == float):
-                        epsilon = 5.96e-08
-                        if abs(normal_value / answer_value - 1) > epsilon:
-                            error_string = {
-                                'Неравенство значений Ключа': str(keys),
-                                'Значение ключа в  JSON ответа': answer_value,
-                                'Значение ключа в предполагаеммый JSON': normal_value
-                            }
-
-                            # Добавляем это в ошибку , и добавляем наш ключ
-                            error.append(error_string)
-
-                    else:
-                        if answer_value != normal_value:
-                            error_string = {
-                                'Неравенство значений Ключа': str(keys),
-                                'Значение ключа в  JSON ответа': answer_value,
-                                'Значение ключа в предполагаеммый JSON': normal_value
-                            }
-
-                            # Добавляем это в ошибку , и добавляем наш ключ
-                            error.append(error_string)
-        return error
-
-    def __checkup_json_with_database(self, JSON_Element, database):
-        '''Итак - Здесь приводим сравнивание JSON по ключаем '''
-        # Итак = Перебираем нашу БД
-        error = []
-        element_id = None
-        element_ts = None
-        for i in range(len(database)):
-            # Ищем здесь две связки - таймштамп и айди
-            JSON_Element['id'] = int(JSON_Element['id'])
-            database[i]['id'] = int(database[i]['id'])
-            JSON_Element['ts'] = int(JSON_Element['ts'])
-            database[i]['ts'] = int(database[i]['ts'])
-
-            if (int(JSON_Element['id']) == int(database[i]['id'])) and (
-                    int(JSON_Element['ts']) == int(database[i]['ts'])):
-                # Если мы нашли нужный таймштамп нужного айдишника - Продолжаем
-
-                # здесь сравниваем уже конкретные значения нашего полученного JSON c Записью
-                error = error + self.__check_up_element_keys(normal_element=database[i], answer_element=JSON_Element)
-
-            if JSON_Element['id'] == database[i]['id']:
-                element_id = i
-
-            if JSON_Element['ts'] == database[i]['ts']:
-                element_ts = i
-            # Если не нашли нужный Элемент
-        if element_id is None:
-            error = error + [{'Не удалось найти Элемент JSON id ': JSON_Element['id'],
-                              'JSON_Element': JSON_Element,
-                              'То что записали в БД': database}]
-        if element_ts is None:
-            error = error + [{'Не удалось найти Элемент JSON ts ': JSON_Element['ts'],
-                              'JSON_Element': JSON_Element,
-                              'То что записали в БД': database}]
-
-        return error
-
+    # ---------------------------------------------------------------------------------------------------------------------
+    #                             Итак - Здесь идет проверка валидности
+    # ---------------------------------------------------------------------------------------------------------------------
     def __checkup_field_valid(self):
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!НАдо ДОПИСАТЬ проверку валидности!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         error = []
@@ -849,20 +565,27 @@ class POSTCheckUP:
                         Template_list_ArchTypes.ElectricConfig_ArchType_name_list +
                         Template_list_ArchTypes.DigitalConfig_ArchType_name_list +
                         Template_list_ArchTypes.PulseConfig_ArchType_name_list
-                                                                    ):
-                    if database_was_recording[i][x].get('Valid') != 1:
+                ):
+
+                    # Сначала Обрабатываем вариант , если валид равен 1 или 0 :
+                    if database_was_recording[i][x].get('Valid') in [1, 0]:
                         # Так - Поле Валид не равно 1 , то проверяем  что у нас в JSON
-
-
-                        # print(self.JSON_deconstruct)
-                        # Проверяем набор элементарных ключей
-                        # for keys in database_was_recording[i][x]:
-                        #     if database_was_recording[i][x].get(keys) not in ['Name', 'id', 'Valid', 'ts'] :
-
+                        for keys in database_was_recording[i][x]:
+                            if keys not in ['Name', 'id', 'Valid', 'ts']:
+                                # Если у нас есть лишний ключ
+                                if database_was_recording[i][x].get('Valid') != 1:
+                                    error = error + [
+                                        {
+                                            'error': 'Поле Valid приняло не правильное значение',
+                                            'Элемент где записанно не правильно - ': database_was_recording[i][x],
+                                        }
+                                    ]
+                    else:
                         error = error + [
                             {
                                 'error': 'Поле Valid приняло не правильное значение',
-                                'Элемент где записанно не правильно - ': database_was_recording[i]
+                                'Элемент где записанно не правильно - ': database_was_recording[i][x],
+                                'Само поле Valid': database_was_recording[i][x].get('Valid')
                             }
                         ]
         return error
@@ -877,6 +600,24 @@ class POSTCheckUP:
             'tarif2': ['A+2', 'A-2', 'R+2', 'R-2'],
             'tarif3': ['A+3', 'A-3', 'R+3', 'R-3'],
             'tarif4': ['A+4', 'A-4', 'R+4', 'R-4'],
+
+            'phaseA': ['UA', 'IA', 'PA', 'QA', 'SA', 'kPA', 'AngAB'],
+            'phaseB': ['UB', 'IB', 'PB', 'QB', 'SB', 'kPB', 'AngBC'],
+            'phaseC': ['UC', 'IC', 'PC', 'QC', 'SC', 'kPC', 'AngAC'],
+            'phaseSum': ['PS', 'QS', 'SS', 'kPS', 'Freq'],
+            'ConsPower': ['P+', 'Q+', 'P-', 'Q-'],
+            'Pulse' : ['Pls1', 'Pls2', 'Pls3', 'Pls4', 'Pls5', 'Pls6', 'Pls7', 'Pls8', 'Pls9', 'Pls10', 'Pls11', 'Pls12',
+                    'Pls13', 'Pls14', 'Pls15', 'Pls16', 'Pls17', 'Pls18', 'Pls19', 'Pls20', 'Pls21', 'Pls22', 'Pls23',
+                    'Pls24', 'Pls25', 'Pls26', 'Pls27', 'Pls28', 'Pls29', 'Pls30', 'Pls31', 'Pls32'],
+            'Digital': ['Chnl1', 'Chnl2', 'Chnl3', 'Chnl4', 'Chnl5', 'Chnl6', 'Chnl7', 'Chnl8', 'Chnl9',
+                                 'Chnl10',
+                                 'Chnl11', 'Chnl12', 'Chnl13', 'Chnl14', 'Chnl15', 'Chnl16', 'Chnl17', 'Chnl18',
+                                 'Chnl19', 'Chnl20',
+                                 'Chnl21', 'Chnl22', 'Chnl23', 'Chnl24', 'Chnl25', 'Chnl26', 'Chnl27', 'Chnl28',
+                                 'Chnl29', 'Chnl30',
+                                 'Chnl31', 'Chnl32'],
+
+            # 'Journal' : ['event', 'eventId',]
         }
 
         # Теперь перебираем все возможные комбинации по типам данных
@@ -902,8 +643,14 @@ class POSTCheckUP:
                 for category in none_dict:
                     # Если категория пуста - то получаем все тэги категории
                     if len(none_dict[category]) == 0:
-                        tags_list = none_dict_etalon[category]
+                        tags_list = deepcopy(none_dict_etalon)
+                        # Обновляем чтоб удалить все что есть
+                        tags_list.update(
+                            {'ConsPower': ['cTime', 'P+', 'Q+', 'P-', 'Q-', 'isPart', 'isOvfl', 'isSummer']}
+                        )
+                        tags_list = tags_list[category]
                         # Теперь проходимся по листу - и удаляем все эти тэги из элемента JSON
                         for name_tag in tags_list:
                             self.JSON_deconstruct[i][x].pop(name_tag)
         return self.JSON_deconstruct
+# ---------------------------------------------------------------------------------------------------------------------

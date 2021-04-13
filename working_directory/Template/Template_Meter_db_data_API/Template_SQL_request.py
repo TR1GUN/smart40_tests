@@ -591,7 +591,7 @@ WHERE
 	DeviceIdx > 0
 """
 
-PulseValues_select_list = """
+PulseValues_select_list = ["""
 SELECT 
 
     Channels ,
@@ -631,7 +631,7 @@ SELECT
 FROM  PulseValues
 WHERE
 	Id  > 0
-"""
+"""]
 
 PulseValues_insert = 'INSERT INTO PulseValues (Id,Channels,  Chnl1 ,  Chnl2 ,  Chnl3 ,  Chnl4 ,  Chnl5 ,  Chnl6 ,  ' \
                      'Chnl7 ,  Chnl8 ,  Chnl9 ,  Chnl10 ,  Chnl11 ,  Chnl12 ,  Chnl13 ,  Chnl14 ,  Chnl15 ,  Chnl16 , ' \

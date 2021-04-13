@@ -76,7 +76,7 @@ class CheckUP:
 
     # //////
     def __checkup_element_certain_measure(self,
-                                          # Наш jSON Ответа
+                                          # Наш JSON Ответа
                                           JSON_deconstruct,
                                           # Наша БД что записалось согласно JSON
                                           DataBase_was_recording
