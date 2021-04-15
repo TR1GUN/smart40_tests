@@ -280,6 +280,9 @@ class POST(MeterData):
 
             data_base_was_recorded = ReceivingDataAccordingToJSON(JSON=self.JSON_dict, Select_all=False).get_result()
 
+
+            print(result)
+
             result = POSTCheckUP(DataBase_before=data_base_before_recording,
                                  DataBase_after=data_base_after_recording,
                                  DataBase_was_recording=data_base_was_recorded,
@@ -288,6 +291,8 @@ class POST(MeterData):
             result = self.__write_log(result)
 
         return result
+
+
 
 
 # # -------------------------------------------------------------------------------------------------------------------
