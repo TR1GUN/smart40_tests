@@ -28,25 +28,25 @@ def parametrize_by_element(reqest: str, ArchType_name_list: list):
     # Если у нас гет запрос
     if reqest == 'post':
         template_parametrize = [
-            [1, 1, True, True],
-            [2, 3, True, True],
-            [3, 1, True, True],
-            [1, 1, False, False],
-            [2, 3, False, False],
-            [3, 1, False, False]
+            [1, 1, {}],
+            [2, 3, {}],
+            [3, 1, {}],
+            [1, 1, {}],
+            [2, 3, {}],
+            [3, 1, {}]
         ]
     if reqest == 'get':
         template_parametrize = [
-            [0, 1, 1, 2, 0, True, False, False, False, False, False],
-            [1, 2, 2, 3, 1, False, True, False, False, False, False],
-            [2, 3, 3, 4, 2, False, False, True, False, False, False],
-            [4, 4, 4, 5, 3, False, False, False, True, False, False],
-            [0, 5, 1, 6, 4, False, False, False, True, False, True],
-            [1, 4, 2, 5, 3, False, False, True, False, False, True],
-            [2, 5, 3, 6, 2, False, True, False, False, False, True],
-            [4, 4, 4, 5, 1, True, False, False, False, False, True],
-            [2, 3, 3, 4, 0, True, False, False, False, True, False],
-            [2, 2, 3, 3, 0, False, True, False, False, True, True]
+            [0, 1, 1, 2, 0, True, False, False, False, False, False, {}],
+            [1, 2, 2, 3, 1, False, True, False, False, False, False, {}],
+            [2, 3, 3, 4, 2, False, False, True, False, False, False, {}],
+            [4, 4, 4, 5, 3, False, False, False, True, False, False, {}],
+            [0, 5, 1, 6, 4, False, False, False, True, False, True, {}],
+            [1, 4, 2, 5, 3, False, False, True, False, False, True, {}],
+            [2, 5, 3, 6, 2, False, True, False, False, False, True, {}],
+            [4, 4, 4, 5, 1, True, False, False, False, False, True, {}],
+            [2, 3, 3, 4, 0, True, False, False, False, True, False, {}],
+            [2, 2, 3, 3, 0, False, True, False, False, True, True, {}]
         ]
     for i in range(len(ArchType_name_list)):
         ArchType_name = [ArchType_name_list[i]]
@@ -56,24 +56,6 @@ def parametrize_by_element(reqest: str, ArchType_name_list: list):
     return parametrize_list
 
 
-# # итак - начнем прикручивать pytest - для начала - чистим БД
-#
-# @pytest.fixture(scope='function', autouse=True)
-# def delete_metertable():
-#     from working_directory.sqlite import execute_command_to_write_return_dict
-#     result = execute_command_to_write_return_dict(command='delete from MeterTable ')
-#     return result
-
-
-# import tracemalloc
-#
-# tracemalloc.start()
-
-
-# def test_delete_metertable(delete_metertable):
-#
-#     result = delete_metertable()
-#     assert result == []
 # ---------------------------------------------------------------------------------------------------------------------
 #                                                  POST
 # ---------------------------------------------------------------------------------------------------------------------
@@ -84,149 +66,139 @@ def parametrize_by_element(reqest: str, ArchType_name_list: list):
 # generate_unicale_ts - Сгенерирвоать уникальный таймштамп
 
 # ------------------------------------- ElectricConfig -----------------------------------------------------------------
-@pytest.mark.parametrize("list_measure, count_id, count_ts, generate_unicale_id, generate_unicale_ts",
+@pytest.mark.parametrize("list_measure, count_id, count_ts, tags",
                          [
-                             (ElectricConfig_ArchType_name_list, 1, 1, True, True),
-                             (ElectricConfig_ArchType_name_list, 2, 3, True, True),
-                             (ElectricConfig_ArchType_name_list, 3, 1, True, True),
-                             (ElectricConfig_ArchType_name_list, 1, 1, False, False),
-                             (ElectricConfig_ArchType_name_list, 2, 3, False, False),
-                             (ElectricConfig_ArchType_name_list, 3, 1, False, False)
+                             (ElectricConfig_ArchType_name_list, 1, 1, {}),
+                             (ElectricConfig_ArchType_name_list, 2, 3, {}),
+                             (ElectricConfig_ArchType_name_list, 3, 1, {}),
+                             (ElectricConfig_ArchType_name_list, 1, 1, {}),
+                             (ElectricConfig_ArchType_name_list, 2, 3, {}),
+                             (ElectricConfig_ArchType_name_list, 3, 1, {})
                          ])
 def test_POST_ElectricConfig_meterdata_db(type_connect,
                                           list_measure,
                                           count_id,
                                           count_ts,
-                                          generate_unicale_id,
-                                          generate_unicale_ts):
+                                          tags):
     sleep(1)
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
-                                                                generate_unicale_id=generate_unicale_id,
-                                                                generate_unicale_ts=generate_unicale_ts)
+                                                                tags=tags)
 
     assert meterdata == []
 
 
 # ------------------------------------- PulseConfig -----------------------------------------------------------------
-@pytest.mark.parametrize("list_measure, count_id, count_ts, generate_unicale_id, generate_unicale_ts",
+@pytest.mark.parametrize("list_measure, count_id, count_ts, tags",
                          [
-                             (PulseConfig_ArchType_name_list, 1, 1, True, True),
-                             (PulseConfig_ArchType_name_list, 2, 3, True, True),
-                             (PulseConfig_ArchType_name_list, 3, 1, True, True),
-                             (PulseConfig_ArchType_name_list, 1, 1, False, False),
-                             (PulseConfig_ArchType_name_list, 2, 3, False, False),
-                             (PulseConfig_ArchType_name_list, 3, 1, False, False)
+                             (PulseConfig_ArchType_name_list, 1, 1, {}),
+                             (PulseConfig_ArchType_name_list, 2, 3, {}),
+                             (PulseConfig_ArchType_name_list, 3, 1, {}),
+                             (PulseConfig_ArchType_name_list, 1, 1, {}),
+                             (PulseConfig_ArchType_name_list, 2, 3, {}),
+                             (PulseConfig_ArchType_name_list, 3, 1, {})
                          ])
 def test_POST_PulseConfig_meterdata_db(type_connect,
                                        list_measure,
                                        count_id,
                                        count_ts,
-                                       generate_unicale_id,
-                                       generate_unicale_ts):
+                                       tags):
     sleep(1)
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
-                                                                generate_unicale_id=generate_unicale_id,
-                                                                generate_unicale_ts=generate_unicale_ts)
+                                                                tags=tags)
 
     assert meterdata == []
 
 
 # -------------------------------------DigitalConfig -----------------------------------------------------------------
-@pytest.mark.parametrize("list_measure, count_id, count_ts, generate_unicale_id, generate_unicale_ts",
+@pytest.mark.parametrize("list_measure, count_id, count_ts, tags",
                          [
-                             (DigitalConfig_ArchType_name_list, 1, 1, True, True),
-                             (DigitalConfig_ArchType_name_list, 2, 3, True, True),
-                             (DigitalConfig_ArchType_name_list, 3, 1, True, True),
-                             (DigitalConfig_ArchType_name_list, 1, 1, False, False),
-                             (DigitalConfig_ArchType_name_list, 2, 3, False, False),
-                             (DigitalConfig_ArchType_name_list, 3, 1, False, False)
+                             (DigitalConfig_ArchType_name_list, 1, 1, {}),
+                             (DigitalConfig_ArchType_name_list, 2, 3, {}),
+                             (DigitalConfig_ArchType_name_list, 3, 1, {}),
+                             (DigitalConfig_ArchType_name_list, 1, 1, {}),
+                             (DigitalConfig_ArchType_name_list, 2, 3, {}),
+                             (DigitalConfig_ArchType_name_list, 3, 1, {})
                          ])
 def test_POST_DigitalConfig_meterdata_db(type_connect, list_measure,
                                          count_id,
                                          count_ts,
-                                         generate_unicale_id,
-                                         generate_unicale_ts):
+                                         tags):
     sleep(1)
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
-                                                                generate_unicale_id=generate_unicale_id,
-                                                                generate_unicale_ts=generate_unicale_ts)
+                                                                tags=tags)
 
     assert meterdata == []
 
 
 # ------------------------------------- ElecticEnergyValues ----------------------------------------------------------
+
+
 parametrize_ElecticEnergyValues_ArchType_name_list = parametrize_by_element(reqest='post',
                                                                             ArchType_name_list=ElecticEnergyValues_ArchType_name_list)
 
 
-@pytest.mark.parametrize("list_measure, count_id, count_ts, generate_unicale_id, generate_unicale_ts",
+@pytest.mark.parametrize("list_measure, count_id, count_ts, tags",
                          parametrize_ElecticEnergyValues_ArchType_name_list)
 def test_POST_ElecticEnergyValues_meterdata_db_by_element(type_connect, list_measure,
                                                           count_id,
                                                           count_ts,
-                                                          generate_unicale_id,
-                                                          generate_unicale_ts):
+                                                          tags):
     sleep(1)
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
-                                                                generate_unicale_id=generate_unicale_id,
-                                                                generate_unicale_ts=generate_unicale_ts)
+                                                                tags=tags)
 
     assert meterdata == []
 
 
-@pytest.mark.parametrize("list_measure, count_id, count_ts, generate_unicale_id, generate_unicale_ts",
+@pytest.mark.parametrize("list_measure, count_id, count_ts, tags",
                          [
-                             (ElecticEnergyValues_ArchType_name_list, 1, 1, True, True),
-                             (ElecticEnergyValues_ArchType_name_list, 2, 3, True, True),
-                             (ElecticEnergyValues_ArchType_name_list, 3, 1, True, True),
-                             (ElecticEnergyValues_ArchType_name_list, 1, 1, False, False),
-                             (ElecticEnergyValues_ArchType_name_list, 2, 3, False, False),
-                             (ElecticEnergyValues_ArchType_name_list, 3, 1, False, False)
+                             (ElecticEnergyValues_ArchType_name_list, 1, 1, {}),
+                             (ElecticEnergyValues_ArchType_name_list, 2, 3, {}),
+                             (ElecticEnergyValues_ArchType_name_list, 3, 1, {}),
+                             (ElecticEnergyValues_ArchType_name_list, 1, 1, {}),
+                             (ElecticEnergyValues_ArchType_name_list, 2, 3, {}),
+                             (ElecticEnergyValues_ArchType_name_list, 3, 1, {})
                          ])
 def test_POST_ElecticEnergyValues_meterdata_db(type_connect, list_measure,
                                                count_id,
                                                count_ts,
-                                               generate_unicale_id,
-                                               generate_unicale_ts):
+                                               tags):
     sleep(1)
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
-                                                                generate_unicale_id=generate_unicale_id,
-                                                                generate_unicale_ts=generate_unicale_ts)
+                                                                tags=tags)
 
     assert meterdata == []
 
 
 # ------------------------------------- ElectricQualityValues ---------------------------------------------------------
-@pytest.mark.parametrize("list_measure, count_id, count_ts, generate_unicale_id, generate_unicale_ts",
+@pytest.mark.parametrize("list_measure, count_id, count_ts, tags",
                          [
-                             (ElectricQualityValues_ArchType_name_list, 1, 1, True, True),
-                             (ElectricQualityValues_ArchType_name_list, 2, 3, True, True),
-                             (ElectricQualityValues_ArchType_name_list, 3, 1, True, True),
-                             (ElectricQualityValues_ArchType_name_list, 1, 1, False, False),
-                             (ElectricQualityValues_ArchType_name_list, 2, 3, False, False),
-                             (ElectricQualityValues_ArchType_name_list, 3, 1, False, False)
+                             (ElectricQualityValues_ArchType_name_list, 1, 1, {}),
+                             (ElectricQualityValues_ArchType_name_list, 2, 3, {}),
+                             (ElectricQualityValues_ArchType_name_list, 3, 1, {}),
+                             (ElectricQualityValues_ArchType_name_list, 1, 1, {}),
+                             (ElectricQualityValues_ArchType_name_list, 2, 3, {}),
+                             (ElectricQualityValues_ArchType_name_list, 3, 1, {})
                          ])
 def test_POST_ElectricQualityValues_meterdata_db(type_connect, list_measure,
                                                  count_id,
                                                  count_ts,
-                                                 generate_unicale_id,
-                                                 generate_unicale_ts):
+                                                 tags):
     sleep(1)
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
-                                                                generate_unicale_id=generate_unicale_id,
-                                                                generate_unicale_ts=generate_unicale_ts)
+                                                                tags=tags)
 
     assert meterdata == []
 
@@ -236,45 +208,41 @@ parametrize_ElectricPowerValues_ArchType_name_list = parametrize_by_element(reqe
                                                                             ArchType_name_list=ElectricPowerValues_ArchType_name_list)
 
 
-@pytest.mark.parametrize("list_measure, count_id, count_ts, generate_unicale_id, generate_unicale_ts",
+@pytest.mark.parametrize("list_measure, count_id, count_ts, tags",
                          parametrize_ElectricPowerValues_ArchType_name_list)
 def test_POST_ElectricPowerValues_meterdata_db_by_element(type_connect,
                                                           list_measure,
                                                           count_id,
                                                           count_ts,
-                                                          generate_unicale_id,
-                                                          generate_unicale_ts):
+                                                          tags):
     sleep(1)
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
-                                                                generate_unicale_id=generate_unicale_id,
-                                                                generate_unicale_ts=generate_unicale_ts)
+                                                                )
 
     assert meterdata == []
 
 
-@pytest.mark.parametrize("list_measure, count_id, count_ts, generate_unicale_id, generate_unicale_ts",
+@pytest.mark.parametrize("list_measure, count_id, count_ts, tags",
                          [
-                             (ElectricPowerValues_ArchType_name_list, 1, 1, True, True),
-                             (ElectricPowerValues_ArchType_name_list, 2, 3, True, True),
-                             (ElectricPowerValues_ArchType_name_list, 3, 1, True, True),
-                             (ElectricPowerValues_ArchType_name_list, 1, 1, False, False),
-                             (ElectricPowerValues_ArchType_name_list, 2, 3, False, False),
-                             (ElectricPowerValues_ArchType_name_list, 3, 1, False, False)
+                             (ElectricPowerValues_ArchType_name_list, 1, 1, {}),
+                             (ElectricPowerValues_ArchType_name_list, 2, 3, {}),
+                             (ElectricPowerValues_ArchType_name_list, 3, 1, {}),
+                             (ElectricPowerValues_ArchType_name_list, 1, 1, {}),
+                             (ElectricPowerValues_ArchType_name_list, 2, 3, {}),
+                             (ElectricPowerValues_ArchType_name_list, 3, 1, {})
                          ])
 def test_POST_ElectricPowerValues_meterdata_db(type_connect,
                                                list_measure,
                                                count_id,
                                                count_ts,
-                                               generate_unicale_id,
-                                               generate_unicale_ts):
+                                               tags):
     sleep(1)
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
-                                                                generate_unicale_id=generate_unicale_id,
-                                                                generate_unicale_ts=generate_unicale_ts)
+                                                                tags=tags)
 
     assert meterdata == []
 
@@ -284,97 +252,90 @@ parametrize_PulseValues_ArchType_name = parametrize_by_element(reqest='post',
                                                                ArchType_name_list=PulseValues_ArchType_name_list)
 
 
-@pytest.mark.parametrize("list_measure, count_id, count_ts, generate_unicale_id, generate_unicale_ts",
+@pytest.mark.parametrize("list_measure, count_id, count_ts, tags",
                          parametrize_PulseValues_ArchType_name
                          )
 def test_POST_PulseValues_meterdata_db_by_element(type_connect,
                                                   list_measure,
                                                   count_id,
                                                   count_ts,
-                                                  generate_unicale_id,
-                                                  generate_unicale_ts):
+                                                  tags):
     sleep(1)
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
-                                                                generate_unicale_id=generate_unicale_id,
-                                                                generate_unicale_ts=generate_unicale_ts)
+                                                                tags=tags)
 
     assert meterdata == []
 
 
-@pytest.mark.parametrize("list_measure, count_id, count_ts, generate_unicale_id, generate_unicale_ts",
+@pytest.mark.parametrize("list_measure, count_id, count_ts, tags",
                          [
-                             (PulseValues_ArchType_name_list, 1, 1, True, True),
-                             (PulseValues_ArchType_name_list, 2, 3, True, True),
-                             (PulseValues_ArchType_name_list, 3, 1, True, True),
-                             (PulseValues_ArchType_name_list, 1, 1, False, False),
-                             (PulseValues_ArchType_name_list, 2, 3, False, False),
-                             (PulseValues_ArchType_name_list, 3, 1, False, False)
+                             (PulseValues_ArchType_name_list, 1, 1, {}),
+                             (PulseValues_ArchType_name_list, 2, 3, {}),
+                             (PulseValues_ArchType_name_list, 3, 1, {}),
+                             (PulseValues_ArchType_name_list, 1, 1, {}),
+                             (PulseValues_ArchType_name_list, 2, 3, {}),
+                             (PulseValues_ArchType_name_list, 3, 1, {})
                          ]
                          )
 def test_POST_PulseValues_meterdata_db(type_connect,
                                        list_measure,
                                        count_id,
                                        count_ts,
-                                       generate_unicale_id,
-                                       generate_unicale_ts):
+                                       tags):
     sleep(1)
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
-                                                                generate_unicale_id=generate_unicale_id,
-                                                                generate_unicale_ts=generate_unicale_ts)
+                                                                tags=tags)
 
     assert meterdata == []
 
 
 # ------------------------------------- DigitalValues -----------------------------------------------------------------
+
 parametrize_DigitalValues_ArchType_name = parametrize_by_element(reqest='post',
                                                                  ArchType_name_list=DigitalValues_ArchType_name_list)
 
 
-@pytest.mark.parametrize("list_measure, count_id, count_ts, generate_unicale_id, generate_unicale_ts",
+@pytest.mark.parametrize("list_measure, count_id, count_ts,tags",
                          parametrize_DigitalValues_ArchType_name
                          )
 def test_POST_DigitalValues_meterdata_db_by_element(type_connect,
                                                     list_measure,
                                                     count_id,
                                                     count_ts,
-                                                    generate_unicale_id,
-                                                    generate_unicale_ts):
+                                                    tags):
     sleep(1)
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
-                                                                generate_unicale_id=generate_unicale_id,
-                                                                generate_unicale_ts=generate_unicale_ts)
+                                                                tags=tags)
 
     assert meterdata == []
 
 
-@pytest.mark.parametrize("list_measure, count_id, count_ts, generate_unicale_id, generate_unicale_ts",
+@pytest.mark.parametrize("list_measure, count_id, count_ts, tags",
                          [
-                             (DigitalValues_ArchType_name_list, 1, 1, True, True),
-                             (DigitalValues_ArchType_name_list, 2, 3, True, True),
-                             (DigitalValues_ArchType_name_list, 3, 1, True, True),
-                             (DigitalValues_ArchType_name_list, 1, 1, False, False),
-                             (DigitalValues_ArchType_name_list, 2, 3, False, False),
-                             (DigitalValues_ArchType_name_list, 3, 1, False, False)
+                             (DigitalValues_ArchType_name_list, 1, 1, {}),
+                             (DigitalValues_ArchType_name_list, 2, 3, {}),
+                             (DigitalValues_ArchType_name_list, 3, 1, {}),
+                             (DigitalValues_ArchType_name_list, 1, 1, {}),
+                             (DigitalValues_ArchType_name_list, 2, 3, {}),
+                             (DigitalValues_ArchType_name_list, 3, 1, {})
                          ]
                          )
 def test_POST_DigitalValues_meterdata_db(type_connect,
                                          list_measure,
                                          count_id,
                                          count_ts,
-                                         generate_unicale_id,
-                                         generate_unicale_ts):
+                                         tags):
     sleep(1)
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
-                                                                generate_unicale_id=generate_unicale_id,
-                                                                generate_unicale_ts=generate_unicale_ts)
+                                                                tags=tags)
 
     assert meterdata == []
 
@@ -384,45 +345,41 @@ parametrize_JournalValues_ArchType_name = parametrize_by_element(reqest='post',
                                                                  ArchType_name_list=JournalValues_ArchType_name_list)
 
 
-@pytest.mark.parametrize("list_measure, count_id, count_ts, generate_unicale_id, generate_unicale_ts",
+@pytest.mark.parametrize("list_measure, count_id, count_ts, tags",
                          parametrize_JournalValues_ArchType_name)
 def test_POST_JournalValues_meterdata_db_by_element(type_connect,
                                                     list_measure,
                                                     count_id,
                                                     count_ts,
-                                                    generate_unicale_id,
-                                                    generate_unicale_ts):
+                                                    tags):
     sleep(1)
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
-                                                                generate_unicale_id=generate_unicale_id,
-                                                                generate_unicale_ts=generate_unicale_ts)
+                                                                tags=tags)
 
     assert meterdata == []
 
 
-@pytest.mark.parametrize("list_measure, count_id, count_ts, generate_unicale_id, generate_unicale_ts",
+@pytest.mark.parametrize("list_measure, count_id, count_ts, tags",
                          [
-                             (JournalValues_ArchType_name_list, 1, 1, True, True),
-                             (JournalValues_ArchType_name_list, 2, 3, True, True),
-                             (JournalValues_ArchType_name_list, 3, 1, True, True),
-                             (JournalValues_ArchType_name_list, 1, 1, False, False),
-                             (JournalValues_ArchType_name_list, 2, 3, False, False),
-                             (JournalValues_ArchType_name_list, 3, 1, False, False)
+                             (JournalValues_ArchType_name_list, 1, 1, {}),
+                             (JournalValues_ArchType_name_list, 2, 3, {}),
+                             (JournalValues_ArchType_name_list, 3, 1, {}),
+                             (JournalValues_ArchType_name_list, 1, 1, {}),
+                             (JournalValues_ArchType_name_list, 2, 3, {}),
+                             (JournalValues_ArchType_name_list, 3, 1, {})
                          ])
 def test_POST_JournalValues_meterdata_db(type_connect,
                                          list_measure,
                                          count_id,
                                          count_ts,
-                                         generate_unicale_id,
-                                         generate_unicale_ts):
+                                         tags):
     sleep(1)
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
-                                                                generate_unicale_id=generate_unicale_id,
-                                                                generate_unicale_ts=generate_unicale_ts)
+                                                                tags=tags)
 
     assert meterdata == []
 
@@ -431,27 +388,25 @@ def test_POST_JournalValues_meterdata_db(type_connect,
 all_ArchType_name_list = ElectricConfig_ArchType_name_list + PulseConfig_ArchType_name_list + DigitalConfig_ArchType_name_list + ElecticEnergyValues_ArchType_name_list + ElectricQualityValues_ArchType_name_list + ElectricPowerValues_ArchType_name_list + PulseValues_ArchType_name_list + DigitalValues_ArchType_name_list + JournalValues_ArchType_name_list
 
 
-@pytest.mark.parametrize("list_measure, count_id, count_ts, generate_unicale_id, generate_unicale_ts",
+@pytest.mark.parametrize("list_measure, count_id, count_ts, tags",
                          [
-                             (all_ArchType_name_list, 1, 1, True, True),
-                             (all_ArchType_name_list, 2, 3, True, True),
-                             (all_ArchType_name_list, 3, 1, True, True),
-                             (all_ArchType_name_list, 1, 1, False, False),
-                             (all_ArchType_name_list, 2, 3, False, False),
-                             (all_ArchType_name_list, 3, 1, False, False)
+                             (all_ArchType_name_list, 1, 1, {}),
+                             (all_ArchType_name_list, 2, 3, {}),
+                             (all_ArchType_name_list, 3, 1, {}),
+                             (all_ArchType_name_list, 1, 1, {}),
+                             (all_ArchType_name_list, 2, 3, {}),
+                             (all_ArchType_name_list, 3, 1, {})
                          ])
 def test_POST_all_meterdata_db(type_connect,
                                list_measure,
                                count_id,
                                count_ts,
-                               generate_unicale_id,
-                               generate_unicale_ts):
+                               tags):
     sleep(1)
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
-                                                                generate_unicale_id=generate_unicale_id,
-                                                                generate_unicale_ts=generate_unicale_ts)
+                                                                tags=tags)
 
     assert meterdata == []
 
@@ -466,19 +421,19 @@ def test_POST_all_meterdata_db(type_connect,
 # ElectricConfig
 @pytest.mark.parametrize(
     "list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
-    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds",
+    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds , tags",
     [
 
-        (ElectricConfig_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False),
-        (ElectricConfig_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False),
-        (ElectricConfig_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False),
-        (ElectricConfig_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False),
-        (ElectricConfig_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True),
-        (ElectricConfig_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True),
-        (ElectricConfig_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True),
-        (ElectricConfig_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True),
-        (ElectricConfig_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False),
-        (ElectricConfig_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True)
+        (ElectricConfig_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}),
+        (ElectricConfig_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}),
+        (ElectricConfig_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {}),
+        (ElectricConfig_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}),
+        (ElectricConfig_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}),
+        (ElectricConfig_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {}),
+        (ElectricConfig_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}),
+        (ElectricConfig_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}),
+        (ElectricConfig_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}),
+        (ElectricConfig_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {})
 
     ]
 )
@@ -507,7 +462,9 @@ def test_GET_ElectricConfig_meterdata_db(
         # Булевый маркер - Селект только последнего времени
         select_last_time,
         # Булевый маркер - Выход за границы времени что сгенерировали
-        out_of_bounds
+        out_of_bounds,
+        # Переопределенные тэги
+        tags
 ):
     # Чистим БД
 
@@ -524,7 +481,8 @@ def test_GET_ElectricConfig_meterdata_db(
                                                                serial=serial,
                                                                select_id_all=select_id_all,
                                                                select_last_time=select_last_time,
-                                                               out_of_bounds=out_of_bounds
+                                                               out_of_bounds=out_of_bounds,
+                                                               tags=tags
                                                                )
 
     assert meterdata == []
@@ -535,18 +493,18 @@ def test_GET_ElectricConfig_meterdata_db(
 
 @pytest.mark.parametrize(
     "list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
-    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds",
+    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags",
     [
-        (PulseConfig_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False),
-        (PulseConfig_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False),
-        (PulseConfig_ArchType_name_list, 2, 3, 3, 4, 2, False, False, False, True, False, False),
-        (PulseConfig_ArchType_name_list, 4, 4, 4, 5, 3, True, False, False, False, False, False),
-        (PulseConfig_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True),
-        (PulseConfig_ArchType_name_list, 1, 4, 2, 5, 3, False, False, False, True, False, True),
-        (PulseConfig_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True),
-        (PulseConfig_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True),
-        (PulseConfig_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False),
-        (PulseConfig_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True)
+        (PulseConfig_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}),
+        (PulseConfig_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}),
+        (PulseConfig_ArchType_name_list, 2, 3, 3, 4, 2, False, False, False, True, False, False, {}),
+        (PulseConfig_ArchType_name_list, 4, 4, 4, 5, 3, True, False, False, False, False, False, {}),
+        (PulseConfig_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}),
+        (PulseConfig_ArchType_name_list, 1, 4, 2, 5, 3, False, False, False, True, False, True, {}),
+        (PulseConfig_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}),
+        (PulseConfig_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}),
+        (PulseConfig_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}),
+        (PulseConfig_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {})
 
     ]
 )
@@ -575,7 +533,9 @@ def test_GET_PulseConfig_meterdata_db(
         # Булевый маркер - Селект только последнего времени
         select_last_time,
         # Булевый маркер - Выход за границы времени что сгенерировали
-        out_of_bounds
+        out_of_bounds,
+        # Переопределенные тэги
+        tags
 ):
     # Чистим БД
 
@@ -592,7 +552,8 @@ def test_GET_PulseConfig_meterdata_db(
                                                                serial=serial,
                                                                select_id_all=select_id_all,
                                                                select_last_time=select_last_time,
-                                                               out_of_bounds=out_of_bounds
+                                                               out_of_bounds=out_of_bounds,
+                                                               tags=tags
                                                                )
 
     assert meterdata == []
@@ -604,18 +565,18 @@ def test_GET_PulseConfig_meterdata_db(
 
 @pytest.mark.parametrize(
     "list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
-    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds",
+    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds , tags",
     [
-        (DigitalConfig_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False),
-        (DigitalConfig_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False),
-        (DigitalConfig_ArchType_name_list, 2, 3, 3, 4, 2, True, False, False, False, False, False),
-        (DigitalConfig_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False),
-        (DigitalConfig_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True),
-        (DigitalConfig_ArchType_name_list, 1, 4, 2, 5, 3, True, False, False, False, False, True),
-        (DigitalConfig_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True),
-        (DigitalConfig_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True),
-        (DigitalConfig_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False),
-        (DigitalConfig_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True)
+        (DigitalConfig_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}),
+        (DigitalConfig_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}),
+        (DigitalConfig_ArchType_name_list, 2, 3, 3, 4, 2, True, False, False, False, False, False, {}),
+        (DigitalConfig_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}),
+        (DigitalConfig_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}),
+        (DigitalConfig_ArchType_name_list, 1, 4, 2, 5, 3, True, False, False, False, False, True, {}),
+        (DigitalConfig_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}),
+        (DigitalConfig_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}),
+        (DigitalConfig_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}),
+        (DigitalConfig_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {})
 
     ]
 )
@@ -644,7 +605,9 @@ def test_GET_DigitalConfig_meterdata_db(
         # Булевый маркер - Селект только последнего времени
         select_last_time,
         # Булевый маркер - Выход за границы времени что сгенерировали
-        out_of_bounds
+        out_of_bounds,
+        # Переопределенные тэги
+        tags
 ):
     # Чистим БД
 
@@ -661,21 +624,24 @@ def test_GET_DigitalConfig_meterdata_db(
                                                                serial=serial,
                                                                select_id_all=select_id_all,
                                                                select_last_time=select_last_time,
-                                                               out_of_bounds=out_of_bounds
+                                                               out_of_bounds=out_of_bounds,
+                                                               tags=tags
                                                                )
 
     assert meterdata == []
 
 
 # # ------------------------------------- ElecticEnergyValues ----------------------------------------------------------
-parametrize_ElecticEnergyValues_ArchType_name_list = parametrize_by_element(reqest='get',
-                                                                            ArchType_name_list=ElecticEnergyValues_ArchType_name_list)
+parametrize_ElecticEnergyValues_ArchType_name_list = parametrize_by_element(
+    reqest='get',
+    ArchType_name_list=ElecticEnergyValues_ArchType_name_list
+)
 
 
-@pytest.mark.parametrize("list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , "
-                         "count_tags , select_device_idx , select_meter_id , serial, select_id_all , select_last_time"
-                         " , out_of_bounds",
-                         parametrize_ElecticEnergyValues_ArchType_name_list)
+@pytest.mark.parametrize(
+    "list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
+    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags",
+    parametrize_ElecticEnergyValues_ArchType_name_list)
 def test_GET_ElecticEnergyValues_meterdata_db_by_element(
         type_connect,
         # Список из типов данных
@@ -701,7 +667,9 @@ def test_GET_ElecticEnergyValues_meterdata_db_by_element(
         # Булевый маркер - Селект только последнего времени
         select_last_time,
         # Булевый маркер - Выход за границы времени что сгенерировали
-        out_of_bounds
+        out_of_bounds,
+        # Переопределенные тэги
+        tags
 ):
     # Чистим БД
 
@@ -718,7 +686,8 @@ def test_GET_ElecticEnergyValues_meterdata_db_by_element(
                                                                serial=serial,
                                                                select_id_all=select_id_all,
                                                                select_last_time=select_last_time,
-                                                               out_of_bounds=out_of_bounds
+                                                               out_of_bounds=out_of_bounds,
+                                                               tags=tags
                                                                )
 
     assert meterdata == []
@@ -728,18 +697,18 @@ def test_GET_ElecticEnergyValues_meterdata_db_by_element(
 
 @pytest.mark.parametrize(
     "list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
-    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds",
+    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags",
     [
-        (ElecticEnergyValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False),
-        (ElecticEnergyValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False),
-        (ElecticEnergyValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False),
-        (ElecticEnergyValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False),
-        (ElecticEnergyValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True),
-        (ElecticEnergyValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True),
-        (ElecticEnergyValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True),
-        (ElecticEnergyValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True),
-        (ElecticEnergyValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False),
-        (ElecticEnergyValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True)
+        (ElecticEnergyValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}),
+        (ElecticEnergyValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}),
+        (ElecticEnergyValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {}),
+        (ElecticEnergyValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}),
+        (ElecticEnergyValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}),
+        (ElecticEnergyValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {}),
+        (ElecticEnergyValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}),
+        (ElecticEnergyValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}),
+        (ElecticEnergyValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}),
+        (ElecticEnergyValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {})
 
     ]
 )
@@ -768,7 +737,9 @@ def test_GET_ElecticEnergyValues_meterdata_db(
         # Булевый маркер - Селект только последнего времени
         select_last_time,
         # Булевый маркер - Выход за границы времени что сгенерировали
-        out_of_bounds
+        out_of_bounds,
+        # Переопределенные тэги
+        tags
 ):
     # Чистим БД
 
@@ -785,7 +756,8 @@ def test_GET_ElecticEnergyValues_meterdata_db(
                                                                serial=serial,
                                                                select_id_all=select_id_all,
                                                                select_last_time=select_last_time,
-                                                               out_of_bounds=out_of_bounds
+                                                               out_of_bounds=out_of_bounds,
+                                                               tags=tags
                                                                )
 
     assert meterdata == []
@@ -796,18 +768,18 @@ def test_GET_ElecticEnergyValues_meterdata_db(
 
 @pytest.mark.parametrize(
     "list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
-    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds",
+    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags",
     [
-        (ElectricQualityValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False),
-        (ElectricQualityValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False),
-        (ElectricQualityValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False),
-        (ElectricQualityValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False),
-        (ElectricQualityValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True),
-        (ElectricQualityValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True),
-        (ElectricQualityValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True),
-        (ElectricQualityValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True),
-        (ElectricQualityValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False),
-        (ElectricQualityValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True)
+        (ElectricQualityValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}),
+        (ElectricQualityValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}),
+        (ElectricQualityValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {}),
+        (ElectricQualityValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}),
+        (ElectricQualityValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}),
+        (ElectricQualityValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {}),
+        (ElectricQualityValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}),
+        (ElectricQualityValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}),
+        (ElectricQualityValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}),
+        (ElectricQualityValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {})
 
     ]
 )
@@ -836,7 +808,9 @@ def test_GET_ElectricQualityValues_meterdata_db(
         # Булевый маркер - Селект только последнего времени
         select_last_time,
         # Булевый маркер - Выход за границы времени что сгенерировали
-        out_of_bounds
+        out_of_bounds,
+        # Переопределенные тэги
+        tags
 ):
     # Чистим БД
 
@@ -853,7 +827,8 @@ def test_GET_ElectricQualityValues_meterdata_db(
                                                                serial=serial,
                                                                select_id_all=select_id_all,
                                                                select_last_time=select_last_time,
-                                                               out_of_bounds=out_of_bounds
+                                                               out_of_bounds=out_of_bounds,
+                                                               tags=tags
                                                                )
 
     assert meterdata == []
@@ -868,10 +843,10 @@ parametrize_ElectricPowerValues_ArchType_name_list = parametrize_by_element(
     ArchType_name_list=ElectricPowerValues_ArchType_name_list)
 
 
-@pytest.mark.parametrize("list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , "
-                         "count_tags , select_device_idx , select_meter_id , serial, select_id_all , select_last_time"
-                         " , out_of_bounds",
-                         parametrize_ElectricPowerValues_ArchType_name_list)
+@pytest.mark.parametrize(
+    "list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
+    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags",
+    parametrize_ElectricPowerValues_ArchType_name_list)
 def test_GET_ElectricPowerValues_meterdata_db_by_element(
         type_connect,
         # Список из типов данных
@@ -897,7 +872,9 @@ def test_GET_ElectricPowerValues_meterdata_db_by_element(
         # Булевый маркер - Селект только последнего времени
         select_last_time,
         # Булевый маркер - Выход за границы времени что сгенерировали
-        out_of_bounds
+        out_of_bounds,
+        # Переопределенные тэги
+        tags
 ):
     # Чистим БД
 
@@ -914,7 +891,8 @@ def test_GET_ElectricPowerValues_meterdata_db_by_element(
                                                                serial=serial,
                                                                select_id_all=select_id_all,
                                                                select_last_time=select_last_time,
-                                                               out_of_bounds=out_of_bounds
+                                                               out_of_bounds=out_of_bounds,
+                                                               tags=tags
                                                                )
 
     assert meterdata == []
@@ -925,18 +903,18 @@ def test_GET_ElectricPowerValues_meterdata_db_by_element(
 
 @pytest.mark.parametrize(
     "list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
-    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds",
+    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags",
     [
-        (ElectricPowerValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False),
-        (ElectricPowerValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False),
-        (ElectricPowerValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False),
-        (ElectricPowerValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False),
-        (ElectricPowerValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True),
-        (ElectricPowerValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True),
-        (ElectricPowerValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True),
-        (ElectricPowerValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True),
-        (ElectricPowerValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False),
-        (ElectricPowerValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True)
+        (ElectricPowerValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}),
+        (ElectricPowerValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}),
+        (ElectricPowerValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {}),
+        (ElectricPowerValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}),
+        (ElectricPowerValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}),
+        (ElectricPowerValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {}),
+        (ElectricPowerValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}),
+        (ElectricPowerValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}),
+        (ElectricPowerValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}),
+        (ElectricPowerValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {})
 
     ]
 )
@@ -965,7 +943,9 @@ def test_GET_ElectricPowerValues_meterdata_db(
         # Булевый маркер - Селект только последнего времени
         select_last_time,
         # Булевый маркер - Выход за границы времени что сгенерировали
-        out_of_bounds
+        out_of_bounds,
+        # Переопределенные тэги
+        tags
 ):
     # Чистим БД
 
@@ -982,7 +962,8 @@ def test_GET_ElectricPowerValues_meterdata_db(
                                                                serial=serial,
                                                                select_id_all=select_id_all,
                                                                select_last_time=select_last_time,
-                                                               out_of_bounds=out_of_bounds
+                                                               out_of_bounds=out_of_bounds,
+                                                               tags=tags
                                                                )
 
     assert meterdata == []
@@ -993,9 +974,8 @@ parametrize_PulseValues_ArchType_name = parametrize_by_element(reqest='get',
                                                                ArchType_name_list=PulseValues_ArchType_name_list)
 
 
-@pytest.mark.parametrize("list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , "
-                         "count_tags , select_device_idx , select_meter_id , serial, select_id_all , select_last_time"
-                         " , out_of_bounds",
+@pytest.mark.parametrize("list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
+    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags",
                          parametrize_PulseValues_ArchType_name
                          )
 def test_GET_PulseValues_meterdata_db_by_element(
@@ -1023,7 +1003,9 @@ def test_GET_PulseValues_meterdata_db_by_element(
         # Булевый маркер - Селект только последнего времени
         select_last_time,
         # Булевый маркер - Выход за границы времени что сгенерировали
-        out_of_bounds
+        out_of_bounds,
+        # Переопределенные тэги
+        tags
 ):
     # Чистим БД
 
@@ -1040,7 +1022,8 @@ def test_GET_PulseValues_meterdata_db_by_element(
                                                                serial=serial,
                                                                select_id_all=select_id_all,
                                                                select_last_time=select_last_time,
-                                                               out_of_bounds=out_of_bounds
+                                                               out_of_bounds=out_of_bounds,
+                                                               tags=tags
                                                                )
 
     assert meterdata == []
@@ -1051,18 +1034,18 @@ def test_GET_PulseValues_meterdata_db_by_element(
 
 @pytest.mark.parametrize(
     "list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
-    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds",
+    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags",
     [
-        (PulseValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False),
-        (PulseValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False),
-        (PulseValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False),
-        (PulseValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False),
-        (PulseValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True),
-        (PulseValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True),
-        (PulseValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True),
-        (PulseValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True),
-        (PulseValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False),
-        (PulseValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True)
+        (PulseValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}),
+        (PulseValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}),
+        (PulseValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {}),
+        (PulseValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}),
+        (PulseValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}),
+        (PulseValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {}),
+        (PulseValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}),
+        (PulseValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}),
+        (PulseValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}),
+        (PulseValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {})
 
     ]
 )
@@ -1091,7 +1074,9 @@ def test_GET_PulseValues_meterdata_db(
         # Булевый маркер - Селект только последнего времени
         select_last_time,
         # Булевый маркер - Выход за границы времени что сгенерировали
-        out_of_bounds
+        out_of_bounds,
+        # Переопределенные тэги
+        tags
 ):
     # Чистим БД
 
@@ -1108,7 +1093,8 @@ def test_GET_PulseValues_meterdata_db(
                                                                serial=serial,
                                                                select_id_all=select_id_all,
                                                                select_last_time=select_last_time,
-                                                               out_of_bounds=out_of_bounds
+                                                               out_of_bounds=out_of_bounds,
+                                                               tags=tags
                                                                )
 
     assert meterdata == []
@@ -1119,9 +1105,8 @@ parametrize_DigitalValues_ArchType_name = parametrize_by_element(reqest='get',
                                                                  ArchType_name_list=DigitalValues_ArchType_name_list)
 
 
-@pytest.mark.parametrize("list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , "
-                         "count_tags , select_device_idx , select_meter_id , serial, select_id_all , select_last_time"
-                         " , out_of_bounds",
+@pytest.mark.parametrize("list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
+    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags",
                          parametrize_DigitalValues_ArchType_name
                          )
 def test_GET_DigitalValues_meterdata_db_by_element(
@@ -1149,7 +1134,9 @@ def test_GET_DigitalValues_meterdata_db_by_element(
         # Булевый маркер - Селект только последнего времени
         select_last_time,
         # Булевый маркер - Выход за границы времени что сгенерировали
-        out_of_bounds
+        out_of_bounds,
+        # Переопределенные тэги
+        tags
 ):
     # Чистим БД
 
@@ -1166,7 +1153,8 @@ def test_GET_DigitalValues_meterdata_db_by_element(
                                                                serial=serial,
                                                                select_id_all=select_id_all,
                                                                select_last_time=select_last_time,
-                                                               out_of_bounds=out_of_bounds
+                                                               out_of_bounds=out_of_bounds,
+                                                               tags=tags
                                                                )
 
     assert meterdata == []
@@ -1177,18 +1165,18 @@ def test_GET_DigitalValues_meterdata_db_by_element(
 
 @pytest.mark.parametrize(
     "list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
-    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds",
+    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags",
     [
-        (DigitalValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False),
-        (DigitalValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False),
-        (DigitalValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False),
-        (DigitalValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False),
-        (DigitalValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True),
-        (DigitalValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True),
-        (DigitalValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True),
-        (DigitalValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True),
-        (DigitalValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False),
-        (DigitalValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True)
+        (DigitalValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}),
+        (DigitalValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}),
+        (DigitalValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {}),
+        (DigitalValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}),
+        (DigitalValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}),
+        (DigitalValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {}),
+        (DigitalValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}),
+        (DigitalValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}),
+        (DigitalValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}),
+        (DigitalValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {})
 
     ]
 )
@@ -1217,7 +1205,9 @@ def test_GET_DigitalValues_meterdata_db(
         # Булевый маркер - Селект только последнего времени
         select_last_time,
         # Булевый маркер - Выход за границы времени что сгенерировали
-        out_of_bounds
+        out_of_bounds,
+        # Переопределенные тэги
+        tags
 ):
     # Чистим БД
 
@@ -1234,7 +1224,8 @@ def test_GET_DigitalValues_meterdata_db(
                                                                serial=serial,
                                                                select_id_all=select_id_all,
                                                                select_last_time=select_last_time,
-                                                               out_of_bounds=out_of_bounds
+                                                               out_of_bounds=out_of_bounds,
+                                                               tags=tags
                                                                )
 
     assert meterdata == []
@@ -1245,9 +1236,8 @@ parametrize_JournalValues_ArchType_name = parametrize_by_element(reqest='get',
                                                                  ArchType_name_list=JournalValues_ArchType_name_list)
 
 
-@pytest.mark.parametrize("list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , "
-                         "count_tags , select_device_idx , select_meter_id , serial, select_id_all , select_last_time"
-                         " , out_of_bounds",
+@pytest.mark.parametrize("list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
+    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags",
                          parametrize_JournalValues_ArchType_name)
 def test_GET_JournalValues_meterdata_db_by_element(
         type_connect,
@@ -1274,7 +1264,9 @@ def test_GET_JournalValues_meterdata_db_by_element(
         # Булевый маркер - Селект только последнего времени
         select_last_time,
         # Булевый маркер - Выход за границы времени что сгенерировали
-        out_of_bounds
+        out_of_bounds,
+        # Переопределенные тэги
+        tags
 ):
     # Чистим БД
 
@@ -1291,7 +1283,8 @@ def test_GET_JournalValues_meterdata_db_by_element(
                                                                serial=serial,
                                                                select_id_all=select_id_all,
                                                                select_last_time=select_last_time,
-                                                               out_of_bounds=out_of_bounds
+                                                               out_of_bounds=out_of_bounds,
+                                                               tags=tags
                                                                )
 
     assert meterdata == []
@@ -1301,18 +1294,18 @@ def test_GET_JournalValues_meterdata_db_by_element(
 
 @pytest.mark.parametrize(
     "list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
-    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds",
+    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags",
     [
-        (JournalValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False),
-        (JournalValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False),
-        (JournalValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False),
-        (JournalValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False),
-        (JournalValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True),
-        (JournalValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True),
-        (JournalValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True),
-        (JournalValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True),
-        (JournalValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False),
-        (JournalValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True)
+        (JournalValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}),
+        (JournalValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}),
+        (JournalValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {}),
+        (JournalValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}),
+        (JournalValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}),
+        (JournalValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {}),
+        (JournalValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}),
+        (JournalValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}),
+        (JournalValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}),
+        (JournalValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {})
 
     ]
 )
@@ -1341,7 +1334,9 @@ def test_GET_JournalValues_meterdata_db(
         # Булевый маркер - Селект только последнего времени
         select_last_time,
         # Булевый маркер - Выход за границы времени что сгенерировали
-        out_of_bounds
+        out_of_bounds,
+        # Переопределенные тэги
+        tags
 ):
     # Чистим БД
 
@@ -1358,30 +1353,31 @@ def test_GET_JournalValues_meterdata_db(
                                                                serial=serial,
                                                                select_id_all=select_id_all,
                                                                select_last_time=select_last_time,
-                                                               out_of_bounds=out_of_bounds
+                                                               out_of_bounds=out_of_bounds,
+                                                               tags=tags
                                                                )
 
     assert meterdata == []
 
-
-# # -------------------------------------   AllTAGS ---------------------------------------------------------------------
+#
+# # # -------------------------------------   AllTAGS ---------------------------------------------------------------------
 all_ArchType_name_list = ElectricConfig_ArchType_name_list + ElecticEnergyValues_ArchType_name_list + ElectricQualityValues_ArchType_name_list + ElectricPowerValues_ArchType_name_list + PulseValues_ArchType_name_list + DigitalValues_ArchType_name_list + JournalValues_ArchType_name_list
 
 
 @pytest.mark.parametrize(
     "list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
-    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds",
+    "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags",
     [
-        (all_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False),
-        (all_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False),
-        (all_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False),
-        (all_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False),
-        (all_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True),
-        (all_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True),
-        (all_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True),
-        (all_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True),
-        (all_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False),
-        (all_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True)
+        (all_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}),
+        (all_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}),
+        (all_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {}),
+        (all_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}),
+        (all_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}),
+        (all_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {}),
+        (all_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}),
+        (all_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}),
+        (all_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}),
+        (all_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {})
 
     ]
 )
@@ -1410,7 +1406,10 @@ def test_GET_all_ArchType_name_meterdata_db(
         # Булевый маркер - Селект только последнего времени
         select_last_time,
         # Булевый маркер - Выход за границы времени что сгенерировали
-        out_of_bounds
+        out_of_bounds,
+        # Переопределенные тэги
+        tags
+
 ):
     deleteMeterTable()
     sleep(2)
@@ -1425,7 +1424,8 @@ def test_GET_all_ArchType_name_meterdata_db(
                                                                serial=serial,
                                                                select_id_all=select_id_all,
                                                                select_last_time=select_last_time,
-                                                               out_of_bounds=out_of_bounds
+                                                               out_of_bounds=out_of_bounds,
+                                                               tags=tags
                                                                )
 
     assert meterdata == []

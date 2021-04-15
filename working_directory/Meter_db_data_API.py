@@ -98,47 +98,6 @@ class GET(MeterData):
         return result
 
     # -----------------------------------------------------------------------------------------------
-
-    # -------------------------------- ПРОВЕРКА Количества генераций --------------------------------
-    def __define_count_generation(self):
-        pass
-        # Проверяем что количество генераций не есть меньше колличества селектов  - в этом случае у насм все хорошо
-        # if self.select_count_id > self.generate_count_id:
-        # result.append({'error': 'Не правильно задано количество генераций'})
-
-    # --------------------------- ПРОВЕРКА УСПЕШНОСТИ Здания параметров -----------------------------
-    # def __added_config(self, serial):
-    #     '''# Проверяем - задан ли конфиг, если не задан , то все хорошо'''
-    #     list_measure = self.list_measure
-    #
-    #     added_config = False
-    #
-    #     if serial:
-    #         # Проверяем - задан ли конфиг, если не задан , то все хорошо
-    #
-    #         if (Template_list_ArchTypes.ElectricConfig_ArchType_name_list[0] not in list_measure) and \
-    #                 (Template_list_ArchTypes.PulseConfig_ArchType_name_list[0] not in list_measure) and \
-    #                 (Template_list_ArchTypes.DigitalConfig_ArchType_name_list[0] not in list_measure):
-    #             # Теперь надо приписать нужный конфиг и сделаем и сделаем это через множества
-    #             # Теперь формируем на всякий случай лист из всех электрических конфигов
-    #             full_elconfig = Template_list_ArchTypes.ElecticEnergyValues_ArchType_name_list + Template_list_ArchTypes.ElectricQualityValues_ArchType_name_list + \
-    #                             Template_list_ArchTypes.ElectricPowerValues_ArchType_name_list + Template_list_ArchTypes.JournalValues_ArchType_name_list
-    #             # Если есть импульсные значения - то добавляем конфиг
-    #
-    #             # Поскольку тут все грустно - ставим заглушку на El config
-    #             if len(set(list_measure) & set(Template_list_ArchTypes.PulseValues_ArchType_name_list)) > 0:
-    #                 # list_measure = list_measure + PulseConfig_ArchType_name_list
-    #                 list_measure = list_measure + Template_list_ArchTypes.ElectricConfig_ArchType_name_list
-    #             # Если есть диджитал значения - то добавляем конфиг
-    #             if len(set(list_measure) & set(Template_list_ArchTypes.DigitalValues_ArchType_name_list)) > 0:
-    #                 # list_measure = list_measure + DigitalConfig_ArchType_name_list
-    #                 list_measure = list_measure + Template_list_ArchTypes.ElectricConfig_ArchType_name_list
-    #             # Если есть электрик значения - то добавляем конфиг
-    #             if len(set(list_measure) & set(full_elconfig)) > 0:
-    #                 list_measure = list_measure + Template_list_ArchTypes.ElectricConfig_ArchType_name_list
-    #             added_config = True
-
-    # -----------------------------------------------------------------------------------------------
     # Еcли мы отправляем массив данных :
     def Сustom_measures(self,
                         #
@@ -200,7 +159,7 @@ class GET(MeterData):
             select_count_ts=select_count_ts,
             select_count_id=select_count_id)
 
-        print('JSON_dict_record', JSON_dict_record)
+        # print('JSON_dict_record', JSON_dict_record)
         # Теперь получаем данные из БД что записали
         select_for_JSON_to_database = ReceivingDataAccordingToJSON(JSON=self.JSON_dict, Select_all=False).get_result()
 
@@ -325,7 +284,6 @@ class POST(MeterData):
                                  DataBase_after=data_base_after_recording,
                                  DataBase_was_recording=data_base_was_recorded,
                                  JSON_deconstruct=JSON_deconstruct).error_collector
-            print('result', result)
 
             result = self.__write_log(result)
 
@@ -355,14 +313,14 @@ from working_directory.sqlite import deleteMeterTable
 deleteMeterTable()
 sleep(2)
 # # -------------------------------------------------------------------------------------------------------------------
-
-meterdata = POST(type_connect='virtualbox').Сustom_measures(
-    list_measure=['DigConfig'],
-    count_id=1, count_ts=2,
-    tags={'serial':None, 'model':None, 'cArrays':None, 'isDst':None, 'isClock':None, 'isTrf':None,
-            'isAm':None, 'isRm':None, 'isRp':None, 'kI':None, 'kU':None, 'const':None
-         }
-)
+#
+# meterdata = POST(type_connect='virtualbox').Сustom_measures(
+#     list_measure=['PlsMomentPulse'],
+#     count_id=1, count_ts=2,
+#     tags={'serial':None, 'model':None, 'cArrays':None, 'isDst':None, 'isClock':None, 'isTrf':None,
+#             'isAm':None, 'isRm':None, 'isRp':None, 'kI':None, 'kU':None, 'const':None
+#          }
+# )
 
 
 ElMomentQuality = {
@@ -403,20 +361,24 @@ ElConfig = {'serial':None, 'model':None, 'cArrays':None, 'isDst':None, 'isClock'
 
 
 Journal = {'event':None, 'eventId':None, }
-print(meterdata)
+# print(meterdata)
 
 # -------------------------------------------------------------------------------------------------------------------
-# meterdata = GET(type_connect='virtualbox').Сustom_measures(list_measure=['ElArr1ConsPower'],
-#                                                            select_count_ts=4,
-#                                                            select_count_id=4,
-#                                                            generate_count_ts=4,
-#                                                            generate_count_id=5,
-#                                                            count_tags=3,
-#                                                            select_device_idx=True,
-#                                                            select_meter_id=False,
-#                                                            serial=False,
-#                                                            select_id_all=False,
-#                                                            select_last_time=False,
-#                                                            out_of_bounds=False)
-#
-# print(meterdata)
+meterdata = GET(type_connect='virtualbox').Сustom_measures(list_measure=['ElArr1ConsPower'],
+                                                           select_count_ts=2,
+                                                           select_count_id=2,
+                                                           generate_count_ts=3,
+                                                           generate_count_id=3,
+                                                           count_tags=0,
+                                                           select_device_idx=False,
+                                                           select_meter_id=True,
+                                                           serial=False,
+                                                           select_id_all=False,
+                                                           select_last_time=True,
+                                                           out_of_bounds=True)
+
+print(meterdata)
+
+
+# ['PlsConfig'], select_count_ts = 2, select_count_id = 2, generate_count_ts = 3, generate_count_id = 3, count_tags = 0, select_device_idx = False, select_meter_id = True, serial = False
+# select_id_all = False, select_last_time = True, out_of_bounds = True

@@ -282,7 +282,7 @@ class RedefinitionValuesTags:
 # ---------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------------------------
 
-class GETCheckUP:
+class GETCheckUP(CheckUp):
     """
         Класс для проверки для GET запроса
 
@@ -308,6 +308,9 @@ class GETCheckUP:
         self.DataBase_select = DataBase_select
 
         # Проверяем количество элементов
+
+        # print('self.JSON_deconstruct',self.JSON_deconstruct)
+        # print('self.DataBase_select', self.DataBase_select)
 
         self.__checkUP_len()
 
@@ -481,16 +484,16 @@ class POSTCheckUP(CheckUp):
                                           DataBase_was_recording):
         """Стадия проверки конкретного типа данных"""
         error = []
-        print('\n--------------------------')
-        print('JSON_deconstruct', JSON_deconstruct)
-        print('DataBase_before', DataBase_before)
-        print('DataBase_after', DataBase_after)
-        print('DataBase_was_recording', DataBase_was_recording)
+        # print('\n--------------------------')
+        # print('JSON_deconstruct', JSON_deconstruct)
+        # print('DataBase_before', DataBase_before)
+        # print('DataBase_after', DataBase_after)
+        # print('DataBase_was_recording', DataBase_was_recording)
 
         # Теперь первое что делаем - Получаем разницу что записалось по факту
         DataBase_after_the_fact = self.__getting_recording_record_after_fact(DataBase_after=DataBase_after,
                                                                              DataBase_before=DataBase_before)
-        print('----------------------')
+        # print('----------------------')
         # print(DataBase_after_the_fact)
 
         # Делаем коприю бд для проверки на нулевые значения

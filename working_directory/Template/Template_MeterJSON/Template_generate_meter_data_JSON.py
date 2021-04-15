@@ -39,6 +39,11 @@ class GeneratorJSON:
                  # КАСТРОМНЫЕ ТЭГИ
                  Castrom_Value: dict = {}):
         # Переопределяем тэги
+        self.JSON_Meter_data_POST = {}
+        self.JSON_Meter_data_GET = {}
+        self.JSON = {}
+
+
         self.measure = measure
         self.count_ts = count_ts
         self.count_id = count_id
@@ -66,7 +71,7 @@ class GeneratorJSON:
         # Производим генерицаю по копии
         self.JSON_Meter_data_POST = POST(measures=deepcopy(self.JSON)).get_JSON_dict()
 
-        return self.JSON_Meter_data_POST
+        return deepcopy(self.JSON_Meter_data_POST)
 
     def Generator_JSON_for_Meter_data_GET(self,
                                           count_tags: int or list,
@@ -123,4 +128,4 @@ class GeneratorJSON:
         # Производим генерицаю по копии
         self.JSON_Meter_data_GET = GET(measures=deepcopy(JSON_Meter_data_GET)).get_JSON_dict()
 
-        return self.JSON_Meter_data_GET
+        return deepcopy(self.JSON_Meter_data_GET)

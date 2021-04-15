@@ -315,6 +315,7 @@ class ReceivingDataAccordingToJSON:
         for i in range(len(self.JSON['measures'])):
             result = self.__get_define_table(self.JSON['measures'][i])
             result_full = result_full + result
+            # result_full.append(result)
 
         return result_full
 
@@ -1400,6 +1401,7 @@ class RecordDataToDB:
         command_insert_full = command_insert + str(data_insert_full)
         # Обрезаем последнюю запятую
         command_insert_full = command_insert_full[:-1]
+
         # отправляем в космос
 
         result = sqlite.execute_command_to_write_return_dict(command_insert_full)

@@ -1,7 +1,7 @@
 # Сдесь сделаем наш алгоритм сравнения для Meter Daemon
 from working_directory.Template.Template_Meter_db_data_API import Template_list_ArchTypes
 from copy import deepcopy
-
+# from working_directory.Template.Template_Meter_db_data_API.Template_checkup_from_Meter_db_data_API import CheckUp
 
 # ---------------------------------------------------------------------------------------------------------------------
 #                         Здесь расположем главный класс сравнивания - Это важно !!!

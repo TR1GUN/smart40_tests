@@ -342,6 +342,7 @@ def execute_command_to_write_return_dict(command:str):
     :param command: Собсна переменная команды которую надо исполнить - пихать в str
     :return: Сюда результат выполнения этой команды , только в словаре
     """
+
     conn = sqlite3.connect(dbpath)
     conn.row_factory = dict_factory
     c = conn.cursor()

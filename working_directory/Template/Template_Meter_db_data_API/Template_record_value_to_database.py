@@ -21,13 +21,19 @@ class RecordValueToDataBase:
     DeviceIdx_list = []
 
     def __init__(self, JSON_deconstruct: list):
+        self.DeviceIdx_list = []
+        self.JSON_deconstruct = []
+
         self.JSON_deconstruct = JSON_deconstruct
         # Определяем - есть ли значения для записи
         if len(self.JSON_deconstruct) > 0:
             # ЕСЛИ ДА , ТО ОПРЕДЕЛЯЕМ ЕСТЬ ЛИ КОНФИГ
             self.__define_config()
             # После чего ЗАПИСЫВАЕМ ПОУЛЧИВШИЙСЯ РЕЗУЛЬТАТ
-
+            # print('----------------------------------------')
+            # print('----------------ЗАПИСЬ------------------')
+            # print(self.JSON_deconstruct)
+            # print('----------------------------------------')
             RecordDataToDB(data=self.JSON_deconstruct)
 
     # Здесь определяем Есть ли у нас Конфиг , если нет - То добавляем
@@ -38,11 +44,11 @@ class RecordValueToDataBase:
         # /////////////////////////////////////////////////////////////////////////////////////////////////////////
         #                     ОЧЕНЬ ВАЖНАЯ ХРЕНЬ - ПОКА ДОБАВЛЯЕТСЯ ТОЛЬКО ЭЛЕКТРОННЫЙ КОНФИГ
         # /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        # config_list = ElectricConfig_ArchType_name_list +
-        # PulseConfig_ArchType_name_list +
-        # DigitalConfig_ArchType_name_list
+        config_list = ElectricConfig_ArchType_name_list + \
+                        PulseConfig_ArchType_name_list + \
+                        DigitalConfig_ArchType_name_list
 
-        config_list = ElectricConfig_ArchType_name_list
+        # config_list = ElectricConfig_ArchType_name_list
         # full_elconfig = Template_list_ArchTypes.ElecticEnergyValues_ArchType_name_list + \
         #                 Template_list_ArchTypes.ElectricQualityValues_ArchType_name_list + \
         #                 Template_list_ArchTypes.ElectricPowerValues_ArchType_name_list + \

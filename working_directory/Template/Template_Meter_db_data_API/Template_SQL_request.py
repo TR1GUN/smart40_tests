@@ -594,7 +594,7 @@ WHERE
 PulseValues_select_list = ["""
 SELECT 
 
-    Channels ,
+    /*Channels ,*/
     Chnl1     AS   Pls1    ,
     Chnl2     AS   Pls2    ,
     Chnl3     AS   Pls3    ,
@@ -699,7 +699,7 @@ WHERE
 DigitalValues_select_list = ["""
 SELECT 
 
-	Channels       ,
+	/*Channels       ,*/
     Chnl1         ,
     Chnl2         ,
     Chnl3         ,
