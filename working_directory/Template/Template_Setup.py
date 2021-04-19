@@ -1,9 +1,11 @@
 # Здесь описан Класс отправки и приема сообщеий JSON
 import json
 from working_directory.Connect import Byte_coding_decoding, Connection
-from working_directory.Template.Template_Types_Setup import SetupTCPIP, SetupDocker, SetupVirtualBox , SetupInsideLauncher
+from working_directory.Template.Template_Types_Setup import SetupTCPIP, SetupDocker, SetupVirtualBox, \
+    SetupInsideLauncher, SetupSSH
 from sys import getsizeof
 from time import sleep
+
 
 class Setup:
     """
@@ -43,7 +45,7 @@ class Setup:
     type_connect = ''
     options_setup = {}
 
-    def __init__(self, JSON, API: str = 'test_api', type_connect: str ='tcp\ip'):
+    def __init__(self, JSON, API: str = 'test_api', type_connect: str = 'tcp\ip'):
 
         """
         Класс Запуска
@@ -163,39 +165,21 @@ class Setup:
 
         return answer_JSON
 
+    def __setup_SSH(self):
+
+        """Запуск через SSH соединие"""
+
+        answer_JSON = SetupSSH(JSON=self.JSON, API=self.API).answer_JSON
+
+        return answer_JSON
+
     options_setup = {'tcp\ip': __setup_TCPIP,
                      'docker': __setup_Docker,
                      'virtualbox': __setup_VirtualBox,
                      'linux': __setup_Launcher_inside,
                      'inside_launcher': __setup_Launcher_inside,
+                     'ssh': __setup_SSH,
                      }
-    # Закоментируем Все то что было написанно до этого
-    #     self.answer_JSON = self.setup_TCP_IP(JSON)
-    #
-    # def setup_TCP_IP(self, JSON):
-    #     # Переводим нащ JSON в байты
-    #
-    #     self.jsoninbytes = Byte_coding_decoding.to_bytes(JSON)
-    #     # Отправляем нащ байтовый JSON на порт
-    #
-    #     response = Connection.JSON_SendingReceiving(self.jsoninbytes)
-    #     # Получаем ответ
-    #     self.JSON_answer_byte = response.socket_data
-    #     # Декодируем Из байтового вида
-    #     self.JSON_str = Byte_coding_decoding.from_bytes(self.JSON_answer_byte)
-    #     # декодируем из json в dict
-    #
-    #     try:
-    #
-    #         self.JSON_dict = json.loads(self.JSON_str)
-    #     except:
-    #
-    #         self.JSON_dict = {}
-    #         self.JSON_dict['res'] = 999999
-    #         self.JSON_dict['error'] = 'Ошибка парсинга ответа JSON'
-    #         self.JSON_dict['JSON_answer'] = [self.JSON_str]
-    #
-    #     return self.JSON_dict
 
 
 def setup(JSON):

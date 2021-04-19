@@ -192,7 +192,7 @@ class CheckUp:
                     # ЕСЛИ ЗНАЧЕНИЕ НЕ НУЛЕВОЕ _ ВЫБРАСЫВАЕМ ОШИБКУ
                     if database[i][key] is not None:
                         error = [{'Не None ЗНАЧЕНИЯ КЛЮЧА ' + key: database[i][key], 'Элемент БД - ': database[i],
-                                  "ЭЛЕМЕНТ Time": database['ts']}]
+                                  "ЭЛЕМЕНТ Time": database[i]['ts']}]
                         error_list = error_list + error
         return error_list
 

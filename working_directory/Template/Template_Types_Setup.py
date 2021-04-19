@@ -2,11 +2,11 @@
 
 
 # Для начала - Класс запуска через TCP\IP
-# Импортируем необходимые классы Конекта
-from virtualbox.library import IVirtualBox
+
 
 from working_directory.Connect import Byte_coding_decoding, Connection
 from working_directory.Template.Config import path_to_API
+
 
 class SetupTCPIP:
     """
@@ -176,6 +176,9 @@ class SetupDocker:
         return result
 
 
+
+
+
 # Здесь распишем класс Работы если наша система запущена в виртуальной машине
 class SetupVirtualBox:
     """
@@ -205,23 +208,24 @@ class SetupVirtualBox:
         :param API: А сюда надо пихать апиху в стринге - ВАЖНО - используется стринга для названия самого компонента
         как он называется в самом линухе!!!!
         """
-
-
-        # Запускаем апи работы с виртуальным контейнером
-        import virtualbox
+        # Переопределяем
         self.JSON = JSON
         # Инициализируемся
         self.API = API
-        # Теперь получаем наши виртуальные машины
-        vbox: IVirtualBox = virtualbox.VirtualBox()
 
-        # Ищем нашу машину
-        from working_directory.ConfigParser import machine_name
+        # Закоментированное - Перенесенно в другой файл ради многопоточных запусков
+        # Смотрим ошибку создания множества COM обьектов
+        # import virtualbox
+        # vbox = virtualbox.VirtualBox
+        # vbox = vbox()
+        # from working_directory.ConfigParser import machine_name
+        #
+        # self.vm = vbox.find_machine(machine_name)
 
-        vm = vbox.find_machine(machine_name)
 
-        # инициализируем ссесиию
 
+        # Импортируем нашу виртуальную тачку
+        from working_directory.Connect.Virtual_Box import vm
         self.session = vm.create_session()
 
         # после чего проверяем ее статус - если она выключена  - включаем ее
@@ -242,12 +246,19 @@ class SetupVirtualBox:
         # Получаем Наш байтовый массив на выход
         self.answer_JSON = byte_result
 
+        # После уничтожаем сессию
+        del self.session
+        del vm
+
     def __connect_to_virtual_machine(self):
 
         # получаем нашу машину , и инициализируем ссесию гостевого доступа к ней
-        guest_session = self.session.console.guest.create_session(user="smart", password="root",
-                                                                  domain='smart-VirtualBox')
+        # Ищем нашу машину
+        from working_directory.ConfigParser import user_login, user_password, domain
 
+        guest_session = self.session.console.guest.create_session(user=str(user_login),
+                                                                  password=str(user_password),
+                                                                  domain=str(domain))
         # Получаем команду что дожны отправить
         cmd = self.JSON
         # Получаем апи в которую должны отправить
@@ -266,6 +277,9 @@ class SetupVirtualBox:
 
         # Теперь возвращаем результат
 
+        del guest_session
+        # # освобождаем сессию
+        # self.session.console.power_down()
         return result
 
 
@@ -285,7 +299,6 @@ class SetupInsideLauncher:
     answer_JSON = None
 
     def __init__(self, JSON: str, API: str):
-
         """
         Класс для работы с запуском прямиком из линукс машины
 
@@ -314,3 +327,87 @@ class SetupInsideLauncher:
         data, error = process.communicate()
 
         self.answer_JSON = data
+
+
+# здесь расположим класс для работы с запуском тестов внутри через SSH
+class SetupSSH:
+    """
+    Класс для работы по SSH
+
+
+    """
+    __filters_containers = None
+
+    cmd = None
+    JSON = '{}'
+    API = None
+    answer_JSON = None
+
+    def __init__(self, JSON: str, API: str):
+
+        # переопределяем тэги
+        self.JSON = JSON
+        self.API = API
+
+        self.answer_JSON = self._start_ssh()
+
+        # Запускаем
+
+    def _start_ssh(self):
+        import paramiko
+
+        # Создаем клиент
+        client = paramiko.SSHClient()
+
+        # Настравиваем сессию
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+        # Берем настройки подключения
+        from working_directory.ConfigParser import user_login, user_password, addres_ssh
+        # Делаем подкючение к нужному серверу
+
+        # Конектимся
+        client.connect(hostname=str(addres_ssh), username=str(user_login), password=str(user_password),
+                       look_for_keys=False, allow_agent=False)
+
+        # Получаем команду что дожны отправить
+        cmd = self.JSON
+        # Получаем апи в которую должны отправить
+        api_path = path_to_API[self.API]
+
+        # Собираем это все
+        cmd = """ echo ' """ + cmd + """   ' | /""" + api_path
+        # Немного перенделываем команду - чтоб запускать в баше
+        '/bin/sh'
+        # cmd = """ bash  " """ + cmd + """ " """
+
+
+        # Отправляем нашу команду
+        stdin, stdout, stderr = client.exec_command(cmd)
+
+        # Читаем лог вывода
+        data_stdout = stdout.read()
+        data_stderr = stderr.read()
+
+        # Если есть ошибки то возвращаем ошибки
+        if len(data_stderr.decode('utf-8')) > 0:
+            print('jib, ')
+            result = data_stderr
+        else:
+            # если нет никаких ошибок , то возвращаем
+            result = data_stdout
+
+        client.close()
+
+        return result
+
+    def __invoke_shell(self, client):
+        # Делаем реал тайм подключение
+        ssh = client.invoke_shell()
+        # Пускаем команду
+        ssh.send(self.cmd)
+        from time import sleep
+
+        sleep(10)
+        # Получаем ответ
+        self.answer_JSON = ssh.recv(3000)

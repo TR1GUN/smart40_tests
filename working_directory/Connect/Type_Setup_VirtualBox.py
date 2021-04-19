@@ -95,3 +95,4 @@ class SetupVirtualBox:
         # Теперь возвращаем результат
 
         return result
+
