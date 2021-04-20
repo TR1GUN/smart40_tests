@@ -219,6 +219,7 @@ def test_POST_ElectricPowerValues_meterdata_db_by_element(type_connect,
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
+                                                                tags=tags
                                                                 )
 
     assert meterdata == []

@@ -46,7 +46,7 @@ ElecticEnergyValues_tag = ['A+0', 'A+1', 'A+2', 'A+3', 'A+4', 'A-0', 'A-1', 'A-2
                     'R+0', 'R+1', 'R+2', 'R+3', 'R+4', 'R-0', 'R-1', 'R-2', 'R-3', 'R-4']
 
 ElectricQualityValues_tag = ['UA', 'UB', 'UC', 'IA', 'IB', 'IC', 'PS', 'PA', 'PB', 'PC' , 'QS', 'QA',
-                    'QB', 'QC', 'SS', 'SA', 'SB', 'SC', 'AngAB', 'AngBC', 'AngAC', 'kPS', 'kPA', 'kPB', 'kPC', 'Freq']
+                              'QB', 'QC', 'SS', 'SA', 'SB', 'SC', 'AngAB', 'AngBC', 'AngAC', 'kPS', 'kPA', 'kPB', 'kPC', 'Freq']
 
 ElectricPowerValues_tag = ['cTime', 'P+', 'Q+', 'P-', 'Q-',  'isPart', 'isOvfl','isSummer']
 
