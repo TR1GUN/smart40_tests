@@ -1,7 +1,5 @@
 # Здесь расположим тест для проверки поля records  и других проверок дял компонента базы данных
-from working_directory.sqlite import execute_command_values_to_write_return_dict, execute_command_to_read_return_dict
-from working_directory.Template.Template_Meter_db_data_API.Template_checkup_from_Meter_db_data_API import CheckUP, \
-    GETCheckUP, POSTCheckUP
+from working_directory.Template.Template_Meter_db_data_API.Template_checkup_from_Meter_db_data_API import POSTCheckUP
 # Либа для формирования JSON запроса
 from working_directory.Template.Template_MeterJSON.Template_generate_meter_data_JSON import GeneratorJSON
 from working_directory.Template.Template_MeterJSON.Template_Deconstruct import DeconstructJSON
@@ -12,15 +10,14 @@ from working_directory.Template.Template_Setup import Setup
 
 from working_directory.Template.Template_Meter_db_data_API.Template_read_handler_table import \
     ReceivingDataAccordingToJSON
-from working_directory.Connect.JSON_format_coding_decoding import decode_JSON, code_JSON
+from working_directory.Connect.JSON_format_coding_decoding import code_JSON
 
-from working_directory.Template.Template_Meter_db_data_API.Template_parse_answer_JSON import ParseAnswerMeterDataJSON
 import time
 from working_directory.log import log
 from time import sleep
 from working_directory.sqlite import deleteMeterTable
-from working_directory.Template.Template_Meter_daemon.Template_ReWrite_field_Records import ReWriteFieldRecords
 from working_directory.Template.Template_Meter_daemon.Daemon_settings import ArchInfo_settings
+
 
 # from working_directory.Template.Template_Meter_db_data_API import Template_list_ArchTypes
 # ArchTypes_full_list = \
@@ -114,15 +111,30 @@ class ArchInfo(Service):
     def __generate_incorrect_timestamp(self, Count_records):
         """Здесь генерируем не коректные таймштампы для заведомо плохой записи"""
         from working_directory.Template.Template_MeterJSON.Template_generator_random_timestamp import GeneratorTimestamp
-        from copy import deepcopy
 
-        Generator = deepcopy(GeneratorTimestamp)
-        Generator.finis = 1400000000
-        Generator.start = 1300000000
+        class GeneratorTime(GeneratorTimestamp):
+            finis = 1400000000
+            start = 1300000000
+        Generator = GeneratorTime
         Timestamp = Generator(count_ts=Count_records).Timestamp
         return Timestamp
 
     # -----------------------------------------------------------------------------------------------
+    # ----------------------- Редактор наших полей  ArchInfo Под стоковое значение --------------------
+    def _rewrite_ArchInfo(self, count):
+        '''
+        Редактор наших полей  ArchInfo Под нужное значение
+        :return:
+        '''
+
+        from working_directory.Template.Template_Meter_daemon.Template_ReWrite_field_Records import ReWriteFieldRecords
+
+        record = ReWriteFieldRecords(measure=self.ArchType_Name,
+                                     count_records=count)
+
+        return record
+
+    # ---------------------------- Получение Нашего локального айпишника ---------------------------------------------
 
     def RecordsCheckUp(self, ArchType_Name: str, Count_records: int):
         """
@@ -136,14 +148,13 @@ class ArchInfo(Service):
 
         # Первое что делаем - Чистим всю БД
         deleteMeterTable()
+
         sleep(2)
         # После мы берем и редачим нашу Талицу ЗНАЧЕНИЯМИ ПО УМОЛЧАНИЮ
-        record = ReWriteFieldRecords(measure=ArchType_Name,
-                                     count_records=ArchInfo_settings.get(ArchType_Name))
+        record = self._rewrite_ArchInfo(count=ArchInfo_settings.get(ArchType_Name))
 
         # ТЕПЕРЬ МЕНЯЕМ НА НУЖНОЕ ЗНАЧЕНИЕ
-        record = ReWriteFieldRecords(measure=ArchType_Name,
-                                     count_records=Count_records)
+        record = self._rewrite_ArchInfo(count=Count_records)
 
         # ГЕНЕРИРУЕМ НАШИ ДАННЫЕ , которые запишем в таблицу
         Generator = GeneratorJSON(measure=[ArchType_Name],
@@ -159,6 +170,9 @@ class ArchInfo(Service):
         # Теперь получаем деконструированный JSON
 
         JSON_deconstruct = DeconstructJSON(JSON=JSON_dict_record).JSON_deconstruct
+
+        # print('То что записали', JSON_deconstruct)
+
         # после этого - записываем
         RecordValueToDataBase(JSON_deconstruct=JSON_deconstruct)
 
@@ -183,21 +197,29 @@ class ArchInfo(Service):
         # Селектим БД до записи
         data_base_before_recording = ReceivingDataAccordingToJSON(JSON=self.JSON_dict, Select_all=True).get_result()
 
+
+        # print('БД до отправки' ,data_base_before_recording )
         # Теперь Запускаем наш JSON
         AnswerJSON = self.Setup()
 
         # Обрабатываем ошибки самого JSON
         result = self.__error_handler(answer_JSON=AnswerJSON)
 
+
         # Если ошибок нет , то запускаем наш сравниватель
         if len(result) == 0:
             # селектим БД после записи
+
+
             data_base_after_recording = ReceivingDataAccordingToJSON(JSON=self.JSON_dict, Select_all=True).get_result()
 
             # И селектим в БД только записи что мы сделали
 
             data_base_was_recorded = ReceivingDataAccordingToJSON(JSON=self.JSON_dict, Select_all=False).get_result()
 
+            # print('data_base_was_recorded', data_base_was_recorded)
+            # print('data_base_after_recording', data_base_after_recording)
+            # print('JSON_deconstruct', JSON_deconstruct)
             result = POSTCheckUP(DataBase_before=data_base_before_recording,
                                  DataBase_after=data_base_after_recording,
                                  DataBase_was_recording=data_base_was_recorded,
@@ -205,12 +227,21 @@ class ArchInfo(Service):
 
             result = self.__write_log(result)
 
+        # возвращаем в наше исходное ссотояние
+        record = self._rewrite_ArchInfo(count=ArchInfo_settings.get(ArchType_Name))
+
         return result
+
+#####################################################################################################################
+# -------------------------------------------------------------------------------------------------------------------
+#                                               Тестовые Запуски
+# -------------------------------------------------------------------------------------------------------------------
+#####################################################################################################################
+
+
 # -----------------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------
-# -----------------------------------------------------------------------------------------------
-# -----------------------------------------------------------------------------------------------
-#
-# lol = ArchInfo().RecordsCheckUp(ArchType_Name='ElMomentEnergy' , Count_records=3)
-#
+# #
+# lol = ArchInfo().RecordsCheckUp(ArchType_Name='ElArr1ConsPower', Count_records=3)
+# #
 # print(lol)

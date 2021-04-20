@@ -85,6 +85,8 @@ class GeneratorIdDevices:
                 vals = GeneratorValsByDevices(measure=measure,
                                               count_ts=count_ts,
                                               Castrom_Value=self.Castrom_Value)
+
+
                 # Сюда пихаем ID
                 devices['id'] = value_id_list[i]['DeviceIdx']
                 devices['vals'] = deepcopy(vals.vals)

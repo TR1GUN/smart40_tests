@@ -40,6 +40,10 @@ class GeneratorValsByDevices:
                  ):
 
         # Переопределяем ТЭГИ
+        self.measure = ''
+        self.count_ts = None
+        self.Castrom_Value = {}
+        self.meterdev = False
 
         self.measure = measure
         self.count_ts = count_ts

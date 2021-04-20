@@ -36,10 +36,10 @@ def Setup_(JSON , API , Type_Connect):
     return answer_JSON
 
 
-JSON = '{"method": "post", "measures": [{"measure": "ElMomentQuality", "devices": [{"id": 1, "vals": [{"ts": 0, "tags": [{"tag": "UA", "val": 92.49}, {"tag": "UB", "val": -3.0791}, {"tag": "UC", "val": -42.8529}, {"tag": "IA", "val": -38.8463}, {"tag": "IB", "val": 85.7441}, {"tag": "IC", "val": 27.1104}, {"tag": "PS", "val": -59.3813}, {"tag": "PA", "val": -31.1666}, {"tag": "PB", "val": 66.8526}, {"tag": "PC", "val": 57.1044}, {"tag": "QS", "val": 71.4915}, {"tag": "QA", "val": 7.8683}, {"tag": "QB", "val": -52.3546}, {"tag": "QC", "val": 3.1176}, {"tag": "SS", "val": -76.1389}, {"tag": "SA", "val": null}, {"tag": "SB", "val": null}, {"tag": "SC", "val": null}, {"tag": "AngAB", "val": 86.7864}, {"tag": "AngBC", "val": 19.6697}, {"tag": "AngAC", "val": 82.0702}, {"tag": "kPS", "val": 52.3005}, {"tag": "kPA", "val": -98.3878}, {"tag": "kPB", "val": -50.6393}, {"tag": "kPC", "val": -11.4}, {"tag": "Freq", "val": 34.59}]}]}]}]}'
+JSON = '{"method": "post", "measures": [{"measure": "ElConfig", "devices": [{"id": 1, "vals": [{"ts": 1517986690, "tags": [{"tag": "serial", "val": "1336294626"}, {"tag": "model", "val": "Test model Your ad could be here"}, {"tag": "cArrays", "val": 8}, {"tag": "isDst", "val": 0}, {"tag": "isClock", "val": 0}, {"tag": "isTrf", "val": 0}, {"tag": "isAm", "val": 1}, {"tag": "isRm", "val": 0}, {"tag": "isRp", "val": 1}, {"tag": "kI", "val": 39.0}, {"tag": "kU", "val": 30.0}, {"tag": "const", "val": -3.9156}]}]}]}]}'
 
 API = 'uspd-meter_daemon'
 # type_connect = 'virtualbox'
-a = Setup_(JSON=JSON , API='meterdev' , Type_Connect='virtualbox')
+a = Setup_(JSON=JSON , API='meter_db_data_api' , Type_Connect='virtualbox')
 
 print(a)

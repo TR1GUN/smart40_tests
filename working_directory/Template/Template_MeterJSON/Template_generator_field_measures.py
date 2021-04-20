@@ -23,7 +23,7 @@ class GeneratorMeasures:
                  count_ts: int = 3 or list,
 
                  # КОЛИЧЕСТВО АЙДИШНИКОВ - ЕТО ВАЖНА- В ПОСЛЕДВСТВИИ ВЛИЯЕТ НА ДЛИНУ JSON
-                 count_id: int = 3or list,
+                 count_id: int = 3 or list,
 
                  # КАСТРОМНЫЕ ТЭГИ
                  Castrom_Value: dict = {}):
@@ -71,6 +71,7 @@ class GeneratorMeasures:
                     # дергаем наш конфиг
                     measures_dict['measure'] = list_measure[i]
                     # генерируем данные для него
+
                     devices = GeneratorIdDevices(count_id=self.count_id,
                                                  count_ts=self.generate_ts_final,
                                                  measure=list_measure[i],
@@ -89,7 +90,7 @@ class GeneratorMeasures:
             if type(self.count_ts) == list:
                 # Если у нас набор листа больше 1
                 if len(self.count_ts) > 1:
-                    self.generate_ts_final = self.count_ts[0]
+                    self.generate_ts_final = [self.count_ts[0]]
 
                 elif len(self.count_ts) == 1:
                     self.generate_ts_final = self.count_ts

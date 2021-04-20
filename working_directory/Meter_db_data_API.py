@@ -439,8 +439,6 @@ class ThreadingPOST(POST):
         # Запускаем
         self.answer_JSON = self.__Setup_JSON()
 
-        print('\n\n=================', self.answer_JSON)
-
         # Теперь имеем наш ответ - и теперь начинаем его проверять
 
         # Обрабатываем ошибки самого JSON
@@ -665,6 +663,12 @@ class ThreadingGET(GET):
 
         return result
 
+
+#####################################################################################################################
+# -------------------------------------------------------------------------------------------------------------------
+#                                      ЗДЕСЬ ПРОВЕРЯЕМ ТЕСТОВЫЕ ПРОГОНЫ
+# -------------------------------------------------------------------------------------------------------------------
+#####################################################################################################################
 # # -------------------------------------------------------------------------------------------------------------------
 # Сделаем список из всех возможных ArchType
 from working_directory.Template.Template_Meter_db_data_API import Template_list_ArchTypes
@@ -680,13 +684,8 @@ ArchTypes_full_list = \
     Template_list_ArchTypes.PulseConfig_ArchType_name_list + \
     Template_list_ArchTypes.ElectricConfig_ArchType_name_list
 # # -------------------------------------------------------------------------------------------------------------------
-import sys
-sys.coinit_flags = 0
 
-import pythoncom
-        # Сразу перед инициализацией DCOM в run()
-pythoncom.CoInitializeEx(0)
-
+# # -------------------------------------------------------------------------------------------------------------------
 
 # Чистим таблицу
 from time import sleep
@@ -696,15 +695,8 @@ deleteMeterTable()
 sleep(2)
 
 # # -------------------------------------------------------------------------------------------------------------------
-#
-# meterdata = POST(type_connect='ssh').Сustom_measures(
-#     list_measure=['PlsMomentPulse'],
-#     count_id=1, count_ts=2,
-#     tags={'serial':None, 'model':None, 'cArrays':None, 'isDst':None, 'isClock':None, 'isTrf':None,
-#             'isAm':None, 'isRm':None, 'isRp':None, 'kI':None, 'kU':None, 'const':None
-#          }
-# )
-
+#                                                     ДОБАВЫЛЯЕМ ВСЕ ТЭГИ
+# # -------------------------------------------------------------------------------------------------------------------
 
 ElMomentQuality = {
     'UA': None, 'IA': None, 'PA': None, 'QA': None, 'SA': None, 'kPA': None, 'AngAB': None,
@@ -747,6 +739,20 @@ ElConfig = {'serial': None, 'model': None, 'cArrays': None, 'isDst': None, 'isCl
             'isAm': None, 'isRm': None, 'isRp': None, 'kI': None, 'kU': None, 'const': None}
 
 Journal = {'event': None, 'eventId': None, }
+
+
+# # -------------------------------------------------------------------------------------------------------------------
+#                                                     ПРОГОНЫ - ОДИН ПОТОК
+# # -------------------------------------------------------------------------------------------------------------------
+
+# # -------------------------------------------------------------------------------------------------------------------
+# meterdata = POST(type_connect='ssh').Сustom_measures(
+#     list_measure=['PlsMomentPulse'],
+#     count_id=1, count_ts=2,
+#     tags={'serial':None, 'model':None, 'cArrays':None, 'isDst':None, 'isClock':None, 'isTrf':None,
+#             'isAm':None, 'isRm':None, 'isRp':None, 'kI':None, 'kU':None, 'const':None
+#          }
+# )
 # print(meterdata)
 
 # -------------------------------------------------------------------------------------------------------------------
@@ -761,23 +767,25 @@ Journal = {'event': None, 'eventId': None, }
 #                                                            serial=False,
 #                                                            select_id_all=False,
 #                                                            select_last_time=True,
-#                                                            out_of_bounds=True)
+#                                                            out_of_bounds=True
+#                                                            )
 #
 # print(meterdata)
-
-# ['PlsConfig'], select_count_ts = 2, select_count_id = 2, generate_count_ts = 3, generate_count_id = 3, count_tags = 0, select_device_idx = False, select_meter_id = True, serial = False
-# select_id_all = False, select_last_time = True, out_of_bounds = True
 # # -------------------------------------------------------------------------------------------------------------------
-#
-meterdata = ThreadingPOST(type_connect='ssh').Сustom_measures(
-    list_measure=['PlsMomentPulse'],
-    count_id=1, count_ts=2,
-    tags={'serial': None, 'model': None, 'cArrays': None, 'isDst': None, 'isClock': None, 'isTrf': None,
-          'isAm': None, 'isRm': None, 'isRp': None, 'kI': None, 'kU': None, 'const': None
-          }, thread=2
+# # -------------------------------------------------------------------------------------------------------------------
+#                                                     ПРОГОНЫ - МНОГОПОТОЧНОСТЬ
+# # -------------------------------------------------------------------------------------------------------------------
 
-)
+# meterdata = ThreadingPOST(type_connect='ssh').Сustom_measures(
+#     list_measure=['PlsMomentPulse'],
+#     count_id=1, count_ts=2,
+#     tags={'serial': None, 'model': None, 'cArrays': None, 'isDst': None, 'isClock': None, 'isTrf': None,
+#           'isAm': None, 'isRm': None, 'isRp': None, 'kI': None, 'kU': None, 'const': None
+#           }, thread=2
 #
+# )
+# print(meterdata)
+# -------------------------------------------------------------------------------------------------------------------
 # meterdata = ThreadingGET(type_connect='virtualbox').Сustom_measures(list_measure=['ElArr1ConsPower'],
 #                                                            select_count_ts=2,
 #                                                            select_count_id=2,
@@ -793,3 +801,4 @@ meterdata = ThreadingPOST(type_connect='ssh').Сustom_measures(
 #                                                                     thread=2)
 #
 # print(meterdata)
+# -------------------------------------------------------------------------------------------------------------------

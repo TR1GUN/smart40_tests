@@ -27,3 +27,5 @@ os.system(command)
 'python -m pytest test_Meter_db_data_API.py  --type_connect=virtualbox -vv --html=report.html'
 
 'python -m pytest test_Castrom_set.py  --type_connect=virtualbox -vv --html=report.html'
+
+'python -m pytest test_MeterTable_db_API.py  --type_connect=virtualbox -vv --html=report.html'

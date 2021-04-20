@@ -1,7 +1,7 @@
 import os
 
-def write_file_JSON(file_name:str ,writen_text ):
 
+def write_file_JSON(file_name: str, writen_text):
     '''
     Функция для записи в файл.
     Она очень важна
@@ -18,8 +18,7 @@ def write_file_JSON(file_name:str ,writen_text ):
     a.close()
 
 
-def write_file(file_name:str ,writen_text ):
-
+def write_file(file_name: str, writen_text):
     '''
     Функция для записи в файл.
     Она очень важна
@@ -36,8 +35,7 @@ def write_file(file_name:str ,writen_text ):
     a.close()
 
 
-def write_file_JSON_on_Emulator(writen_text ):
-
+def write_file_JSON_on_Emulator(writen_text):
     '''
     Функция для записи в файл.
     Она очень важна
@@ -47,15 +45,14 @@ def write_file_JSON_on_Emulator(writen_text ):
     :return:
     '''
     from Emulator.ParserXML import path
-    path_values= path + '/' + 'values.json'
+    path_values = path + '/' + 'values.json'
 
     a = open(path_values, 'w')
     a.write(writen_text)
     a.close()
 
 
-def write_log_file(file_name:str ,writen_text ,folder:str =''):
-
+def write_log_file(file_name: str, writen_text, folder: str = ''):
     '''
     Функция для записи в файл.
     Она очень важна

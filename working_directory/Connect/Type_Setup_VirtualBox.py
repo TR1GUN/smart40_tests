@@ -1,7 +1,8 @@
 from virtualbox.library import IVirtualBox
 
-from working_directory.Connect import Byte_coding_decoding, Connection
+from working_directory.Connect import Byte_coding_decoding
 from working_directory.Template.Config import path_to_API
+
 
 # Здесь распишем класс Работы если наша система запущена в виртуальной машине
 class SetupVirtualBox:
@@ -32,7 +33,6 @@ class SetupVirtualBox:
         :param API: А сюда надо пихать апиху в стринге - ВАЖНО - используется стринга для названия самого компонента
         как он называется в самом линухе!!!!
         """
-
 
         # Запускаем апи работы с виртуальным контейнером
         import virtualbox
@@ -95,4 +95,3 @@ class SetupVirtualBox:
         # Теперь возвращаем результат
 
         return result
-

@@ -42,12 +42,18 @@ class GeneratorJSON:
         self.JSON_Meter_data_POST = {}
         self.JSON_Meter_data_GET = {}
         self.JSON = {}
+        self.measure = 0
+        self.count_ts = 0
+        self.count_id = 0
+
 
 
         self.measure = measure
         self.count_ts = count_ts
         self.count_id = count_id
         self.Castrom_Value = Castrom_Value
+
+
 
         # Теперь берем и генерируем ЭТАЛОННЫЙ JSON ,без всякой шушеры
 

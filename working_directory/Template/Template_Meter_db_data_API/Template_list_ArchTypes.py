@@ -12,7 +12,6 @@ ElecticEnergyValues_ArchType_name_list = ['ElMomentEnergy', 'ElDayEnergy', 'ElMo
 
 ElectricQualityValues_ArchType_name_list = ['ElMomentQuality']
 
-
 ElectricPowerValues_ArchType_name_list = ['ElArr1ConsPower']
 
 PulseValues_ArchType_name_list = ['PlsMomentPulse','PlsDayPulse','PlsMonthPulse','PlsHourPulse']
