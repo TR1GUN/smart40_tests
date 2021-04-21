@@ -1,11 +1,6 @@
 # Итак здесь расположим наш тест для демона опроса ПУ
 from working_directory.Template.Template_Meter_daemon.Template_generator_JSON_for_mosquitto import \
     GenerateForMosquittoJSON
-
-# from working_directory.Template.Template_Meter_db_data_API.Template_parse_answer_JSON import ParseAnswerMeterDataJSON
-# from working_directory.Template.Template_Meter_daemon.Template_assembly_normal_JSON_like_POST_meter_Data import \
-#     # DecostructMeterDataJSONForDaemon
-# RecordFromEmulatorMeter,
 from working_directory.Connect.JSON_format_coding_decoding import code_JSON
 from working_directory.Template.Template_Meter_db_data_API.Template_read_handler_table import \
     ReceivingDataAccordingToJSON
@@ -17,7 +12,8 @@ from working_directory.Template.Template_Meter_daemon.Template_select_data_base_
 from working_directory.Template.Template_Meter_daemon.Template_CheckUp_for_MeterDaemon import CheckUP
 from working_directory.Template.Template_Setup import Setup
 from working_directory.log import log
-
+from time import sleep
+from working_directory.sqlite import deleteMeterTable
 import threading
 import time
 
@@ -279,6 +275,10 @@ class MeterDaemonSingleMeter(MeterDaemon):
         """
         Здесь содержиться Тесты для УЖЕ заполненой БД - Заполняется только ОДИН таймштамп
         """
+        # Чистим БД
+        deleteMeterTable()
+        sleep(2)
+
         # переопределяем тэги
         self.count_ts_to_record = count_ts_to_record
         self.list_measure = list_measure
@@ -349,7 +349,7 @@ class MeterDaemonSingleMeter(MeterDaemon):
 
         # Теперь - Надо Понять что все записалось в нашу таблицу
 
-        time.sleep(20)
+        sleep(20)
 
         # Итак - Теперь Перезаписываем Деконструируемый JSON
 
@@ -385,6 +385,10 @@ class MeterDaemonSingleMeter(MeterDaemon):
         """
         Здесь содержиться Тесты для УЖЕ заполненой БД - Заполняется только ОДИН таймштамп
         """
+        # Чистим БД
+        deleteMeterTable()
+        sleep(2)
+
         # переопределяем тэги
         self.list_measure = list_measure
         self.generate_count = 1
@@ -428,7 +432,7 @@ class MeterDaemonSingleMeter(MeterDaemon):
 
         # Теперь - Надо Понять что все записалось в нашу таблицу
 
-        time.sleep(10)
+        sleep(10)
 
         # Итак - Теперь Перезаписываем Деконструируемый JSON
 
@@ -592,6 +596,10 @@ class MeterDaemonManyMeter(MeterDaemonSingleMeter):
         """
         Здесь содержиться Тесты для УЖЕ заполненой БД - Заполняется только ОДИН таймштамп
         """
+        # Чистим БД
+        deleteMeterTable()
+        sleep(2)
+
         # ставим заглушку чтоб не ломать ничего
         if count_meter > 10:
             count_meter = 10
@@ -711,6 +719,10 @@ class MeterDaemonManyMeter(MeterDaemonSingleMeter):
         """
         Здесь содержиться Тесты для УЖЕ заполненой БД - Заполняется только ОДИН таймштамп
         """
+        # Чистим БД
+        deleteMeterTable()
+        sleep(2)
+
         # ставим заглушку чтоб не ломать ничего
         if count_meter > 10:
             count_meter = 10
@@ -791,23 +803,32 @@ class MeterDaemonManyMeter(MeterDaemonSingleMeter):
         return result
 
 
-# # -------------------------------------------------------------------------------------------------------------------
-# # -------------------------------------------------------------------------------------------------------------------
 
+
+
+
+
+
+# # -------------------------------------------------------------------------------------------------------------------
+#####################################################################################################################
+# -------------------------------------------------------------------------------------------------------------------
+#                                               Тестовые Запуски
+# -------------------------------------------------------------------------------------------------------------------
+#####################################################################################################################
+# from time import sleep
+# from working_directory.sqlite import deleteMeterTable
+
+# # ------------------------------------------- ОДИН СЧЕТЧИК --------------------------------------------------------
 # a = MeterDaemon().VirtualMeter(job_type=['ElArr1ConsPower'])
 # 'ElConfig','ElMomentEnergy', 'ElMomentQuality' , 'ElArr1ConsPower'
 # print(datetime.datetime.now())
-from time import sleep
-from working_directory.sqlite import deleteMeterTable
+# # ----------------------------------------- МНОГОПОТОЧНЫЙ РЕЖИМ ----------------------------------------------------
+# Чистим БД
 
-deleteMeterTable()
-sleep(2)
+# result = MeterDaemonManyMeter().DataBase_filled(list_measure=['ElMonthEnergy'], count_meter=30, count_ts_to_record=10)
+# print(result)
 
-# MeterDaemonManyMeter
-a = MeterDaemonManyMeter().DataBase_filled(list_measure=['ElMonthEnergy'], count_meter=30, count_ts_to_record=10)
-print(a)
 
-# # Чистим БД
 # a = MeterDaemonSingleMeter().DataBase_filled(list_measure=['ElArr1ConsPower'], count_ts_to_record=100000)
 # print(a)
 # print(datetime.datetime.now())
@@ -820,5 +841,3 @@ print(a)
 # 'ElMonthConsEnergy',
 # 'ElMomentQuality',
 # 'ElArr1ConsPower'] :
-#     a = MeterDaemon().VirtualMeter(job_type=[i])
-#     print(a)

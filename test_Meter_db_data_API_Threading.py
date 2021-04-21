@@ -86,6 +86,9 @@ def test_POST_ElectricConfig_meterdata_db(type_connect,
                                           tags,
                                           # Количество потоков
                                           thread):
+    # Чистим БД
+
+    deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                          count_id=count_id,
@@ -113,6 +116,9 @@ def test_POST_PulseConfig_meterdata_db(type_connect,
                                        tags,
                                        # Количество потоков
                                        thread):
+    # Чистим БД
+
+    deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                          count_id=count_id,
@@ -139,6 +145,9 @@ def test_POST_DigitalConfig_meterdata_db(type_connect, list_measure,
                                          tags,
                                          # Количество потоков
                                          thread):
+    # Чистим БД
+
+    deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                          count_id=count_id,
@@ -166,6 +175,9 @@ def test_POST_ElecticEnergyValues_meterdata_db_by_element(type_connect, list_mea
                                                           tags,
                                                           # Количество потоков
                                                           thread):
+    # Чистим БД
+
+    deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                          count_id=count_id,
@@ -191,6 +203,9 @@ def test_POST_ElecticEnergyValues_meterdata_db(type_connect, list_measure,
                                                tags,
                                                # Количество потоков
                                                thread):
+    # Чистим БД
+
+    deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                          count_id=count_id,
@@ -217,6 +232,9 @@ def test_POST_ElectricQualityValues_meterdata_db(type_connect, list_measure,
                                                  tags,
                                                  # Количество потоков
                                                  thread):
+    # Чистим БД
+
+    deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                          count_id=count_id,
@@ -243,6 +261,9 @@ def test_POST_ElectricPowerValues_meterdata_db_by_element(type_connect,
                                                           tags,
                                                           # Количество потоков
                                                           thread):
+    # Чистим БД
+
+    deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                          count_id=count_id,
@@ -270,6 +291,9 @@ def test_POST_ElectricPowerValues_meterdata_db(type_connect,
                                                tags,
                                                # Количество потоков
                                                thread):
+    # Чистим БД
+
+    deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                          count_id=count_id,
@@ -295,6 +319,9 @@ def test_POST_PulseValues_meterdata_db_by_element(type_connect,
                                                   tags,
                                                   # Количество потоков
                                                   thread):
+    # Чистим БД
+
+    deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                          count_id=count_id,
@@ -322,6 +349,9 @@ def test_POST_PulseValues_meterdata_db(type_connect,
                                        tags,
                                        # Количество потоков
                                        thread):
+    # Чистим БД
+
+    deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                          count_id=count_id,
@@ -348,6 +378,9 @@ def test_POST_DigitalValues_meterdata_db_by_element(type_connect,
                                                     tags,
                                                     # Количество потоков
                                                     thread):
+    # Чистим БД
+
+    deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                          count_id=count_id,
@@ -375,6 +408,9 @@ def test_POST_DigitalValues_meterdata_db(type_connect,
                                          tags,
                                          # Количество потоков
                                          thread):
+    # Чистим БД
+
+    deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                          count_id=count_id,
@@ -399,6 +435,9 @@ def test_POST_JournalValues_meterdata_db_by_element(type_connect,
                                                     tags,
                                                     # Количество потоков
                                                     thread):
+    # Чистим БД
+
+    deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                          count_id=count_id,
@@ -425,6 +464,9 @@ def test_POST_JournalValues_meterdata_db(type_connect,
                                          tags,
                                          # Количество потоков
                                          thread):
+    # Чистим БД
+
+    deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                          count_id=count_id,
@@ -459,6 +501,9 @@ def test_POST_all_meterdata_db(type_connect,
                                tags,
                                # Количество потоков
                                thread):
+    # Чистим БД
+
+    deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                          count_id=count_id,
