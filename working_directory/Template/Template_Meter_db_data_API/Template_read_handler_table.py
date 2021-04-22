@@ -143,7 +143,7 @@ class ReceivingDataAccordingToJSON:
         result = deepcopy(SelectToDataBase(JSON_measure=measures, select_all=Select_all,
                                            Command_table_list=sql_command_to_table_select).result)
 
-        print('-----------------------------------------------')
+
 
         return result
 

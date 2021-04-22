@@ -242,6 +242,13 @@ class VirtualMeter(JOB):
     JSON_answer_normal = {}
 
     def __init__(self, type_connect: str = 'virtualbox'):
+
+        self.error = None
+        self.time = {'set_castrom_time': False, "start": 0, "end": 0}
+        self.type_connect: str = 'virtualbox'
+        self.port = 7777
+        self.JSON_answer_normal = {}
+
         self.error = []
         self.type_connect = type_connect
 

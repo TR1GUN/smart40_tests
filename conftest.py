@@ -1,12 +1,17 @@
 import pytest
-import time
-import docker
+import platform
 
 
 def pytest_addoption(parser):
-    parser.addoption(
-        "--type_connect", action="store", default="virtualbox", help="my option: type1 or type2"
-                    )
+    if str(platform.system()) == 'Windows':
+        parser.addoption(
+            "--type_connect", action="store", default="ssh", help="Способ коннекта с нашей машиной"
+        )
+    else:
+        parser.addoption(
+            "--type_connect", action="store", default="linux", help="Способ коннекта с нашей машиной"
+        )
+
 
 @pytest.fixture
 def type_connect(request):

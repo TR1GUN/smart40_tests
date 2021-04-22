@@ -33,4 +33,4 @@ os.system(command)
 
 'python -m pytest test_Meter_db_data_API_None_Value.py  --type_connect=virtualbox -vv --html=report.html'
 
-'python -m pytest test_Meter_db_data_API_Threading.py  --type_connect=virtualbox -vv --html=report.html'
+'python -m pytest test_Meter_db_data_API_Threading.py  --type_connect=ssh -vv --html=report.html'

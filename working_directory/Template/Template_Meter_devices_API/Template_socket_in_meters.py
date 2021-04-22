@@ -9,6 +9,7 @@ import write_file
 import datetime
 import threading
 
+
 class SocketMeters:
     """
     Здесь инициализируем сокет нашего эмулятора счетчика чтоб обращаться к нему по Ethernet
@@ -21,15 +22,15 @@ class SocketMeters:
     def __init__(self, conect_port):
 
         # Создаем файл лога
-        self.log_file = write_file.write_log_file(file_name='EmulatorMeter_' + str(time.mktime(datetime.datetime.now().timetuple())) + str('.txt'),
-                                                  writen_text='ЛОГ обмена :', folder='Meter/')
+        self.log_file = write_file.write_log_file(
+            file_name='EmulatorMeter_' + str(time.mktime(datetime.datetime.now().timetuple())) + str('.txt'),
+            writen_text='ЛОГ обмена :', folder='Meter/')
         # Задаем Порт
         self.serv_port = None
         self.port = conect_port
 
         # Создаем сокет сервера
         serv_sock = self.__create_serv_sock()
-
 
         self.cid = 0
         # -----
@@ -42,13 +43,13 @@ class SocketMeters:
         #     if self.cid > 0 :
         #         break
         while True:
-            try :
+            try:
                 self.client_socket = self.__accept_client_conn(serv_sock)
             except socket.timeout:
                 break
-        # Производим сессию обмена инфой
+            # Производим сессию обмена инфой
             self.__session_client()
-        # Добавляем еще одного пользователя
+            # Добавляем еще одного пользователя
             self.cid += 1
 
     def __create_serv_sock(self):
@@ -74,10 +75,8 @@ class SocketMeters:
         # print(f'Client #{self.cid} connected '
         #       f'{client_addr[0]}:{client_addr[1]}')
 
-
         client_sock = self.client_sock
         return client_sock
-
 
     def __session_client(self):
         # Читаем запрос
@@ -199,7 +198,7 @@ class SocketMeters:
             print4 = 'Не Удалось расшифровать : ' + str(chunk) + '\n'
         # логируем через файл -
         writen_text = '---------------------------------------------------------\n' + \
-                      str(datetime.datetime.now()) + '\n'  + \
+                      str(datetime.datetime.now()) + '\n' + \
                       print1 + print2 + print3 + print4
 
         write_file.append_write_log_file(file_name=self.log_file, writen_text=writen_text)

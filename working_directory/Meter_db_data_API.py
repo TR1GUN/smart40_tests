@@ -595,8 +595,10 @@ class ThreadingGET(GET):
         self.list_measure = list_measure
         self.thread = thread
 
-
+        self.JSON_dict = {}
+        self.JSON_deconstruct = {}
         self.JSON_dict_record = {}
+
         self.select_for_JSON_to_database = {}
         self.AnswerJSON = {}
         self.answer_JSON_deconstruct = {}
@@ -775,18 +777,16 @@ Journal = {'event': None, 'eventId': None, }
 # # -------------------------------------------------------------------------------------------------------------------
 #                                                     ПРОГОНЫ - МНОГОПОТОЧНОСТЬ
 # # -------------------------------------------------------------------------------------------------------------------
-
+#
 # meterdata = ThreadingPOST(type_connect='ssh').Сustom_measures(
 #     list_measure=['PlsMomentPulse'],
 #     count_id=1, count_ts=2,
-#     tags={'serial': None, 'model': None, 'cArrays': None, 'isDst': None, 'isClock': None, 'isTrf': None,
-#           'isAm': None, 'isRm': None, 'isRp': None, 'kI': None, 'kU': None, 'const': None
-#           }, thread=2
+#     tags={}, thread=2
 #
 # )
 # print(meterdata)
 # -------------------------------------------------------------------------------------------------------------------
-# meterdata = ThreadingGET(type_connect='virtualbox').Сustom_measures(list_measure=['ElArr1ConsPower'],
+# meterdata = ThreadingGET(type_connect='ssh').Сustom_measures(list_measure=['ElArr1ConsPower'],
 #                                                            select_count_ts=2,
 #                                                            select_count_id=2,
 #                                                            generate_count_ts=3,
@@ -798,7 +798,7 @@ Journal = {'event': None, 'eventId': None, }
 #                                                            select_id_all=False,
 #                                                            select_last_time=True,
 #                                                            out_of_bounds=True,
-#                                                                     thread=2)
+#                                                            thread=10)
 #
 # print(meterdata)
 # -------------------------------------------------------------------------------------------------------------------

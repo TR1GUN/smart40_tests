@@ -3,7 +3,7 @@
 from working_directory.Meter_db_data_API import ThreadingPOST, ThreadingGET
 from working_directory.Template.Template_Meter_db_data_API import Template_list_ArchTypes
 from working_directory.sqlite import deleteMeterTable
-from time import sleep
+from time import sleep, time
 import pytest
 
 from random import randint
@@ -32,25 +32,25 @@ def parametrize_by_element(reqest: str, ArchType_name_list: list):
     # Если у нас гет запрос
     if reqest == 'post':
         template_parametrize = [
-            [1, 1, {}, randint(5, 50)],
-            [2, 3, {}, randint(5, 50)],
-            [3, 1, {}, randint(5, 50)],
-            [1, 1, {}, randint(5, 50)],
-            [2, 3, {}, randint(5, 50)],
-            [3, 1, {}, randint(5, 50)]
+            [1, 1, {}, randint(5, 10)],
+            [2, 3, {}, randint(5, 10)],
+            [3, 1, {}, randint(5, 10)],
+            [1, 1, {}, randint(5, 10)],
+            [2, 3, {}, randint(5, 10)],
+            [3, 1, {}, randint(5, 10)]
         ]
     if reqest == 'get':
         template_parametrize = [
-            [0, 1, 1, 2, 0, True, False, False, False, False, False, {}, randint(5, 50)],
-            [1, 2, 2, 3, 1, False, True, False, False, False, False, {}, randint(5, 50)],
-            [2, 3, 3, 4, 2, False, False, True, False, False, False, {}, randint(5, 50)],
-            [4, 4, 4, 5, 3, False, False, False, True, False, False, {}, randint(5, 50)],
-            [0, 5, 1, 6, 4, False, False, False, True, False, True, {}, randint(5, 50)],
-            [1, 4, 2, 5, 3, False, False, True, False, False, True, {}, randint(5, 50)],
-            [2, 5, 3, 6, 2, False, True, False, False, False, True, {}, randint(5, 50)],
-            [4, 4, 4, 5, 1, True, False, False, False, False, True, {}, randint(5, 50)],
-            [2, 3, 3, 4, 0, True, False, False, False, True, False, {}, randint(5, 50)],
-            [2, 2, 3, 3, 0, False, True, False, False, True, True, {}, randint(5, 50)]
+            [0, 1, 1, 2, 0, True, False, False, False, False, False, {}, randint(5, 10)],
+            [1, 2, 2, 3, 1, False, True, False, False, False, False, {}, randint(5, 10)],
+            [2, 3, 3, 4, 2, False, False, True, False, False, False, {}, randint(5, 10)],
+            [4, 4, 4, 5, 3, False, False, False, True, False, False, {}, randint(5, 10)],
+            [0, 5, 1, 6, 4, False, False, False, True, False, True, {}, randint(5, 10)],
+            [1, 4, 2, 5, 3, False, False, True, False, False, True, {}, randint(5, 10)],
+            [2, 5, 3, 6, 2, False, True, False, False, False, True, {}, randint(5, 10)],
+            [4, 4, 4, 5, 1, True, False, False, False, False, True, {}, randint(5, 10)],
+            [2, 3, 3, 4, 0, True, False, False, False, True, False, {}, randint(5, 10)],
+            [2, 2, 3, 3, 0, False, True, False, False, True, True, {}, randint(5, 10)]
         ]
     for i in range(len(ArchType_name_list)):
         ArchType_name = [ArchType_name_list[i]]
@@ -72,12 +72,12 @@ def parametrize_by_element(reqest: str, ArchType_name_list: list):
 # ------------------------------------- ElectricConfig -----------------------------------------------------------------
 @pytest.mark.parametrize("list_measure, count_id, count_ts, tags, thread",
                          [
-                             (ElectricConfig_ArchType_name_list, 1, 1, {}, randint(5, 50)),
-                             (ElectricConfig_ArchType_name_list, 2, 3, {}, randint(5, 50)),
-                             (ElectricConfig_ArchType_name_list, 3, 1, {}, randint(5, 50)),
-                             (ElectricConfig_ArchType_name_list, 1, 1, {}, randint(5, 50)),
-                             (ElectricConfig_ArchType_name_list, 2, 3, {}, randint(5, 50)),
-                             (ElectricConfig_ArchType_name_list, 3, 1, {}, randint(5, 50))
+                             (ElectricConfig_ArchType_name_list, 1, 1, {}, randint(5, 10)),
+                             (ElectricConfig_ArchType_name_list, 2, 3, {}, randint(5, 10)),
+                             (ElectricConfig_ArchType_name_list, 3, 1, {}, randint(5, 10)),
+                             (ElectricConfig_ArchType_name_list, 1, 1, {}, randint(5, 10)),
+                             (ElectricConfig_ArchType_name_list, 2, 3, {}, randint(5, 10)),
+                             (ElectricConfig_ArchType_name_list, 3, 1, {}, randint(5, 10))
                          ])
 def test_POST_ElectricConfig_meterdata_db(type_connect,
                                           list_measure,
@@ -87,7 +87,7 @@ def test_POST_ElectricConfig_meterdata_db(type_connect,
                                           # Количество потоков
                                           thread):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -95,6 +95,8 @@ def test_POST_ElectricConfig_meterdata_db(type_connect,
                                                                          count_ts=count_ts,
                                                                          tags=tags,
                                                                          thread=thread)
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
 
     assert meterdata == []
 
@@ -102,12 +104,12 @@ def test_POST_ElectricConfig_meterdata_db(type_connect,
 # ------------------------------------- PulseConfig -----------------------------------------------------------------
 @pytest.mark.parametrize("list_measure, count_id, count_ts, tags, thread",
                          [
-                             (PulseConfig_ArchType_name_list, 1, 1, {}, randint(5, 50)),
-                             (PulseConfig_ArchType_name_list, 2, 3, {}, randint(5, 50)),
-                             (PulseConfig_ArchType_name_list, 3, 1, {}, randint(5, 50)),
-                             (PulseConfig_ArchType_name_list, 1, 1, {}, randint(5, 50)),
-                             (PulseConfig_ArchType_name_list, 2, 3, {}, randint(5, 50)),
-                             (PulseConfig_ArchType_name_list, 3, 1, {}, randint(5, 50))
+                             (PulseConfig_ArchType_name_list, 1, 1, {}, randint(5, 10)),
+                             (PulseConfig_ArchType_name_list, 2, 3, {}, randint(5, 10)),
+                             (PulseConfig_ArchType_name_list, 3, 1, {}, randint(5, 10)),
+                             (PulseConfig_ArchType_name_list, 1, 1, {}, randint(5, 10)),
+                             (PulseConfig_ArchType_name_list, 2, 3, {}, randint(5, 10)),
+                             (PulseConfig_ArchType_name_list, 3, 1, {}, randint(5, 10))
                          ])
 def test_POST_PulseConfig_meterdata_db(type_connect,
                                        list_measure,
@@ -132,12 +134,12 @@ def test_POST_PulseConfig_meterdata_db(type_connect,
 # -------------------------------------DigitalConfig -----------------------------------------------------------------
 @pytest.mark.parametrize("list_measure, count_id, count_ts, tags, thread",
                          [
-                             (DigitalConfig_ArchType_name_list, 1, 1, {}, randint(5, 50)),
-                             (DigitalConfig_ArchType_name_list, 2, 3, {}, randint(5, 50)),
-                             (DigitalConfig_ArchType_name_list, 3, 1, {}, randint(5, 50)),
-                             (DigitalConfig_ArchType_name_list, 1, 1, {}, randint(5, 50)),
-                             (DigitalConfig_ArchType_name_list, 2, 3, {}, randint(5, 50)),
-                             (DigitalConfig_ArchType_name_list, 3, 1, {}, randint(5, 50))
+                             (DigitalConfig_ArchType_name_list, 1, 1, {}, randint(5, 10)),
+                             (DigitalConfig_ArchType_name_list, 2, 3, {}, randint(5, 10)),
+                             (DigitalConfig_ArchType_name_list, 3, 1, {}, randint(5, 10)),
+                             (DigitalConfig_ArchType_name_list, 1, 1, {}, randint(5, 10)),
+                             (DigitalConfig_ArchType_name_list, 2, 3, {}, randint(5, 10)),
+                             (DigitalConfig_ArchType_name_list, 3, 1, {}, randint(5, 10))
                          ])
 def test_POST_DigitalConfig_meterdata_db(type_connect, list_measure,
                                          count_id,
@@ -219,12 +221,12 @@ def test_POST_ElecticEnergyValues_meterdata_db(type_connect, list_measure,
 # ------------------------------------- ElectricQualityValues ---------------------------------------------------------
 @pytest.mark.parametrize("list_measure, count_id, count_ts, tags, thread",
                          [
-                             (ElectricQualityValues_ArchType_name_list, 1, 1, {}, randint(5, 50)),
-                             (ElectricQualityValues_ArchType_name_list, 2, 3, {}, randint(5, 50)),
-                             (ElectricQualityValues_ArchType_name_list, 3, 1, {}, randint(5, 50)),
-                             (ElectricQualityValues_ArchType_name_list, 1, 1, {}, randint(5, 50)),
-                             (ElectricQualityValues_ArchType_name_list, 2, 3, {}, randint(5, 50)),
-                             (ElectricQualityValues_ArchType_name_list, 3, 1, {}, randint(5, 50))
+                             (ElectricQualityValues_ArchType_name_list, 1, 1, {}, randint(5, 10)),
+                             (ElectricQualityValues_ArchType_name_list, 2, 3, {}, randint(5, 10)),
+                             (ElectricQualityValues_ArchType_name_list, 3, 1, {}, randint(5, 10)),
+                             (ElectricQualityValues_ArchType_name_list, 1, 1, {}, randint(5, 10)),
+                             (ElectricQualityValues_ArchType_name_list, 2, 3, {}, randint(5, 10)),
+                             (ElectricQualityValues_ArchType_name_list, 3, 1, {}, randint(5, 10))
                          ])
 def test_POST_ElectricQualityValues_meterdata_db(type_connect, list_measure,
                                                  count_id,
@@ -1550,16 +1552,16 @@ all_ArchType_name_list = ElectricConfig_ArchType_name_list + ElecticEnergyValues
     "list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
     "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags, thread",
     [
-        (all_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}, randint(5, 50)),
-        (all_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}, randint(5, 50)),
-        (all_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {}, randint(5, 50)),
-        (all_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}, randint(5, 50)),
-        (all_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}, randint(5, 50)),
-        (all_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {}, randint(5, 50)),
-        (all_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}, randint(5, 50)),
-        (all_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}, randint(5, 50)),
-        (all_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}, randint(5, 50)),
-        (all_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {}, randint(5, 50))
+        (all_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}, randint(5, 10)),
+        (all_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}, randint(5, 10)),
+        (all_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {}, randint(5, 10)),
+        (all_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}, randint(5, 10)),
+        (all_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}, randint(5, 10)),
+        (all_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {}, randint(5, 10)),
+        (all_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}, randint(5, 10)),
+        (all_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}, randint(5, 10)),
+        (all_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}, randint(5, 10)),
+        (all_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {}, randint(5, 10))
 
     ]
 )
@@ -1595,6 +1597,8 @@ def test_GET_all_ArchType_name_meterdata_db(
         thread
 
 ):
+    import time
+    time_start = time.time()
     deleteMeterTable()
     sleep(2)
     meterdata = ThreadingGET(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -1612,5 +1616,8 @@ def test_GET_all_ArchType_name_meterdata_db(
                                                                         tags=tags,
                                                                         thread=thread
                                                                         )
+
+    time_finis = time.time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
 
     assert meterdata == []

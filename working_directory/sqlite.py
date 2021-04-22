@@ -306,10 +306,10 @@ def execute_selected_to_view_return_dict(command_create_view:list,command_delete
         pass
 
     for i in range(len(command_create_view)):
-        print('Команда', command_create_view[i])
+
         c.execute(command_create_view[i])
         table_list.append(c.fetchall())
-        print(table_list)
+
 
     if len(table_list) != 0:
         # Отрабатываем для стринговой команды
