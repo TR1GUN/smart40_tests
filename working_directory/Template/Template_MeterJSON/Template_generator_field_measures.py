@@ -50,6 +50,8 @@ class GeneratorMeasures:
         self.count_id = count_id
         self.Castrom_Value = Castrom_Value
 
+        self.count_id = self.__generate_set_id()
+
         self.json = self.__generate_measure()
 
     def __generate_measure(self):
@@ -60,6 +62,7 @@ class GeneratorMeasures:
 
         # Если у нас длина элементов больше нуля , то продолжаем
         if len(list_measure) > 0:
+
             # После чего проходимся по каждому элементу массива и проверяем - стринг ли он
             for i in range(len(list_measure)):
                 if type(list_measure[i]) == str:
@@ -114,3 +117,24 @@ class GeneratorMeasures:
             self.generate_ts_final = self.count_ts
 
     # --------------------------------------------------------------------------------------------------------
+    def __generate_set_id(self):
+        """
+        ОЧЕНЬ ВАЖНЫЙ МОМЕНТ _ ОТКАЗЫЕМСЯ ОТ УНИКАЛЬНЫХ АЙДИШНИКОВ
+        :return:
+        """
+
+        #
+        idx_set_list = []
+        # Теперь генерируем айдишники - если это инт значения
+        if type(self.count_id) == int:
+            from working_directory.Template.Template_MeterJSON.Template_generator_random_device_idx import \
+                GeneratorDeviceIdx
+
+            idx = deepcopy(GeneratorDeviceIdx(count_id=self.count_id).id)
+            # Теперь оттуда вытаскиваем значения
+            for i in range(len(idx)):
+                idx_set_list.append(idx[i]['DeviceIdx'])
+
+            # После этого присваиваем новое значение
+
+        return idx_set_list

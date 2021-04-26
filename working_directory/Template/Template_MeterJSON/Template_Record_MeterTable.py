@@ -318,11 +318,15 @@ class GenerateRecordMeterTable:
         А теперь селектим все внутрение айдишники и добавляем их в список
         :return:
         '''
-        command = 'SELECT DeviceIdx FROM MeterTable WHERE MeterId in ' + str(tuple(self.MeterId_list))
 
-        command = command[:-2] + ')'
+        command_select_MeterId_list = ''
+        for i in range(len(self.MeterId_list)):
+            command_select_MeterId_list = command_select_MeterId_list + str(self.MeterId_list[i]) + ' , '
+
+        command_select_MeterId_list = command_select_MeterId_list[:-2]
+
+        command = 'SELECT DeviceIdx FROM MeterTable WHERE MeterId in ' + '( ' + command_select_MeterId_list + ' ) '
         # Селектим их через нашу БД
-
         result_list = sqlite.execute_command_to_read_return_dict(command=command)
         result = []
         for i in result_list:

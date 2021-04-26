@@ -53,7 +53,7 @@ class MeterData:
 
         # ----------ПРИНТУЕМ---------------
         print('JSON Обрабабатывался:', time_finis - time_start)
-        # Навсякий случай печатаем JSON ответа и что отправляли
+        # На всякий случай печатаем JSON ответа и что отправляли
         print('JSON\n', self.JSON)
         print('answer_JSON\n', self.answer_JSON)
         # ---------------------------------
@@ -93,7 +93,7 @@ class GET(MeterData):
     # -------------------------------   Логирование ОШИБКИ  -----------------------------------------
     def _write_log(self, result):
         if len(result) > 0:
-            result = log(API_name='Meter db data API - POST - ' + str(self.list_measure),
+            result = log(API_name='Meter db data API - GET - ',
                          Error=result,
                          JSON=self.JSON,
                          answer_JSON=self.answer_JSON,
@@ -102,6 +102,7 @@ class GET(MeterData):
 
     # -----------------------------------------------------------------------------------------------
     # Еcли мы отправляем массив данных :
+
     def Сustom_measures(self,
                         #
                         list_measure: list = ['ElConfig'],
@@ -219,7 +220,7 @@ class POST(MeterData):
     # -------------------------------   Логирование ОШИБКИ  -----------------------------------------
     def _write_log(self, result):
         if len(result) > 0:
-            result = log(API_name='Meter db data API - POST - ' + str(self.list_measure),
+            result = log(API_name='Meter db data API - POST - ',
                          Error=result,
                          JSON=self.JSON,
                          answer_JSON=self.answer_JSON,
@@ -283,8 +284,6 @@ class POST(MeterData):
 
             data_base_was_recorded = ReceivingDataAccordingToJSON(JSON=self.JSON_dict, Select_all=False).get_result()
 
-            print(result)
-
             result = POSTCheckUP(DataBase_before=data_base_before_recording,
                                  DataBase_after=data_base_after_recording,
                                  DataBase_was_recording=data_base_was_recorded,
@@ -311,24 +310,40 @@ class ThreadingPOST(POST):
     answer_JSON = {}
     thread = 2
     setup_JSON = False
+    param_setup = None
 
+    # -------------------------------   Логирование ОШИБКИ  -----------------------------------------
+    def _write_log(self, result):
+        if len(result) > 0:
+            result = log(API_name='Meter db data API - ThreadingPOST -  ',
+                         Error=result,
+                         JSON=self.JSON,
+                         answer_JSON=self.answer_JSON,
+                         JSON_normal={'БД': ''})
+        return result
+
+    # -----------------------------------------------------------------------------------------------
     # -----------------------------МЕТОД ЗАПУСКА - ЕГО ПЕРЕОПРЕДЕЛЯЕМ ОТ БАЗОВОГО ------------------------------------
     def Setup(self, JSON, index):
         """МЕТОД ЗАПУСКА JSON"""
 
         while True:
             if self.setup_JSON:
+                # для измерения времени работы API ставим таймер
+                time_start = time.time()
                 JSON_Setup = Setup(JSON=JSON, API=self.API, type_connect=self.type_connect)
                 answer_JSON = JSON_Setup.answer_JSON
                 # Добавляем по индексу - Имени потока
                 self.answer_JSON[index] = answer_JSON
 
-                # # ----------ПРИНТУЕМ---------------
-                # print('JSON Обрабабатывался:', time_finis - time_start)
-                # # Навсякий случай печатаем JSON ответа и что отправляли
-                # print('JSON\n', self.JSON)
-                # print('answer_JSON\n', self.answer_JSON)
-                # # ---------------------------------
+                # Получаем время
+                time_finis = time.time()
+                # ----------ПРИНТУЕМ---------------
+                print('ПОТОК ' + str(index), 'JSON Обрабабатывался:', time_finis - time_start)
+                # Навсякий случай печатаем JSON ответа и что отправляли
+                print('ПОТОК ' + str(index), 'JSON\n', JSON)
+                print('ПОТОК ' + str(index), 'answer_JSON\n', self.answer_JSON[index])
+                # ---------------------------------
 
                 # И сбрамываем
                 break
@@ -356,20 +371,12 @@ class ThreadingPOST(POST):
             Thread_dict['thread_' + str(i)].start()
         self.setup_JSON = True
 
-        time.sleep(10)
+        time.sleep(5)
 
         for i in range(self.thread):
             # Запускаем его
             Thread_dict['thread_' + str(i)].join()
-        # Получаем время
-        time_finis = time.time()
 
-        # # ----------ПРИНТУЕМ---------------
-        # print('JSON Обрабабатывался:', time_finis - time_start)
-        # # Навсякий случай печатаем JSON ответа и что отправляли
-        # print('JSON\n', self.JSON)
-        # print('answer_JSON\n', self.answer_JSON)
-        # # ---------------------------------
         return self.answer_JSON
 
     # ---------------------------   ПРОВЕРКА УСПЕШНОСТИ ОПЕРАЦИИ - Только для потоков ----------------------------
@@ -469,7 +476,7 @@ class ThreadingPOST(POST):
                 if len(result) != 0:
                     result.append({'ОШИБКА В потоке ' + name_thread: result_thread})
 
-            result = self._write_log(result)
+        result = self._write_log(result)
 
         return result
 
@@ -487,9 +494,20 @@ class ThreadingGET(GET):
     answer_JSON_deconstruct = {}
     JSON = {}
     answer_JSON = {}
-    thread = 2
+
     setup_JSON = False
 
+    # -------------------------------   Логирование ОШИБКИ  -----------------------------------------
+    def _write_log(self, result):
+        if len(result) > 0:
+            result = log(API_name='Meter db data API - ThreadingGET -  ',
+                         Error=result,
+                         JSON=self.JSON,
+                         answer_JSON=self.answer_JSON,
+                         JSON_normal={'БД': ''})
+        return result
+
+    # -----------------------------------------------------------------------------------------------
     # ---------------------------   ПРОВЕРКА УСПЕШНОСТИ ОПЕРАЦИИ - Только для потоков ----------------------------
     def __error_handler_thread(self):
 
@@ -507,17 +525,21 @@ class ThreadingGET(GET):
 
         while True:
             if self.setup_JSON:
+                # для измерения времени работы API ставим таймер
+                time_start = time.time()
+
                 JSON_Setup = Setup(JSON=JSON, API=self.API, type_connect=self.type_connect)
                 answer_JSON = JSON_Setup.answer_JSON
                 # Добавляем по индексу - Имени потока
                 self.answer_JSON[index] = answer_JSON
-
-                # # ----------ПРИНТУЕМ---------------
-                # print('JSON Обрабабатывался:', time_finis - time_start)
+                # Получаем время
+                time_finis = time.time()
+                # ----------ПРИНТУЕМ---------------
+                print('ПОТОК ' + str(index), 'JSON Обрабатывался:', time_finis - time_start)
                 # # Навсякий случай печатаем JSON ответа и что отправляли
-                # print('JSON\n', self.JSON)
-                # print('answer_JSON\n', self.answer_JSON)
-                # # ---------------------------------
+                # print('ПОТОК ' + str(index), 'JSON\n', JSON)
+                print('ПОТОК ' + str(index), 'answer_JSON\n', self.answer_JSON[index])
+                # ---------------------------------
 
                 # И сбрамываем
                 break
@@ -547,17 +569,16 @@ class ThreadingGET(GET):
 
         time.sleep(10)
 
+
         for i in range(self.thread):
             # Запускаем его
             Thread_dict['thread_' + str(i)].join()
-        # Получаем время
-        time_finis = time.time()
 
         return self.answer_JSON
 
     # ---------------------------   ПРОВЕРКА УСПЕШНОСТИ ОПЕРАЦИИ - Только для потоков ----------------------------
 
-# -----------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------------
     # Еcли мы отправляем массив данных :
     def Сustom_measures(self,
                         #
@@ -590,6 +611,7 @@ class ThreadingGET(GET):
                         thread: int = 2
 
                         ):
+
         # Включаем обработчик
         result = []
         self.list_measure = list_measure
@@ -616,8 +638,8 @@ class ThreadingGET(GET):
             self.JSON_dict_record['thread_' + str(i)] = Generator.Generator_JSON_for_Meter_data_POST()
             # Теперь получаем деконструированный JSON
             self.JSON_deconstruct['thread_' + str(i)] = DeconstructJSON(
-                                                                        JSON=self.JSON_dict_record['thread_' + str(i)]
-                                                                        ).JSON_deconstruct
+                JSON=self.JSON_dict_record['thread_' + str(i)]
+            ).JSON_deconstruct
 
             RecordValueToDataBase(JSON_deconstruct=self.JSON_deconstruct['thread_' + str(i)])
 
@@ -633,15 +655,14 @@ class ThreadingGET(GET):
                 select_count_ts=select_count_ts,
                 select_count_id=select_count_id)
 
-
+        for i in range(thread):
             # Теперь получаем данные из БД что записали
             self.select_for_JSON_to_database['thread_' + str(i)] = ReceivingDataAccordingToJSON(
-                                                                       JSON=self.JSON_dict['thread_' + str(i)],
-                                                                       Select_all=False).get_result()
+                JSON=self.JSON_dict['thread_' + str(i)],
+                Select_all=False).get_result()
 
         # Теперь Запускаем наш JSON
         self.AnswerJSON = self.__Setup_JSON()
-
 
 
         # Обрабатываем ошибки самого JSON
@@ -651,17 +672,19 @@ class ThreadingGET(GET):
         if len(result) == 0:
             # Теперь деконструируем JSON для сравнения с БД
             for i in range(thread):
-                self.answer_JSON_deconstruct['thread_' + str(i)] = ParseAnswerMeterDataJSON(JSON=self.AnswerJSON['thread_' + str(i)]).JSON_deconstruct
+                self.answer_JSON_deconstruct['thread_' + str(i)] = ParseAnswerMeterDataJSON(
+                    JSON=self.AnswerJSON['thread_' + str(i)]).JSON_deconstruct
 
             for i in range(thread):
                 name_thread = 'thread_' + str(i)
 
                 result_thread = GETCheckUP(JSON_deconstruct=self.answer_JSON_deconstruct[name_thread],
-                                            DataBase_select=self.select_for_JSON_to_database[name_thread]).error_collector
+                                           DataBase_select=self.select_for_JSON_to_database[
+                                               name_thread]).error_collector
                 if len(result_thread) != 0:
                     result.append({'ОШИБКА В потоке ' + name_thread: result_thread})
 
-            result = self._write_log(result)
+        result = self._write_log(result)
 
         return result
 
@@ -685,16 +708,17 @@ ArchTypes_full_list = \
     Template_list_ArchTypes.DigitalConfig_ArchType_name_list + \
     Template_list_ArchTypes.PulseConfig_ArchType_name_list + \
     Template_list_ArchTypes.ElectricConfig_ArchType_name_list
-# # -------------------------------------------------------------------------------------------------------------------
 
 # # -------------------------------------------------------------------------------------------------------------------
 
-# Чистим таблицу
-from time import sleep
-from working_directory.sqlite import deleteMeterTable
-
-deleteMeterTable()
-sleep(2)
+# # -------------------------------------------------------------------------------------------------------------------
+#
+# # Чистим таблицу
+# from time import sleep
+# from working_directory.sqlite import deleteMeterTable
+#
+# deleteMeterTable()
+# sleep(2)
 
 # # -------------------------------------------------------------------------------------------------------------------
 #                                                     ДОБАВЫЛЯЕМ ВСЕ ТЭГИ
@@ -742,35 +766,32 @@ ElConfig = {'serial': None, 'model': None, 'cArrays': None, 'isDst': None, 'isCl
 
 Journal = {'event': None, 'eventId': None, }
 
-
 # # -------------------------------------------------------------------------------------------------------------------
 #                                                     ПРОГОНЫ - ОДИН ПОТОК
 # # -------------------------------------------------------------------------------------------------------------------
 
 # # -------------------------------------------------------------------------------------------------------------------
 # meterdata = POST(type_connect='ssh').Сustom_measures(
-#     list_measure=['PlsMomentPulse'],
+#     list_measure=['ElConfig'],
 #     count_id=1, count_ts=2,
-#     tags={'serial':None, 'model':None, 'cArrays':None, 'isDst':None, 'isClock':None, 'isTrf':None,
-#             'isAm':None, 'isRm':None, 'isRp':None, 'kI':None, 'kU':None, 'const':None
-#          }
+#     tags={'serial': None, 'model': None, 'cArrays': None, 'isDst': None, 'isClock': None, 'isTrf': None, 'isAm': None, 'isRm': None, 'isRp': None, 'kI': None, 'kU': None, 'const': None, }
 # )
 # print(meterdata)
 
 # -------------------------------------------------------------------------------------------------------------------
-# meterdata = GET(type_connect='virtualbox').Сustom_measures(list_measure=['ElArr1ConsPower'],
-#                                                            select_count_ts=2,
-#                                                            select_count_id=2,
-#                                                            generate_count_ts=3,
-#                                                            generate_count_id=3,
-#                                                            count_tags=0,
-#                                                            select_device_idx=False,
-#                                                            select_meter_id=True,
-#                                                            serial=False,
-#                                                            select_id_all=False,
-#                                                            select_last_time=True,
-#                                                            out_of_bounds=True
-#                                                            )
+# meterdata = GET(type_connect='ssh').Сustom_measures(list_measure=['ElArr1ConsPower'],
+#                                                     select_count_ts=4,
+#                                                     select_count_id=4,
+#                                                     generate_count_ts=4,
+#                                                     generate_count_id=5,
+#                                                     count_tag=3,
+#                                                     select_device_idx=False,
+#                                                     select_meter_id=False,
+#                                                     serial=False,
+#                                                     select_id_all=True,
+#                                                     select_last_time=False,
+#                                                     out_of_bounds=False,
+#                                                     )
 #
 # print(meterdata)
 # # -------------------------------------------------------------------------------------------------------------------
@@ -785,20 +806,23 @@ Journal = {'event': None, 'eventId': None, }
 #
 # )
 # print(meterdata)
+
+
+
 # -------------------------------------------------------------------------------------------------------------------
-# meterdata = ThreadingGET(type_connect='ssh').Сustom_measures(list_measure=['ElArr1ConsPower'],
-#                                                            select_count_ts=2,
-#                                                            select_count_id=2,
-#                                                            generate_count_ts=3,
-#                                                            generate_count_id=3,
-#                                                            count_tags=0,
+# meterdata = ThreadingGET(type_connect='ssh').Сustom_measures(list_measure=ArchTypes_full_list,
+#                                                            select_count_ts=4,
+#                                                            select_count_id=4,
+#                                                            generate_count_ts=4,
+#                                                            generate_count_id=5,
+#                                                            count_tags=3,
 #                                                            select_device_idx=False,
-#                                                            select_meter_id=True,
+#                                                            select_meter_id=False,
 #                                                            serial=False,
-#                                                            select_id_all=False,
-#                                                            select_last_time=True,
-#                                                            out_of_bounds=True,
-#                                                            thread=10)
+#                                                            select_id_all=True,
+#                                                            select_last_time=False,
+#                                                            out_of_bounds=False,
+#                                                            thread=9)
 #
 # print(meterdata)
-# -------------------------------------------------------------------------------------------------------------------
+# # -------------------------------------------------------------------------------------------------------------------

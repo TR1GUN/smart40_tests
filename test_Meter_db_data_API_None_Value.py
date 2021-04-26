@@ -1,8 +1,8 @@
 # Здесь расположим тесты на MeterData для None значений
 from working_directory.Meter_db_data_API import POST, GET
 from working_directory.Template.Template_Meter_db_data_API import Template_list_ArchTypes
-
-from time import sleep
+from working_directory.sqlite import deleteMeterTable
+from time import sleep,time
 import pytest
 # Загружаем тестовые данные
 import write_file
@@ -176,11 +176,16 @@ def test_POST_ElecticEnergyValues_meterdata_db_by_element(type_connect, list_mea
                                                           count_ts,
                                                           tags):
     sleep(1)
+    # Чистим БД
+    time_start = time()
+    deleteMeterTable()
+    sleep(2)
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
                                                                 tags=tags)
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -255,10 +260,16 @@ def test_POST_ElectricQualityValues_meterdata_db(type_connect, list_measure,
                                                  count_ts,
                                                  tags):
     sleep(1)
+    # Чистим БД
+    time_start = time()
+    deleteMeterTable()
+    sleep(2)
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
                                                                 tags=tags)
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
 
     assert meterdata == []
 
@@ -291,11 +302,16 @@ def test_POST_ElectricPowerValues_meterdata_db_by_element(type_connect,
                                                           count_ts,
                                                           tags):
     sleep(1)
+    # Чистим БД
+    time_start = time()
+    deleteMeterTable()
+    sleep(2)
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
-                                                                tags=tags
-                                                                )
+                                                                tags=tags)
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
 
     assert meterdata == []
 
@@ -328,10 +344,16 @@ def test_POST_PulseValues_meterdata_db_by_element(type_connect,
                                                   count_ts,
                                                   tags):
     sleep(1)
+    # Чистим БД
+    time_start = time()
+    deleteMeterTable()
+    sleep(2)
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
                                                                 tags=tags)
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
 
     assert meterdata == []
 
@@ -348,6 +370,19 @@ adding_tag_DigitalValues = [
         'Chnl19': None, 'Chnl20': None,
         'Chnl21': None, 'Chnl22': None, 'Chnl23': None, 'Chnl24': None, 'Chnl25': None, 'Chnl26': None,
         'Chnl27': None, 'Chnl28': None,
+        'Chnl29': None, 'Chnl30': None,
+        'Chnl31': None, 'Chnl32': None,
+    },
+{
+        'Chnl1': None, 'Chnl2': None, 'Chnl3': None, 'Chnl4': None, 'Chnl5': None, 'Chnl6': None,
+        'Chnl7': None, 'Chnl8': None, 'Chnl9': None,
+        'Chnl10': None,
+        'Chnl11': None, 'Chnl12': None, 'Chnl13': None, 'Chnl14': None, 'Chnl15': None, 'Chnl16': None,
+        'Chnl17': None, 'Chnl18': None,
+
+    },
+{
+
         'Chnl29': None, 'Chnl30': None,
         'Chnl31': None, 'Chnl32': None,
     }
@@ -367,10 +402,157 @@ def test_POST_DigitalValues_meterdata_db_by_element(type_connect,
                                                     count_ts,
                                                     tags):
     sleep(1)
+    # Чистим БД
+    time_start = time()
+    deleteMeterTable()
+    sleep(2)
     meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
                                                                 count_id=count_id,
                                                                 count_ts=count_ts,
                                                                 tags=tags)
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
+
+    assert meterdata == []
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# ------------------------------------- JournalValues -----------------------------------------------------------------
+
+adding_tag_JournalValues = [
+    {'event': None, 'eventId': None, }, { 'eventId': None, }, {'event': None, }
+]
+
+parametrize_JournalValues_ArchType_name = parametrize_by_element(
+    ArchType_name_list=JournalValues_ArchType_name_list,
+    Adding_Tags=adding_tag_JournalValues)
+
+
+@pytest.mark.parametrize("list_measure, count_id, count_ts,tags",
+                         parametrize_JournalValues_ArchType_name
+                         )
+def test_POST_JournalValues_meterdata_db_by_element(type_connect,
+                                                    list_measure,
+                                                    count_id,
+                                                    count_ts,
+                                                    tags):
+    sleep(1)
+    # Чистим БД
+    time_start = time()
+    deleteMeterTable()
+    sleep(2)
+    meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
+                                                                count_id=count_id,
+                                                                count_ts=count_ts,
+                                                                tags=tags)
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
+
+    assert meterdata == []
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
+# ------------------------------------- ElectricConfig -----------------------------------------------------------------
+
+adding_tag_ElectricConfig = [
+    {'serial': None, 'model': None, 'cArrays': None, 'isDst': None, 'isClock': None, 'isTrf': None, 'isAm': None, 'isRm': None, 'isRp': None, 'kI': None, 'kU': None, 'const': None, }
+]
+
+parametrize_ElectricConfig_ArchType_name = parametrize_by_element(
+    ArchType_name_list=ElectricConfig_ArchType_name_list,
+    Adding_Tags=adding_tag_ElectricConfig)
+
+
+@pytest.mark.parametrize("list_measure, count_id, count_ts,tags",
+                         parametrize_ElectricConfig_ArchType_name
+                         )
+def test_POST_ElectricConfig_meterdata_db_by_element(type_connect,
+                                                    list_measure,
+                                                    count_id,
+                                                    count_ts,
+                                                    tags):
+    sleep(1)
+    # Чистим БД
+    time_start = time()
+    deleteMeterTable()
+    sleep(2)
+    meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
+                                                                count_id=count_id,
+                                                                count_ts=count_ts,
+                                                                tags=tags)
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
+
+    assert meterdata == []
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# ------------------------------------- PulseConfig -----------------------------------------------------------------
+
+adding_tag_PulseConfig = [
+    {'serial':None,'model':None, 'chnl':None, 'isDst':None }
+]
+
+parametrize_PulseConfig_ArchType_name = parametrize_by_element(
+    ArchType_name_list=PulseConfig_ArchType_name_list,
+    Adding_Tags=adding_tag_PulseConfig)
+
+
+@pytest.mark.parametrize("list_measure, count_id, count_ts,tags",
+                         parametrize_PulseConfig_ArchType_name
+                         )
+def test_POST_PulseConfig_meterdata_db_by_element(type_connect,
+                                                    list_measure,
+                                                    count_id,
+                                                    count_ts,
+                                                    tags):
+    sleep(1)
+    # Чистим БД
+    time_start = time()
+    deleteMeterTable()
+    sleep(2)
+    meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
+                                                                count_id=count_id,
+                                                                count_ts=count_ts,
+                                                                tags=tags)
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
+
+    assert meterdata == []
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# ------------------------------------- DigitalConfig -----------------------------------------------------------------
+
+adding_tag_DigitalConfig = [
+    {'serial':None, 'model':None, 'chnlIn':None, 'chnlOut':None, 'isDst':None}
+]
+
+parametrize_DigitalConfig_ArchType_name = parametrize_by_element(
+    ArchType_name_list=DigitalConfig_ArchType_name_list,
+    Adding_Tags=adding_tag_DigitalConfig)
+
+
+@pytest.mark.parametrize("list_measure, count_id, count_ts,tags",
+                         parametrize_DigitalConfig_ArchType_name
+                         )
+def test_POST_DigitalConfig_meterdata_db_by_element(type_connect,
+                                                    list_measure,
+                                                    count_id,
+                                                    count_ts,
+                                                    tags):
+    sleep(1)
+    # Чистим БД
+    time_start = time()
+    deleteMeterTable()
+    sleep(2)
+    meterdata = POST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
+                                                                count_id=count_id,
+                                                                count_ts=count_ts,
+                                                                tags=tags)
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
 
     assert meterdata == []
 

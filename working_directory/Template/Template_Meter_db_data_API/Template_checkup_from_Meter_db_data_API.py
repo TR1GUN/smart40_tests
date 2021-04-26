@@ -609,9 +609,12 @@ class POSTCheckUP(CheckUp):
             'phaseC': ['UC', 'IC', 'PC', 'QC', 'SC', 'kPC', 'AngAC'],
             'phaseSum': ['PS', 'QS', 'SS', 'kPS', 'Freq'],
             'ConsPower': ['P+', 'Q+', 'P-', 'Q-'],
-            'Pulse' : ['Pls1', 'Pls2', 'Pls3', 'Pls4', 'Pls5', 'Pls6', 'Pls7', 'Pls8', 'Pls9', 'Pls10', 'Pls11', 'Pls12',
+            'Pulse': ['Pls1', 'Pls2', 'Pls3', 'Pls4', 'Pls5', 'Pls6', 'Pls7', 'Pls8', 'Pls9', 'Pls10', 'Pls11', 'Pls12',
                     'Pls13', 'Pls14', 'Pls15', 'Pls16', 'Pls17', 'Pls18', 'Pls19', 'Pls20', 'Pls21', 'Pls22', 'Pls23',
                     'Pls24', 'Pls25', 'Pls26', 'Pls27', 'Pls28', 'Pls29', 'Pls30', 'Pls31', 'Pls32'],
+
+        }
+        none_dict_etalon_rewrite_zero = {
             'Digital': ['Chnl1', 'Chnl2', 'Chnl3', 'Chnl4', 'Chnl5', 'Chnl6', 'Chnl7', 'Chnl8', 'Chnl9',
                                  'Chnl10',
                                  'Chnl11', 'Chnl12', 'Chnl13', 'Chnl14', 'Chnl15', 'Chnl16', 'Chnl17', 'Chnl18',
@@ -620,7 +623,7 @@ class POSTCheckUP(CheckUp):
                                  'Chnl29', 'Chnl30',
                                  'Chnl31', 'Chnl32'],
 
-            # 'Journal' : ['event', 'eventId',]
+            'Journal' : ['event', 'eventId',]
         }
 
         # Теперь перебираем все возможные комбинации по типам данных
@@ -642,6 +645,13 @@ class POSTCheckUP(CheckUp):
                                 if keys_for_tag in none_dict[category]:
                                     # Удаляем его
                                     none_dict[category].pop(none_dict[category].index(keys_for_tag))
+                            # ЕСли у нас тэг входит в диджитал значения и в журналы , записываем его значение как 0
+                            for category in none_dict_etalon_rewrite_zero:
+                                if keys_for_tag in none_dict_etalon_rewrite_zero[category]:
+                                    # Перезаписываем его
+                                    self.JSON_deconstruct[i][x][keys_for_tag] = 0
+
+
                 # ТЕПЕРЬ - смотрим - какие из категорий остались пустые
                 for category in none_dict:
                     # Если категория пуста - то получаем все тэги категории

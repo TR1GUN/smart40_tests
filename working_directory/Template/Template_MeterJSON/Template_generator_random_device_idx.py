@@ -75,6 +75,7 @@ class GeneratorDeviceIdx:
                                             address_meter="Adress be away",
                                             adress="o.o"
                                             ).DeviceIdx_list
+
         value_id_list = []
         # ДЕЛАЕМ ИЗ НИХ СПИСОК ТАК СЛОВНО ИХ МЫ ЗАСЕЛЕКТИЛИ , ЛОЛ
         for i in range(len(generate)):
