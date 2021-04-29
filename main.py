@@ -1,4 +1,4 @@
-import platform
+a = 'ErrorMeter db data API - ThreadingGET -  [[\'ElJrnlPwr\', \'ElJrnlTimeCorr\', \'ElJrnlReset\', \'ElJrnlC1Init\', \'ElJrnlC2Init\', \'ElJrnlTrfCorr\', \'ElJrnlOpen\', \'ElJrnlUnAyth\', \'ElJrnlPwrA\', \'ElJrnlPwrB\', \'ElJrnlPwrC\', \'ElJrnlProg\', \'ElJrnlRelay\', \'ElJrnlLimESumm\', \'ElJrnlLimETrf\', \'ElJrnlLimETrf1\', \'ElJrnlLimETrf2\', \'ElJrnlLimETrf3\', \'ElJrnlLimETrf4\', \'ElJrnlLimUAMax\', \'ElJrnlLimUAMin\', \'ElJrnlLimUBMax\', \'ElJrnlLimUBMin\', \'ElJrnlLimUCMax\', \'ElJrnlLimUCMin\', \'ElJrnlLimUABMax\', \'ElJrnlLimUABMin\', \'ElJrnlLimUBCMax\', \'ElJrnlLimUBCMin\', \'ElJrnlLimUCAMax\', \'ElJrnlLimUCAMin\', \'ElJrnlLimIAMax\', \'ElJrnlLimIBMax\', \'ElJrnlLimICMax\', \'ElJrnlLimFreqMax\', \'ElJrnlLimFreqMin\', \'ElJrnlLimPwr\', \'ElJrnlLimPwrPP\', \'ElJrnlLimPwrPM\', \'ElJrnlLimPwrQP\', \'ElJrnlLimPwrQM\', \'ElJrnlReverce\', \'PlsJrnlTimeCorr\', \'DigMomentState\', \'DigJournalState\', \'PlsMomentPulse\', \'PlsDayPulse\', \'PlsMonthPulse\', \'PlsHourPulse\', \'ElArr1ConsPower\', \'ElMomentQuality\', \'ElMomentEnergy\', \'ElDayEnergy\', \'ElMonthEnergy\', \'ElDayConsEnergy\', \'ElMonthConsEnergy\', \'DigConfig\', \'PlsConfig\', \'ElConfig\'], 4, 4, 4, 5, 3, False, False, True, False, False, False, 9] log JSON in 1619180568.txt'
 
 
-print(platform.system())
+print(a[200:])

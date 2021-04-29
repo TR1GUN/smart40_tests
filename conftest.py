@@ -5,11 +5,11 @@ import platform
 def pytest_addoption(parser):
     if str(platform.system()) == 'Windows':
         parser.addoption(
-            "--type_connect", action="store", default="ssh", help="Способ коннекта с нашей машиной"
+            "--type_connect", action="store", default="ssh", help="coonect"
         )
     else:
         parser.addoption(
-            "--type_connect", action="store", default="linux", help="Способ коннекта с нашей машиной"
+            "--type_connect", action="store", default="linux", help="connect"
         )
 
 

@@ -291,8 +291,6 @@ class GenerateRecordMeterTable:
         # Запускаем Генератор
         self.__generate_record_metertable()
 
-
-
         self.DeviceIdx_list = self.get_select_deviceidx()
 
     def __generate_record_metertable(self):
@@ -307,7 +305,6 @@ class GenerateRecordMeterTable:
                 adress=self.adress,
                 InterfaceConfig=self.InterfaceConfig
             )
-
 
             # Итак - Если мы добавили счетчик и он не пустота - Добавляем в массив
             if Record.Meter_MeterId is not None:
@@ -327,6 +324,7 @@ class GenerateRecordMeterTable:
 
         command = 'SELECT DeviceIdx FROM MeterTable WHERE MeterId in ' + '( ' + command_select_MeterId_list + ' ) '
         # Селектим их через нашу БД
+
         result_list = sqlite.execute_command_to_read_return_dict(command=command)
         result = []
         for i in result_list:

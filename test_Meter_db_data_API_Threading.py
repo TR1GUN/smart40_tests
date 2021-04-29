@@ -1,4 +1,3 @@
-# Здесь расположим тесты на MeterData  многопоточном режиме
 
 from working_directory.Meter_db_data_API import ThreadingPOST, ThreadingGET
 from working_directory.Template.Template_Meter_db_data_API import Template_list_ArchTypes
@@ -119,7 +118,7 @@ def test_POST_PulseConfig_meterdata_db(type_connect,
                                        # Количество потоков
                                        thread):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -127,7 +126,8 @@ def test_POST_PulseConfig_meterdata_db(type_connect,
                                                                          count_ts=count_ts,
                                                                          tags=tags,
                                                                          thread=thread)
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -148,7 +148,7 @@ def test_POST_DigitalConfig_meterdata_db(type_connect, list_measure,
                                          # Количество потоков
                                          thread):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -156,7 +156,8 @@ def test_POST_DigitalConfig_meterdata_db(type_connect, list_measure,
                                                                          count_ts=count_ts,
                                                                          tags=tags,
                                                                          thread=thread)
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -178,7 +179,7 @@ def test_POST_ElecticEnergyValues_meterdata_db_by_element(type_connect, list_mea
                                                           # Количество потоков
                                                           thread):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -186,7 +187,8 @@ def test_POST_ElecticEnergyValues_meterdata_db_by_element(type_connect, list_mea
                                                                          count_ts=count_ts,
                                                                          tags=tags,
                                                                          thread=thread)
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -206,7 +208,7 @@ def test_POST_ElecticEnergyValues_meterdata_db(type_connect, list_measure,
                                                # Количество потоков
                                                thread):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -214,7 +216,8 @@ def test_POST_ElecticEnergyValues_meterdata_db(type_connect, list_measure,
                                                                          count_ts=count_ts,
                                                                          tags=tags,
                                                                          thread=thread)
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -235,7 +238,7 @@ def test_POST_ElectricQualityValues_meterdata_db(type_connect, list_measure,
                                                  # Количество потоков
                                                  thread):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -243,7 +246,8 @@ def test_POST_ElectricQualityValues_meterdata_db(type_connect, list_measure,
                                                                          count_ts=count_ts,
                                                                          tags=tags,
                                                                          thread=thread)
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -264,7 +268,7 @@ def test_POST_ElectricPowerValues_meterdata_db_by_element(type_connect,
                                                           # Количество потоков
                                                           thread):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -273,7 +277,8 @@ def test_POST_ElectricPowerValues_meterdata_db_by_element(type_connect,
                                                                          tags=tags,
                                                                          thread=thread
                                                                          )
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -294,7 +299,7 @@ def test_POST_ElectricPowerValues_meterdata_db(type_connect,
                                                # Количество потоков
                                                thread):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -302,7 +307,8 @@ def test_POST_ElectricPowerValues_meterdata_db(type_connect,
                                                                          count_ts=count_ts,
                                                                          tags=tags,
                                                                          thread=thread)
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -322,7 +328,7 @@ def test_POST_PulseValues_meterdata_db_by_element(type_connect,
                                                   # Количество потоков
                                                   thread):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -330,7 +336,8 @@ def test_POST_PulseValues_meterdata_db_by_element(type_connect,
                                                                          count_ts=count_ts,
                                                                          tags=tags,
                                                                          thread=thread)
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -352,7 +359,7 @@ def test_POST_PulseValues_meterdata_db(type_connect,
                                        # Количество потоков
                                        thread):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -360,7 +367,8 @@ def test_POST_PulseValues_meterdata_db(type_connect,
                                                                          count_ts=count_ts,
                                                                          tags=tags,
                                                                          thread=thread)
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -381,7 +389,7 @@ def test_POST_DigitalValues_meterdata_db_by_element(type_connect,
                                                     # Количество потоков
                                                     thread):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -389,7 +397,8 @@ def test_POST_DigitalValues_meterdata_db_by_element(type_connect,
                                                                          count_ts=count_ts,
                                                                          tags=tags,
                                                                          thread=thread)
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -411,7 +420,7 @@ def test_POST_DigitalValues_meterdata_db(type_connect,
                                          # Количество потоков
                                          thread):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -419,7 +428,8 @@ def test_POST_DigitalValues_meterdata_db(type_connect,
                                                                          count_ts=count_ts,
                                                                          tags=tags,
                                                                          thread=thread)
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -438,7 +448,7 @@ def test_POST_JournalValues_meterdata_db_by_element(type_connect,
                                                     # Количество потоков
                                                     thread):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -446,7 +456,8 @@ def test_POST_JournalValues_meterdata_db_by_element(type_connect,
                                                                          count_ts=count_ts,
                                                                          tags=tags,
                                                                          thread=thread)
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -467,7 +478,7 @@ def test_POST_JournalValues_meterdata_db(type_connect,
                                          # Количество потоков
                                          thread):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -475,7 +486,8 @@ def test_POST_JournalValues_meterdata_db(type_connect,
                                                                          count_ts=count_ts,
                                                                          tags=tags,
                                                                          thread=thread)
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -504,7 +516,7 @@ def test_POST_all_meterdata_db(type_connect,
                                # Количество потоков
                                thread):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(1)
     meterdata = ThreadingPOST(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -512,7 +524,8 @@ def test_POST_all_meterdata_db(type_connect,
                                                                          count_ts=count_ts,
                                                                          tags=tags,
                                                                          thread=thread)
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -529,16 +542,16 @@ def test_POST_all_meterdata_db(type_connect,
     "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds , tags, thread",
     [
 
-        (ElectricConfig_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}, randint(5, 50)),
-        (ElectricConfig_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}, randint(5, 50)),
-        (ElectricConfig_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {}, randint(5, 50)),
-        (ElectricConfig_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}, randint(5, 50)),
-        (ElectricConfig_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}, randint(5, 50)),
-        (ElectricConfig_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {}, randint(5, 50)),
-        (ElectricConfig_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}, randint(5, 50)),
-        (ElectricConfig_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}, randint(5, 50)),
-        (ElectricConfig_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}, randint(5, 50)),
-        (ElectricConfig_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {}, randint(5, 50))
+        (ElectricConfig_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}, randint(5, 10)),
+        (ElectricConfig_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}, randint(5, 10)),
+        (ElectricConfig_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {}, randint(5, 10)),
+        (ElectricConfig_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}, randint(5, 10)),
+        (ElectricConfig_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}, randint(5, 10)),
+        (ElectricConfig_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {}, randint(5, 10)),
+        (ElectricConfig_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}, randint(5, 10)),
+        (ElectricConfig_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}, randint(5, 10)),
+        (ElectricConfig_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}, randint(5, 10)),
+        (ElectricConfig_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {}, randint(5, 10))
 
     ]
 )
@@ -574,7 +587,7 @@ def test_GET_ElectricConfig_meterdata_db(
         thread
 ):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(2)
     meterdata = ThreadingGET(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -592,7 +605,8 @@ def test_GET_ElectricConfig_meterdata_db(
                                                                         tags=tags,
                                                                         thread=thread
                                                                         )
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -603,16 +617,16 @@ def test_GET_ElectricConfig_meterdata_db(
     "list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
     "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags, thread",
     [
-        (PulseConfig_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}, randint(5, 50)),
-        (PulseConfig_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}, randint(5, 50)),
-        (PulseConfig_ArchType_name_list, 2, 3, 3, 4, 2, False, False, False, True, False, False, {}, randint(5, 50)),
-        (PulseConfig_ArchType_name_list, 4, 4, 4, 5, 3, True, False, False, False, False, False, {}, randint(5, 50)),
-        (PulseConfig_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}, randint(5, 50)),
-        (PulseConfig_ArchType_name_list, 1, 4, 2, 5, 3, False, False, False, True, False, True, {}, randint(5, 50)),
-        (PulseConfig_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}, randint(5, 50)),
-        (PulseConfig_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}, randint(5, 50)),
-        (PulseConfig_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}, randint(5, 50)),
-        (PulseConfig_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {}, randint(5, 50))
+        (PulseConfig_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}, randint(5, 10)),
+        (PulseConfig_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}, randint(5, 10)),
+        (PulseConfig_ArchType_name_list, 2, 3, 3, 4, 2, False, False, False, True, False, False, {}, randint(5, 10)),
+        (PulseConfig_ArchType_name_list, 4, 4, 4, 5, 3, True, False, False, False, False, False, {}, randint(5, 10)),
+        (PulseConfig_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}, randint(5, 10)),
+        (PulseConfig_ArchType_name_list, 1, 4, 2, 5, 3, False, False, False, True, False, True, {}, randint(5, 10)),
+        (PulseConfig_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}, randint(5, 10)),
+        (PulseConfig_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}, randint(5, 10)),
+        (PulseConfig_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}, randint(5, 10)),
+        (PulseConfig_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {}, randint(5, 10))
 
     ]
 )
@@ -648,7 +662,7 @@ def test_GET_PulseConfig_meterdata_db(
         thread
 ):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(2)
     meterdata = ThreadingGET(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -666,7 +680,8 @@ def test_GET_PulseConfig_meterdata_db(
                                                                         tags=tags,
                                                                         thread=thread
                                                                         )
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -678,16 +693,16 @@ def test_GET_PulseConfig_meterdata_db(
     "list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
     "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds , tags, thread",
     [
-        (DigitalConfig_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}, randint(5, 50)),
-        (DigitalConfig_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}, randint(5, 50)),
-        (DigitalConfig_ArchType_name_list, 2, 3, 3, 4, 2, True, False, False, False, False, False, {}, randint(5, 50)),
-        (DigitalConfig_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}, randint(5, 50)),
-        (DigitalConfig_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}, randint(5, 50)),
-        (DigitalConfig_ArchType_name_list, 1, 4, 2, 5, 3, True, False, False, False, False, True, {}, randint(5, 50)),
-        (DigitalConfig_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}, randint(5, 50)),
-        (DigitalConfig_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}, randint(5, 50)),
-        (DigitalConfig_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}, randint(5, 50)),
-        (DigitalConfig_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {}, randint(5, 50))
+        (DigitalConfig_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}, randint(5, 10)),
+        (DigitalConfig_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}, randint(5, 10)),
+        (DigitalConfig_ArchType_name_list, 2, 3, 3, 4, 2, True, False, False, False, False, False, {}, randint(5, 10)),
+        (DigitalConfig_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}, randint(5, 10)),
+        (DigitalConfig_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}, randint(5, 10)),
+        (DigitalConfig_ArchType_name_list, 1, 4, 2, 5, 3, True, False, False, False, False, True, {}, randint(5, 10)),
+        (DigitalConfig_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}, randint(5, 10)),
+        (DigitalConfig_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}, randint(5, 10)),
+        (DigitalConfig_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}, randint(5, 10)),
+        (DigitalConfig_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {}, randint(5, 10))
 
     ]
 )
@@ -723,7 +738,7 @@ def test_GET_DigitalConfig_meterdata_db(
         thread
 ):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(2)
     meterdata = ThreadingGET(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -741,7 +756,8 @@ def test_GET_DigitalConfig_meterdata_db(
                                                                         tags=tags,
                                                                         thread=thread
                                                                         )
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -788,7 +804,7 @@ def test_GET_ElecticEnergyValues_meterdata_db_by_element(
         thread
 ):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(2)
     meterdata = ThreadingGET(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -806,7 +822,8 @@ def test_GET_ElecticEnergyValues_meterdata_db_by_element(
                                                                         tags=tags,
                                                                         thread=thread
                                                                         )
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -817,25 +834,25 @@ def test_GET_ElecticEnergyValues_meterdata_db_by_element(
     "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags, thread",
     [
         (ElecticEnergyValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElecticEnergyValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElecticEnergyValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElecticEnergyValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElecticEnergyValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElecticEnergyValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElecticEnergyValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElecticEnergyValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElecticEnergyValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElecticEnergyValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {},
-         randint(5, 50))
+         randint(5, 10))
 
     ]
 )
@@ -871,7 +888,7 @@ def test_GET_ElecticEnergyValues_meterdata_db(
         thread
 ):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(2)
     meterdata = ThreadingGET(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -889,7 +906,8 @@ def test_GET_ElecticEnergyValues_meterdata_db(
                                                                         tags=tags,
                                                                         thread=thread
                                                                         )
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -901,25 +919,25 @@ def test_GET_ElecticEnergyValues_meterdata_db(
     "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags, thread",
     [
         (ElectricQualityValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElectricQualityValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElectricQualityValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElectricQualityValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElectricQualityValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElectricQualityValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElectricQualityValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElectricQualityValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElectricQualityValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElectricQualityValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {},
-         randint(5, 50))
+         randint(5, 10))
 
     ]
 )
@@ -955,7 +973,7 @@ def test_GET_ElectricQualityValues_meterdata_db(
         thread
 ):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(2)
     meterdata = ThreadingGET(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -973,7 +991,8 @@ def test_GET_ElectricQualityValues_meterdata_db(
                                                                         tags=tags,
                                                                         thread=thread
                                                                         )
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -1022,7 +1041,7 @@ def test_GET_ElectricPowerValues_meterdata_db_by_element(
         thread
 ):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(2)
     meterdata = ThreadingGET(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -1040,7 +1059,8 @@ def test_GET_ElectricPowerValues_meterdata_db_by_element(
                                                                         tags=tags,
                                                                         thread=thread
                                                                         )
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -1052,25 +1072,25 @@ def test_GET_ElectricPowerValues_meterdata_db_by_element(
     "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags, thread",
     [
         (ElectricPowerValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElectricPowerValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElectricPowerValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElectricPowerValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElectricPowerValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElectricPowerValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElectricPowerValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElectricPowerValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElectricPowerValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {},
-         randint(5, 50)),
+         randint(5, 10)),
         (ElectricPowerValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {},
-         randint(5, 50))
+         randint(5, 10))
 
     ]
 )
@@ -1106,7 +1126,7 @@ def test_GET_ElectricPowerValues_meterdata_db(
         thread
 ):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(2)
     meterdata = ThreadingGET(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -1124,7 +1144,8 @@ def test_GET_ElectricPowerValues_meterdata_db(
                                                                         tags=tags,
                                                                         thread=thread
                                                                         )
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -1170,7 +1191,7 @@ def test_GET_PulseValues_meterdata_db_by_element(
         thread
 ):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(2)
     meterdata = ThreadingGET(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -1188,7 +1209,8 @@ def test_GET_PulseValues_meterdata_db_by_element(
                                                                         tags=tags,
                                                                         thread=thread
                                                                         )
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -1199,16 +1221,16 @@ def test_GET_PulseValues_meterdata_db_by_element(
     "list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
     "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags, thread",
     [
-        (PulseValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}, randint(5, 50)),
-        (PulseValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}, randint(5, 50)),
-        (PulseValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {}, randint(5, 50)),
-        (PulseValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}, randint(5, 50)),
-        (PulseValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}, randint(5, 50)),
-        (PulseValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {}, randint(5, 50)),
-        (PulseValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}, randint(5, 50)),
-        (PulseValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}, randint(5, 50)),
-        (PulseValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}, randint(5, 50)),
-        (PulseValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {}, randint(5, 50))
+        (PulseValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}, randint(5, 10)),
+        (PulseValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}, randint(5, 10)),
+        (PulseValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {}, randint(5, 10)),
+        (PulseValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}, randint(5, 10)),
+        (PulseValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}, randint(5, 10)),
+        (PulseValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {}, randint(5, 10)),
+        (PulseValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}, randint(5, 10)),
+        (PulseValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}, randint(5, 10)),
+        (PulseValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}, randint(5, 10)),
+        (PulseValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {}, randint(5, 10))
 
     ]
 )
@@ -1244,7 +1266,7 @@ def test_GET_PulseValues_meterdata_db(
         thread
 ):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(2)
     meterdata = ThreadingGET(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -1262,7 +1284,8 @@ def test_GET_PulseValues_meterdata_db(
                                                                         tags=tags,
                                                                         thread=thread
                                                                         )
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -1308,7 +1331,7 @@ def test_GET_DigitalValues_meterdata_db_by_element(
         thread
 ):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(2)
     meterdata = ThreadingGET(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -1326,7 +1349,8 @@ def test_GET_DigitalValues_meterdata_db_by_element(
                                                                         tags=tags,
                                                                         thread=thread
                                                                         )
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -1337,16 +1361,16 @@ def test_GET_DigitalValues_meterdata_db_by_element(
     "list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
     "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags, thread",
     [
-        (DigitalValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}, randint(5, 50)),
-        (DigitalValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}, randint(5, 50)),
-        (DigitalValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {}, randint(5, 50)),
-        (DigitalValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}, randint(5, 50)),
-        (DigitalValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}, randint(5, 50)),
-        (DigitalValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {}, randint(5, 50)),
-        (DigitalValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}, randint(5, 50)),
-        (DigitalValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}, randint(5, 50)),
-        (DigitalValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}, randint(5, 50)),
-        (DigitalValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {}, randint(5, 50))
+        (DigitalValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}, randint(5, 10)),
+        (DigitalValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}, randint(5, 10)),
+        (DigitalValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {}, randint(5, 10)),
+        (DigitalValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}, randint(5, 10)),
+        (DigitalValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}, randint(5, 10)),
+        (DigitalValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {}, randint(5, 10)),
+        (DigitalValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}, randint(5, 10)),
+        (DigitalValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}, randint(5, 10)),
+        (DigitalValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}, randint(5, 10)),
+        (DigitalValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {}, randint(5, 10))
 
     ]
 )
@@ -1382,7 +1406,7 @@ def test_GET_DigitalValues_meterdata_db(
         thread
 ):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(2)
     meterdata = ThreadingGET(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -1400,7 +1424,8 @@ def test_GET_DigitalValues_meterdata_db(
                                                                         tags=tags,
                                                                         thread=thread
                                                                         )
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -1445,7 +1470,7 @@ def test_GET_JournalValues_meterdata_db_by_element(
         thread
 ):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(2)
     meterdata = ThreadingGET(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -1463,7 +1488,8 @@ def test_GET_JournalValues_meterdata_db_by_element(
                                                                         tags=tags,
                                                                         thread=thread
                                                                         )
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -1473,16 +1499,16 @@ def test_GET_JournalValues_meterdata_db_by_element(
     "list_measure , select_count_ts , select_count_id , generate_count_ts , generate_count_id , count_tags , "
     "select_device_idx , select_meter_id , serial, select_id_all , select_last_time , out_of_bounds, tags, thread",
     [
-        (JournalValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}, randint(5, 50)),
-        (JournalValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}, randint(5, 50)),
-        (JournalValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {}, randint(5, 50)),
-        (JournalValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}, randint(5, 50)),
-        (JournalValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}, randint(5, 50)),
-        (JournalValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {}, randint(5, 50)),
-        (JournalValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}, randint(5, 50)),
-        (JournalValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}, randint(5, 50)),
-        (JournalValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}, randint(5, 50)),
-        (JournalValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {}, randint(5, 50))
+        (JournalValues_ArchType_name_list, 0, 1, 1, 2, 0, True, False, False, False, False, False, {}, randint(5, 10)),
+        (JournalValues_ArchType_name_list, 1, 2, 2, 3, 1, False, True, False, False, False, False, {}, randint(5, 10)),
+        (JournalValues_ArchType_name_list, 2, 3, 3, 4, 2, False, False, True, False, False, False, {}, randint(5, 10)),
+        (JournalValues_ArchType_name_list, 4, 4, 4, 5, 3, False, False, False, True, False, False, {}, randint(5, 10)),
+        (JournalValues_ArchType_name_list, 0, 5, 1, 6, 4, False, False, False, True, False, True, {}, randint(5, 10)),
+        (JournalValues_ArchType_name_list, 1, 4, 2, 5, 3, False, False, True, False, False, True, {}, randint(5, 10)),
+        (JournalValues_ArchType_name_list, 2, 5, 3, 6, 2, False, True, False, False, False, True, {}, randint(5, 10)),
+        (JournalValues_ArchType_name_list, 4, 4, 4, 5, 1, True, False, False, False, False, True, {}, randint(5, 10)),
+        (JournalValues_ArchType_name_list, 2, 3, 3, 4, 0, True, False, False, False, True, False, {}, randint(5, 10)),
+        (JournalValues_ArchType_name_list, 2, 2, 3, 3, 0, False, True, False, False, True, True, {}, randint(5, 10))
 
     ]
 )
@@ -1518,7 +1544,7 @@ def test_GET_JournalValues_meterdata_db(
         thread
 ):
     # Чистим БД
-
+    time_start = time()
     deleteMeterTable()
     sleep(2)
     meterdata = ThreadingGET(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -1536,7 +1562,8 @@ def test_GET_JournalValues_meterdata_db(
                                                                         tags=tags,
                                                                         thread=thread
                                                                         )
-
+    time_finis = time()
+    print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
     assert meterdata == []
 
 
@@ -1597,8 +1624,8 @@ def test_GET_all_ArchType_name_meterdata_db(
         thread
 
 ):
-    import time
-    time_start = time.time()
+    # Чистим БД
+    time_start = time()
     deleteMeterTable()
     sleep(2)
     meterdata = ThreadingGET(type_connect=type_connect).Сustom_measures(list_measure=list_measure,
@@ -1617,7 +1644,7 @@ def test_GET_all_ArchType_name_meterdata_db(
                                                                         thread=thread
                                                                         )
 
-    time_finis = time.time()
+    time_finis = time()
     print('ТЕСТ ПРОХОДИЛ :', time_finis - time_start)
 
     assert meterdata == []

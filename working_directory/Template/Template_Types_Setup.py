@@ -391,7 +391,6 @@ class SetupSSH:
 
         # Если есть ошибки то возвращаем ошибки
         if len(data_stderr.decode('utf-8')) > 0:
-            print('jib, ')
             result = data_stderr
         else:
             # если нет никаких ошибок , то возвращаем
