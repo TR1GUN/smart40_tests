@@ -302,6 +302,10 @@ class GET:
 
             # Получаем время
             time_finis = time.time()
+            # print('JSON\n', JSON)
+            #
+            # print('answer_JSON\n', answer_JSON)
+
 
             print('JSON Обрабабатывался:', time_finis - time_start)
 
@@ -670,3 +674,6 @@ class DELETE:
 # --------------------------------------------------------------------------------------------------------------------
 
 # --------------------------------------------------------------------------------------------------------------------
+#
+# meter_settings = GET().MeterTable(count_get_ids=1, count_generate_ids=1)
+# print(meter_settings)

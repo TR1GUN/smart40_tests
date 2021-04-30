@@ -819,9 +819,10 @@ class MeterDaemonManyMeter(MeterDaemonSingleMeter):
 # from working_directory.sqlite import deleteMeterTable
 
 # # ------------------------------------------- ОДИН СЧЕТЧИК --------------------------------------------------------
-# a = MeterDaemon().VirtualMeter(job_type=['ElArr1ConsPower'])
-# 'ElConfig','ElMomentEnergy', 'ElMomentQuality' , 'ElArr1ConsPower'
-# print(datetime.datetime.now())
+#
+# MeterDaemon_result = MeterDaemonSingleMeter('ssh').DataBase_clear(list_measure=['ElJrnlPwr'],
+#                                                                                           count_tree=2)
+# print(MeterDaemon_result)
 # # ----------------------------------------- МНОГОПОТОЧНЫЙ РЕЖИМ ----------------------------------------------------
 # Чистим БД
 

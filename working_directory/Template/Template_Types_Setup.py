@@ -376,11 +376,11 @@ class SetupSSH:
         api_path = path_to_API[self.API]
 
         # Собираем это все
-        cmd = """ echo ' """ + cmd + """   ' | /""" + api_path
+        cmd = """ echo ' """ + cmd + """   ' | """ + api_path
         # Немного перенделываем команду - чтоб запускать в баше
         '/bin/sh'
         # cmd = """ bash  " """ + cmd + """ " """
-
+        print(cmd)
 
         # Отправляем нашу команду
         stdin, stdout, stderr = client.exec_command(cmd)
