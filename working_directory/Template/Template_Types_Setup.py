@@ -380,7 +380,7 @@ class SetupSSH:
         # Немного перенделываем команду - чтоб запускать в баше
         '/bin/sh'
         # cmd = """ bash  " """ + cmd + """ " """
-        print(cmd)
+        # print(cmd)
 
         # Отправляем нашу команду
         stdin, stdout, stderr = client.exec_command(cmd)

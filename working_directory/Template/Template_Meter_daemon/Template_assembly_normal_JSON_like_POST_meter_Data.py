@@ -4,6 +4,7 @@ from working_directory.Template.Template_Meter_db_data_API import Template_list_
 from Emulator.Counters.Config_settings import get_time
 from copy import deepcopy
 
+
 # //-----------------------------------------------------------------------------------------------------------------
 #                         Класс для перестройки JSON формата MeterDEV в формат Meter DATA
 # //-----------------------------------------------------------------------------------------------------------------
@@ -14,14 +15,20 @@ class AssemblyDictLikeMeterData:
         'method': 'post',
         'res': 0,
         'measures': None
-            }
+    }
     JSON_list = []
     ids_meter = []
     measure_list = []
     JSON_GET = {}
 
     def __init__(self, JSON_list: list, ids_meter):
-        # Теперь берем наш Дособиратель и разбираем написианное тут
+
+        self.JSON = {
+            'method': 'post',
+            'res': 0,
+            'measures': None
+                    }
+        # Теперь берем наш Дособиратель и разбираем написанное тут
         self.ids_meter = ids_meter
         self.JSON_list = JSON_list
         # Список данных с однним таймштампов - моментные показания
@@ -63,11 +70,10 @@ class AssemblyDictLikeMeterData:
         for i in range(len(self.ids_meter)):
             JSON['devices'].append(deepcopy(fild_devices))
 
-        # print(JSON['devices'])
-        # print(fild_devices)
-        # for i in range(len(JSON['devices'])):
+            # print(JSON['devices'])
+            # print(fild_devices)
+            # for i in range(len(JSON['devices'])):
             JSON['devices'][i]['id'] = self.ids_meter[i]
-
 
             # Теперь переопрелеляем тайм
             # Здесь - Удаляем серийник

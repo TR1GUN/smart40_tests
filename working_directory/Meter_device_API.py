@@ -429,5 +429,5 @@ JournalValues_list = [
 # ---------------------------------------------------------------------------------------------------------------------
 
 
-# test = VirtualMeter(type_connect='ssh').iface_Ethernet(job_type='ElJrnlTrfCorr')
-# print(test)
+test = VirtualMeter(type_connect='virtualbox').iface_Ethernet(job_type='ElJrnlPwr')
+print(test)

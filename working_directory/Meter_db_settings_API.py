@@ -677,3 +677,7 @@ class DELETE:
 #
 # meter_settings = GET().MeterTable(count_get_ids=1, count_generate_ids=1)
 # print(meter_settings)
+
+#
+# meter_settings = GET().
+# print(meter_settings)

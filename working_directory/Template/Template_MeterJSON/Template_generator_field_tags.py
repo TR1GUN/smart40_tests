@@ -88,7 +88,7 @@ class GeneratorTagsByDevices:
 
         # Определяем значения для журналов
         elif tag in ['eventId', 'event']:
-            # Итак - тут очень важно начнем витвление
+            # Итак - тут очень важно начнем вeтвление
             if self.measure in ['ElJrnlLimUAMax', 'ElJrnlLimUAMin', 'ElJrnlLimUBMax', 'ElJrnlLimUBMin',
                                 'ElJrnlLimUCMax', 'ElJrnlLimUCMin', 'ElJrnlPwrC', 'ElJrnlPwrB', 'ElJrnlPwrA',
                                 "ElJrnlPwr", ]:

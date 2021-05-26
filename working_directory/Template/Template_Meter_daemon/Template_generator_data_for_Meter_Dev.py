@@ -14,6 +14,7 @@ class GenerateDataForMeterDev:
     JSON_Meter_Dev = {}
 
     def __init__(self, measure_list: list = ['ElConfig', "ElMomentEnergy", 'ElArr1ConsPower']):
+        self.JSON_Meter_Dev = {}
         self.job_type = measure_list
         # Получаем наш сгенерированый JSON
         self.JSON_Meter_Dev = self.__generate_data_for_Meter_Device()

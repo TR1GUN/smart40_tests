@@ -24,6 +24,14 @@ class SeparateJSONfromMeterDev:
     count_ts_to_record = 12
 
     def __init__(self, JSON_original, count_ts_to_record: int = 40):
+
+        self.JSON_record_for_data_base = []
+
+        self.JSON_for_MeterDev = []
+
+        self.JSON_original = []
+
+
         self.JSON_original = JSON_original
         self.count_ts_to_record = count_ts_to_record
         # Если у нас число записей больше чем 11 , то ставим 11
@@ -116,17 +124,17 @@ class SeparateJSONfromMeterDev:
             for_MeterDev = copy.deepcopy(element_list)
             record_for_data_base = []
 
-        if self.type_measure in ElectricQualityValues_ArchType_name_list:
-            for i in range(len(for_MeterDev)):
-                for x in range(len(for_MeterDev[i]['tags'])):
-                    if for_MeterDev[i]['tags'][x]['tag'] in ['SA', 'SB', 'SC', 'SS']:
-                        # JSON_meter_value[i]['tags'][x]['val'] = None
-                        print(for_MeterDev[i]['tags'][x])
-                for i in range(len(record_for_data_base)):
-                    for x in range(len(record_for_data_base[i]['tags'])):
-                        if record_for_data_base[i]['tags'][x]['tag'] in ['SA', 'SB', 'SC', 'SS']:
-                            # JSON_meter_value[i]['tags'][x]['val'] = None
-                            print(record_for_data_base[i]['tags'][x])
+        # if self.type_measure in ElectricQualityValues_ArchType_name_list:
+        #     for i in range(len(for_MeterDev)):
+        #         for x in range(len(for_MeterDev[i]['tags'])):
+        #             if for_MeterDev[i]['tags'][x]['tag'] in ['SA', 'SB', 'SC', 'SS']:
+        #                 # JSON_meter_value[i]['tags'][x]['val'] = None
+        #                 print(for_MeterDev[i]['tags'][x])
+        #         for i in range(len(record_for_data_base)):
+        #             for x in range(len(record_for_data_base[i]['tags'])):
+        #                 if record_for_data_base[i]['tags'][x]['tag'] in ['SA', 'SB', 'SC', 'SS']:
+        #                     # JSON_meter_value[i]['tags'][x]['val'] = None
+        #                     print(record_for_data_base[i]['tags'][x])
 
         return for_MeterDev, record_for_data_base
 

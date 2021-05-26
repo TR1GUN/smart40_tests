@@ -772,25 +772,25 @@ Journal = {'event': None, 'eventId': None, }
 
 # # -------------------------------------------------------------------------------------------------------------------
 # meterdata = POST(type_connect='ssh').Сustom_measures(
-#     list_measure=['ElConfig'],
+#     list_measure=['ElMomentQuality'],
 #     count_id=1, count_ts=2,
 #     tags={'serial': None, 'model': None, 'cArrays': None, 'isDst': None, 'isClock': None, 'isTrf': None, 'isAm': None, 'isRm': None, 'isRp': None, 'kI': None, 'kU': None, 'const': None, }
 # )
 # print(meterdata)
 
 # -------------------------------------------------------------------------------------------------------------------
-# meterdata = GET(type_connect='ssh').Сustom_measures(list_measure=['ElArr1ConsPower'],
-#                                                     select_count_ts=4,
-#                                                     select_count_id=4,
+# meterdata = GET(type_connect='virtualbox').Сustom_measures(list_measure=['PlsMomentPulse'],
+#                                                     select_count_ts=0,
+#                                                     select_count_id=5,
 #                                                     generate_count_ts=4,
 #                                                     generate_count_id=5,
-#                                                     count_tag=3,
+#                                                     count_tags=0,
 #                                                     select_device_idx=False,
-#                                                     select_meter_id=False,
+#                                                     select_meter_id=True,
 #                                                     serial=False,
-#                                                     select_id_all=True,
+#                                                     select_id_all=False,
 #                                                     select_last_time=False,
-#                                                     out_of_bounds=False,
+#                                                     out_of_bounds=True,
 #                                                     )
 #
 # print(meterdata)
@@ -810,7 +810,7 @@ Journal = {'event': None, 'eventId': None, }
 
 
 # -------------------------------------------------------------------------------------------------------------------
-# meterdata = ThreadingGET(type_connect='ssh').Сustom_measures(list_measure=ArchTypes_full_list,
+# meterdata = ThreadingGET(type_connect='ssh').Сustom_measures(list_measure=["ElConfig"],
 #                                                            select_count_ts=4,
 #                                                            select_count_id=4,
 #                                                            generate_count_ts=4,
@@ -820,7 +820,7 @@ Journal = {'event': None, 'eventId': None, }
 #                                                            select_meter_id=False,
 #                                                            serial=False,
 #                                                            select_id_all=True,
-#                                                            select_last_time=False,
+#                                                            select_last_time=True,
 #                                                            out_of_bounds=False,
 #                                                            thread=9)
 #

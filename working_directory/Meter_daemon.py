@@ -191,9 +191,6 @@ class MeterDaemonSingleMeter(MeterDaemon):
 
         from working_directory.Template.Template_MeterJSON.Template_Record_MeterTable import GenerateRecordMeterTable
 
-        print(self.iface)
-        print(self.type_meter)
-
         adress = self.__GetIPConfig()
         Generate_Record_Meter = GenerateRecordMeterTable(
             generate_count=self.generate_count,
@@ -278,6 +275,8 @@ class MeterDaemonSingleMeter(MeterDaemon):
         # Чистим БД
         deleteMeterTable()
         sleep(2)
+        self.JSON_Meter_Dev = []
+        self.list_measure = []
 
         # переопределяем тэги
         self.count_ts_to_record = count_ts_to_record
@@ -291,7 +290,6 @@ class MeterDaemonSingleMeter(MeterDaemon):
 
         # Генерируем данные данные для нашего счетчика
         self.JSON_Meter_Dev = self._generate_data_to_meter_dev()
-
         # Теперь - что делаем - Мы разделяем Наши записи
         Separate = SeparateJSONfromMeterDev(JSON_original=self.JSON_Meter_Dev,
                                             count_ts_to_record=self.count_ts_to_record)
@@ -366,6 +364,8 @@ class MeterDaemonSingleMeter(MeterDaemon):
             database_after=data_base_after_recording
         ).DataBase_was_recording
 
+        print('self.database_was_recording', self.database_was_recording)
+        print('self.JSON_meterdata_deconstruct', self.JSON_meterdata_deconstruct)
         result = CheckUP(DataBase_was_recording=self.database_was_recording,
                          JSON_deconstruct=self.JSON_meterdata_deconstruct).error_collector
 
@@ -570,7 +570,6 @@ class MeterDaemonManyMeter(MeterDaemonSingleMeter):
             AssemblyDictLikeMeterData
         from copy import deepcopy
 
-        # JSON_dict_meterdata = AssemblyDictLikeMeterData(self.JSON_Meter_Dev, self.DeviceIdx_list).JSON
 
         restructuring = AssemblyDictLikeMeterData(self.JSON_Meter_Dev, self.DeviceIdx_list)
 
@@ -823,6 +822,17 @@ class MeterDaemonManyMeter(MeterDaemonSingleMeter):
 # MeterDaemon_result = MeterDaemonSingleMeter('ssh').DataBase_clear(list_measure=['ElJrnlPwr'],
 #                                                                                           count_tree=2)
 # print(MeterDaemon_result)
+
+# deleteMeterTable()
+# sleep(1)
+#
+
+MeterDaemon_result = MeterDaemonSingleMeter(type_connect='ssh').DataBase_filled(
+            list_measure=['ElMomentEnergy'],
+            count_ts_to_record=0,
+            count_tree=2
+                                                 )
+print(MeterDaemon_result)
 # # ----------------------------------------- МНОГОПОТОЧНЫЙ РЕЖИМ ----------------------------------------------------
 # Чистим БД
 
