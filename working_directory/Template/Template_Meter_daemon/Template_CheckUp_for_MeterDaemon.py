@@ -1,8 +1,6 @@
 # Сдесь сделаем наш алгоритм сравнения для Meter Daemon
 from working_directory.Template.Template_Meter_db_data_API import Template_list_ArchTypes
 from copy import deepcopy
-# from working_directory.Template.Template_Meter_db_data_API.Template_checkup_from_Meter_db_data_API import CheckUp
-
 # ---------------------------------------------------------------------------------------------------------------------
 #                         Здесь расположем главный класс сравнивания - Это важно !!!
 # ---------------------------------------------------------------------------------------------------------------------
@@ -41,8 +39,10 @@ class CheckUP:
 
             # Теперь достраиваем JSON
             self.JSON_deconstruct = self.__Rewrite_JSON()
-            # Првоеряем валидность
-            self.error_collector = self.error_collector + self.__checkup_field_valid()
+
+            # Исключаем
+            # # Првоеряем валидность
+            # self.error_collector = self.error_collector + self.__checkup_field_valid()
 
             # после переопределения полей - делаем сравнение
             self.error_collector = self.error_collector + self.__checkup_archtype_name()
@@ -317,3 +317,8 @@ class CheckUP:
                     JSON[i][x]['ts'] = timestamp
 
         return JSON
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+#                         Здесь расположен класс сравнения для МНОГОПОТОЧНОГО метор ДЕМОНА
+# ---------------------------------------------------------------------------------------------------------------------

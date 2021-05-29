@@ -21,22 +21,28 @@ class GenerateTimestamp:
     delta_moment: int = delta_moment
     delta_Journal: int = delta_Journal
     cTime = 30
+    Count_timestamp = None
 
     def __init__(self,
                  # Обязательные параметры:
                  # ТИП ДАННЫХ
                  measure,
                  # Временные ограничения
-                 Time):
+                 Time,
+                 # КОЛИЧЕСТВО тайм штампов что генерируем - ЕСЛИ ПО СТАНДАРТУ - ТО ПИШЕМ ЗНАЧЕНИЕ NONE
+                 Count_timestamp=None):
+
+
         self.measure = measure
         self.Time = Time
+        self.Count_timestamp = Count_timestamp
 
         # НЕ ОБЯЗАТЕЛЬНЫЕ ДАННЫЕ
         # Глубина запроса времени
 
     def Generate_Timestamp_list(self):
         """
-        Здесь генерируем нужное количество нужного времени относительно нашего jSON запроса
+        Здесь генерируем нужное количество нужного времени относительно нашего JSON запроса
         :return:
         """
 
@@ -45,37 +51,47 @@ class GenerateTimestamp:
         # Группа первая - Значения показателей на день
         if self.measure in measure_containin_day_list:
             # Число таймштампов равно глубине разницы дней -
-            self.delta_day = datetime.fromtimestamp(self.Time['end']) - datetime.fromtimestamp(self.Time['start'])
-
+            if self.Count_timestamp is not None:
+                self.delta_day = self.Count_timestamp
+            else:
+                self.delta_day = datetime.fromtimestamp(self.Time['end']) - datetime.fromtimestamp(self.Time['start'])
+                self.delta_day = self.delta_day.days
             # Если у нас показатель на начало суток - то включаем и сегодня тоже
             if self.measure in [measure_containin_day_list[0], measure_containin_day_list[2]]:
-                self.delta_day = self.delta_day.days + 1
+                self.delta_day = self.delta_day
                 self.timestamp_list = self.__generate_correct_timestamp_through_timedelta(range_ts=self.delta_day,
                                                                                           day=1,
                                                                                           add_day=False)
             # Если нет , то и не включаем - СЧЕТ ИДЕТ ОТ ВЧЕРА
             else:
-                self.delta_day = self.delta_day.days
-            # self.coun_ts = self.delta_day
-            # А теперь генерируем список этих данных
-            # Получаем наш список дат , измеряя каждый день
+                self.delta_day = self.delta_day - 1
+                # self.coun_ts = self.delta_day
+                # А теперь генерируем список этих данных
+                # Получаем наш список дат , измеряя каждый день
                 self.timestamp_list = self.__generate_correct_timestamp_through_timedelta(range_ts=self.delta_day,
                                                                                           day=1,
                                                                                           add_day=True)
 
         # Группа вторая -  Значения показателей на месяц
         elif self.measure in measure_containin_month_list:
-            # Здесь делаем тоже самое что и с днями - для показаний потребления - отнимаем минус месяц
+            if self.Count_timestamp is not None:
+                self.delta_month = self.Count_timestamp
+
             if self.measure in [measure_containin_month_list[0], measure_containin_month_list[2]]:
-            # self.coun_ts = self.delta_month
+                # self.coun_ts = self.delta_month
                 self.timestamp_list = self.__generate_correct_timestamp(range_ts=self.delta_month, month=1)
+            # Здесь делаем тоже самое что и с днями - для показаний потребления - отнимаем минус месяц
             else:
-            # А теперь генерируем список этих данных
-                self.timestamp_list = self.__generate_correct_timestamp(range_ts=self.delta_month, month=1, add_month=True)
+                # А теперь генерируем список этих данных
+                self.delta_month = self.delta_month - 1
+                self.timestamp_list = self.__generate_correct_timestamp(range_ts=self.delta_month, month=1,
+                                                                        add_month=True)
 
         # Группа третья -  Значения показателей на 30 минут - ПРОФИЛИ МОЩНОСТИ
         elif self.measure in measure_containin_half_hour_list:
             # Число таймштампов равно глубине разницы дней -
+            if self.Count_timestamp is not None:
+                self.delta_half_hour = self.Count_timestamp
             # self.coun_ts = self.delta_half_hour
             # А теперь генерируем список этих данных
             # Получаем наш список дат , измеряя каждый день
@@ -86,7 +102,8 @@ class GenerateTimestamp:
         # Группа четвертая  - Значения показателей на час
         elif self.measure in measure_containin_hour_list:
             # Число таймштампов равно глубине разницы дней -
-
+            if self.Count_timestamp is not None:
+                self.delta_hour = self.Count_timestamp
             # self.coun_ts = delta_hour
             # А теперь генерируем список этих данных
             # Получаем наш список дат , измеряя каждый день
@@ -105,7 +122,11 @@ class GenerateTimestamp:
         # Группа Шестая   -  ЖУРНАЛЫ
         elif self.measure in measure_Journal_list:
             # Число таймштампов равно глубине разницы дней -
-            self.coun_ts = delta_Journal
+            if self.Count_timestamp is not None:
+                self.delta_Journal = self.Count_timestamp
+
+
+            # self.coun_ts = delta_Journal
             # А теперь генерируем список этих данных
             # Получаем наш список дат , измеряя каждый день
             self.timestamp_list = self.__generate_correct_timestamp_through_timedelta(range_ts=self.delta_Journal,
@@ -113,6 +134,7 @@ class GenerateTimestamp:
 
         # Иначе - Мы обрабаотываем мгновенные показатели
         else:
+
             # число таймштампов равно 1 - так как мгновенные показатели
             self.coun_ts = 1
             self.timestamp_list = self.__generate_correct_timestamp_through_timedelta(range_ts=self.delta_moment,
@@ -163,7 +185,7 @@ class GenerateTimestamp:
         return timestamp_list
 
     def __generate_correct_timestamp(self, range_ts: int = 0,
-                                     month: int = 0, day: int = 0, hour: int = 0, minute: int = 0, add_month = False):
+                                     month: int = 0, day: int = 0, hour: int = 0, minute: int = 0, add_month=False):
         """
         Итак - данная функция делает список из timestamp которые будут коректны
         :return:
@@ -200,8 +222,8 @@ class GenerateTimestamp:
 
             # Если у нас поулчается 13 месяц то меняем на 1
             # if date_month > 12:
-                # date_year = date.year + 1
-                # date_month = 1
+            # date_year = date.year + 1
+            # date_month = 1
             if date_month < 1:
                 date_year = date.year - 1
                 date_month = 12
@@ -257,3 +279,47 @@ class GenerateTimestamp:
 
         timestamp_list.reverse()
         return timestamp_list
+
+
+    # def _define_MomentTime(self):
+    #     """
+    #     :return:
+    #     """
+    # # Здесь расположим наш распределитель Который возвращает нужную функцию генерации
+    # measure_dict =\
+    #     {
+    #
+    #     # КОНФИГ
+    #     'ElConfig': _define_ElConfig,
+    #     # МОМЕНТНАЯ ЭНЕРГИЯ
+    #     'ElMomentEnergy':_define_ElMomentEnergy,
+    #     # ЭНЕРГИЯ НА НАЧАЛО ДНЯ
+    #     'ElDayEnergy':_define_ElDayEnergy,
+    #     # ЭНЕРГИЯ НА НАЧАЛО МЕСЯЦА
+    #     'ElMonthEnergy':_define_ElMonthEnergy,
+    #     # ПОТРЕБЛЯЕМАЯ ЭНЕРГИЯ НА НАЧАЛО ДНЯ
+    #     'ElDayConsEnergy':_define_ElDayConsEnergy,
+    #     # ПОТРЕБЛЯЕМАЯ ЭНЕРГИЯ НА МЕСЯЦ
+    #     'ElMonthConsEnergy':_define_ElMonthConsEnergy,
+    #     # ТЕКУЩИЕ ПОКАЗАНИЯ ПОКАЗАНИЯ КАЧЕСТВА СЕТИ
+    #     'ElMomentQuality': _define_ElMomentQuality,
+    #     # ПРОФИЛЬ МОЩНОСТИ
+    #     'ElArr1ConsPower': _define_ElArr1ConsPower,
+    #
+    #     # ЖУРНАЛЫ
+    #     'ElJrnlPwr':_define_Journal,
+    #     'ElJrnlTimeCorr':_define_Journal,
+    #     'ElJrnlReset':_define_Journal,
+    #     'ElJrnlTrfCorr':_define_Journal,
+    #     'ElJrnlOpen':_define_Journal,
+    #     'ElJrnlUnAyth':_define_Journal,
+    #     'ElJrnlPwrA':_define_Journal,
+    #     'ElJrnlPwrB':_define_Journal,
+    #     'ElJrnlPwrC':_define_Journal,
+    #     'ElJrnlLimUAMax':_define_Journal,
+    #     'ElJrnlLimUAMin':_define_Journal,
+    #     'ElJrnlLimUBMax':_define_Journal,
+    #     'ElJrnlLimUBMin':_define_Journal,
+    #     'ElJrnlLimUCMax':_define_Journal,
+    #     'ElJrnlLimUCMin':_define_Journal,
+    # }

@@ -114,6 +114,18 @@ class MeterDaemonSingleMeter(MeterDaemon):
     # ----------------------------------------------------------------------------------------------------------------
     #                                            Вспомомгательные методы
     # ----------------------------------------------------------------------------------------------------------------
+    def _definition_count_timestamp(self):
+        """
+        Определение количества таймштампов
+        :return:
+        """
+        from working_directory.Template.Template_Meter_daemon.Daemon_settings import ArchInfo_settings
+        # ГЕНЕРИРУЕМ НУЖНОЕ КОЛИЧЕСТВО ЗАПИСЕЙ
+        count_timesatamp = {}
+        for i in range(len(self.list_measure)):
+            count_timesatamp[i] = ArchInfo_settings.get(self.list_measure[i])
+
+        return count_timesatamp
 
     # ----------------------- Редактор наших полей  ArchInfo Под нужное значение   -----------------------------------
     def _rewrite_ArchInfo(self):
@@ -146,7 +158,7 @@ class MeterDaemonSingleMeter(MeterDaemon):
     # ---------------------------- Генерация данных для Виртуального счетчика ----------------------------------------
 
     # Пока сделаем это отдельным методом - Как там будет дальше - я не знаю
-    def _generate_data_to_meter_dev(self):
+    def _generate_data_to_meter_dev(self, count_timestamp={}):
         """
         В Этом Методе генерируем наши JSON для MeterDEV
         :return:
@@ -154,7 +166,8 @@ class MeterDaemonSingleMeter(MeterDaemon):
         from working_directory.Template.Template_Meter_daemon.Template_generator_data_for_Meter_Dev import \
             GenerateDataForMeterDev
 
-        JSON_Meter_Dev = GenerateDataForMeterDev(measure_list=self.list_measure).JSON_Meter_Dev
+        JSON_Meter_Dev = GenerateDataForMeterDev(measure_list=self.list_measure,
+                                                 count_timestamp=count_timestamp).JSON_Meter_Dev
         return JSON_Meter_Dev
 
     # ---------------------------- Метод для записи НАШИХ ДАННЫХ в ВИРТУАЛЬНЫЙ СЧЕТЧИК -------------------------------
@@ -288,8 +301,11 @@ class MeterDaemonSingleMeter(MeterDaemon):
 
         self._rewrite_ArchInfo()
 
+        # ТЕПЕРЬ - ГЕНЕРИРУЕМ НУЖНОЕ КОЛИЧЕСТВО ЗАПИСЕЙ
+        count_timesatamp = self._definition_count_timestamp()
+
         # Генерируем данные данные для нашего счетчика
-        self.JSON_Meter_Dev = self._generate_data_to_meter_dev()
+        self.JSON_Meter_Dev = self._generate_data_to_meter_dev(count_timesatamp)
         # Теперь - что делаем - Мы разделяем Наши записи
         Separate = SeparateJSONfromMeterDev(JSON_original=self.JSON_Meter_Dev,
                                             count_ts_to_record=self.count_ts_to_record)
@@ -446,11 +462,13 @@ class MeterDaemonSingleMeter(MeterDaemon):
             database_after=data_base_after_recording
         ).DataBase_was_recording
 
+        # ТЕПЕРЬ НАДО - убрать записи с valid 0
+
         result = CheckUP(DataBase_was_recording=self.database_was_recording,
                          JSON_deconstruct=self.JSON_meterdata_deconstruct).error_collector
 
         # Теперь если есть ошибки - логируем их
-
+        print(result)
         result = self.write_log(result=result)
 
         return result
@@ -490,6 +508,7 @@ class MeterDaemonManyMeter(MeterDaemonSingleMeter):
     InterfaceConfig: str = "9600,8n1"
 
     count_meter = 1
+
     # ----------------------------------------------------------------------------------------------------------------
     #                                            Вспомомгательные методы
     # ----------------------------------------------------------------------------------------------------------------
@@ -515,6 +534,8 @@ class MeterDaemonManyMeter(MeterDaemonSingleMeter):
         from working_directory.Template.Template_Meter_devices_API.Template_socket_in_meters import SocketMeters
         # Создаем словарь из наших потоков
         Thread_dict = {}
+        print('СОЗДАЕМ ')
+
         # Создаем словарь потоков из наших счетчиков
         for self.count_thread in range(self.count_meter):
             # Создаем словарь из портов
@@ -524,10 +545,37 @@ class MeterDaemonManyMeter(MeterDaemonSingleMeter):
             # Запускаем его
             Thread_dict['Thread_meter_' + str(self.count_thread)].start()
 
-        sleep(2)
+        sleep(20)
+
+        # print('Thread_dict', Thread_dict)
+        #
+        # i = 0
+        #
+        # while i != self.count_meter:
+        #     # Завершенные потоки
+        #     completed_thread = []
+        #     for thread in Thread_dict:
+        #
+        #         # print('isAlive() ', Thread_dict[thread].isAlive())
+        #         print('is_alive() ', Thread_dict[thread].is_alive())
+        #         if Thread_dict[thread].is_alive() is False:
+        #
+        #             Thread_dict[thread].join()
+        #             i = i + 1
+        #             completed_thread.append(thread)
+        #
+        #     for complete in completed_thread:
+        #         completed_thread.pop(complete)
+        while True:
+            for thread in Thread_dict:
+                if Thread_dict[thread] is False:
+                    break
         # Теперь надо их обьеденить в один - После того как он отработал
+
         for thread in Thread_dict:
+            print('ЗАВЕРШАЕМ', Thread_dict[thread])
             Thread_dict[thread].join()
+        print('lol lol lol')
 
     # ---------------------------- Метод для Генерации Нужных данных в MeterTable   -------------------------------
 
@@ -569,7 +617,6 @@ class MeterDaemonManyMeter(MeterDaemonSingleMeter):
         from working_directory.Template.Template_Meter_daemon.Template_assembly_normal_JSON_like_POST_meter_Data import \
             AssemblyDictLikeMeterData
         from copy import deepcopy
-
 
         restructuring = AssemblyDictLikeMeterData(self.JSON_Meter_Dev, self.DeviceIdx_list)
 
@@ -616,6 +663,7 @@ class MeterDaemonManyMeter(MeterDaemonSingleMeter):
         # Генерируем данные данные для нашего счетчика
         self.JSON_Meter_Dev = self._generate_data_to_meter_dev()
 
+        print(self.JSON_Meter_Dev)
         # Теперь - что делаем - Мы разделяем Наши записи
         Separate = SeparateJSONfromMeterDev(JSON_original=self.JSON_Meter_Dev,
                                             count_ts_to_record=self.count_ts_to_record)
@@ -668,19 +716,24 @@ class MeterDaemonManyMeter(MeterDaemonSingleMeter):
         self.JSON = self._GenerateJSON()
 
         # # Теперь запускаем имитатор отдельным потоком
-        server = threading.Thread(target=self.__EmulatorMeter)
+        server = threading.Thread(target=self._EmulatorMeter)
         server.start()
+        time.sleep(5)
+
         #
         # Теперь что делаем - Теперь запускаем наш сформированный JSON в в мененеджер задааний
         self.Setup()
 
         # После чего объеденяем потоки
-
-        server.join()
-
-        # Теперь - Надо Понять что все записалось в нашу таблицу
-
         time.sleep(20)
+        print('эвавава')
+
+        while True:
+            if server.is_alive() is False:
+                server.join()
+                break
+        # Теперь - Надо Понять что все записалось в нашу таблицу
+        print('слили ')
 
         # Итак - Теперь Перезаписываем Деконструируемый JSON
 
@@ -696,7 +749,8 @@ class MeterDaemonManyMeter(MeterDaemonSingleMeter):
             database_before=data_base_before_recording,
             database_after=data_base_after_recording
         ).DataBase_was_recording
-
+        print('database_was_recording = ', self.database_was_recording)
+        print('JSON_meterdata_deconstruct = ', self.JSON_meterdata_deconstruct)
         result = CheckUP(DataBase_was_recording=self.database_was_recording,
                          JSON_deconstruct=self.JSON_meterdata_deconstruct).error_collector
 
@@ -769,6 +823,7 @@ class MeterDaemonManyMeter(MeterDaemonSingleMeter):
         # Теперь запускаем имитатор отдельным потоком
         server = threading.Thread(target=self.__EmulatorMeter)
         server.start()
+
         #
         # Теперь что делаем - Теперь запускаем наш сформированный JSON в в мененеджер задааний
         self.Setup()
@@ -802,12 +857,6 @@ class MeterDaemonManyMeter(MeterDaemonSingleMeter):
         return result
 
 
-
-
-
-
-
-
 # # -------------------------------------------------------------------------------------------------------------------
 #####################################################################################################################
 # -------------------------------------------------------------------------------------------------------------------
@@ -819,26 +868,26 @@ class MeterDaemonManyMeter(MeterDaemonSingleMeter):
 
 # # ------------------------------------------- ОДИН СЧЕТЧИК --------------------------------------------------------
 #
-# MeterDaemon_result = MeterDaemonSingleMeter('ssh').DataBase_clear(list_measure=['ElJrnlPwr'],
-#                                                                                           count_tree=2)
+# MeterDaemon_result = MeterDaemonSingleMeter('ssh').DataBase_clear(list_measure=['ElMomentQuality'],
+#                                                                   count_tree=2)
 # print(MeterDaemon_result)
 
 # deleteMeterTable()
 # sleep(1)
 #
 
-MeterDaemon_result = MeterDaemonSingleMeter(type_connect='ssh').DataBase_filled(
-            list_measure=['ElMomentEnergy'],
-            count_ts_to_record=0,
-            count_tree=2
-                                                 )
-print(MeterDaemon_result)
+# MeterDaemon_result = MeterDaemonSingleMeter(type_connect='ssh').DataBase_filled(
+#             list_measure=['ElMomentEnergy'],
+#             count_ts_to_record=0,
+#             count_tree=2
+#                                                  )
+# print(MeterDaemon_result)
 # # ----------------------------------------- МНОГОПОТОЧНЫЙ РЕЖИМ ----------------------------------------------------
 # Чистим БД
 
-# result = MeterDaemonManyMeter().DataBase_filled(list_measure=['ElMonthEnergy'], count_meter=30, count_ts_to_record=10)
-# print(result)
-
+result = MeterDaemonManyMeter(type_connect='ssh').DataBase_filled(list_measure=['ElDayEnergy'], count_meter=1,
+                                                                  count_ts_to_record=0)
+print(result)
 
 # a = MeterDaemonSingleMeter().DataBase_filled(list_measure=['ElArr1ConsPower'], count_ts_to_record=100000)
 # print(a)

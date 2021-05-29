@@ -58,12 +58,15 @@ class SocketMeters:
 
         serv_sock = socket.socket(socket.AF_INET,
                                   socket.SOCK_STREAM,
-                                  proto=0)
+                                  # proto=0
+                                  )
+
+        print(self.port)
         serv_sock.bind(('', self.port))
 
-        serv_sock.settimeout(20.0)
+        serv_sock.settimeout(160.0)
 
-        serv_sock.listen()
+        serv_sock.listen(1)
 
         return serv_sock
 
@@ -91,6 +94,7 @@ class SocketMeters:
             else:
                 # Формируем ответ
                 response = self.__handle_request(request)
+                # Отправляем ответ
                 self.__write_response(response)
 
     # Читаем запрос
@@ -139,11 +143,11 @@ class SocketMeters:
 
         except ConnectionResetError:
             # Соединение было неожиданно разорвано.
-            # print('Соединение было неожиданно разорвано.')
+            print('Соединение было неожиданно разорвано.')
             return None
         except:
 
-            # print('Неизвестная ошибка')
+            print('Неизвестная ошибка')
             #
             # print('ЧТО ПРОЧИТАЛИ\n', request)
             return None
@@ -164,44 +168,69 @@ class SocketMeters:
     # отправляет клиенту ответ
     def __write_response(self, response):
         # Сделаем так что ответ идет массивом
+        print('getpeername',self.client_socket.getpeername())
+        print('getblocking',self.client_socket.getblocking())
+        print('gettimeout',self.client_socket.gettimeout())
+        print('getsockname',  self.client_socket.getsockname())
 
-        #
+        from datetime import datetime
+        print(datetime.now())
 
-        self.client_socket.sendall(response)
-        time.sleep(1)
+        try:
+            self.client_socket.sendall(response)
+            time.sleep(1)
+        except:
+            print('-----------GOVNOO--------')
+            print(self.client_socket.getpeername())
+            print(self.client_socket.getblocking())
+            print(self.client_socket.gettimeout())
+            print(self.client_socket.getsockname())
+            print('aaaaaaaaaaa')
+
+            chunk = self.client_socket.recv(1024)
+            print('ffffff',chunk)
+            # if self.client_socket.getblocking() == True :
+            #     self.client_socket.settimeout(20.0)
+            #     # self.__write_response(response)
+            #     print(self.client_socket.getblocking())
+            #     lol = self.client_socket.send(b'\x00')
+            #     print('jnghfdbkb',lol)
+            #     time.sleep(1)
 
     # -----------------------------------------------
     def close_socket(self):
         # Если ответа нет, закрываем сокет
         self.client_socket.close()
 
+        print('ЗАКРЫЛИ СОКЕТ',  self.client_socket.getsockname())
+
     def log(self, chunk, type_packet: str):
         print('\n!!!!!!!!!!', '!!!!!!!!!!!\n')
         print(type_packet + 'пакет : ', chunk, ' ')
-        print(' Его длина : ', len(chunk), '')
-        print('Байт код\n', chunk.hex(), '\n')
-        print('ДАМП : ', dump(chunk), '')
-
-        try:
-            print('Расшифровка :', chunk.decode('ascii'), '\n')
-        except UnicodeDecodeError:
-            print('Не Удалось расшифровать :', chunk, '\n')
-
-        print1 = str(type_packet) + 'пакет : ' + str(chunk) + '\n'
-        print2 = ' Его длина : ' + str(len(chunk)) + '\n'
-
-        print3 = 'ДАМП : ' + str(dump(chunk)) + '\n'
-
-        try:
-            print4 = 'Расшифровка : ' + str(chunk.decode('ascii')) + '\n'
-        except UnicodeDecodeError:
-            print4 = 'Не Удалось расшифровать : ' + str(chunk) + '\n'
-        # логируем через файл -
-        writen_text = '---------------------------------------------------------\n' + \
-                      str(datetime.datetime.now()) + '\n' + \
-                      print1 + print2 + print3 + print4
-
-        write_file.append_write_log_file(file_name=self.log_file, writen_text=writen_text)
+        # print(' Его длина : ', len(chunk), '')
+        # print('Байт код\n', chunk.hex(), '\n')
+        # print('ДАМП : ', dump(chunk), '')
+        #
+        # try:
+        #     print('Расшифровка :', chunk.decode('ascii'), '\n')
+        # except UnicodeDecodeError:
+        #     print('Не Удалось расшифровать :', chunk, '\n')
+        #
+        # print1 = str(type_packet) + 'пакет : ' + str(chunk) + '\n'
+        # print2 = ' Его длина : ' + str(len(chunk)) + '\n'
+        #
+        # print3 = 'ДАМП : ' + str(dump(chunk)) + '\n'
+        #
+        # try:
+        #     print4 = 'Расшифровка : ' + str(chunk.decode('ascii')) + '\n'
+        # except UnicodeDecodeError:
+        #     print4 = 'Не Удалось расшифровать : ' + str(chunk) + '\n'
+        # # логируем через файл -
+        # writen_text = '---------------------------------------------------------\n' + \
+        #               str(datetime.datetime.now()) + '\n' + \
+        #               print1 + print2 + print3 + print4
+        #
+        # write_file.append_write_log_file(file_name=self.log_file, writen_text=writen_text)
 
 # # =========================================
 # print('Полученный Пакет\n', request)
