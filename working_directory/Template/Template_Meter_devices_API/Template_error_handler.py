@@ -78,6 +78,7 @@ class ErrorHeandler:
 
                 self.JSON_etalon_deconstruct = self.__deconstruct_JSON(JSON_answer_normal)
 
+                # А теперь очень важный момент - для моментных показателей - ставим все в нулину
                 # А теперь отправляем в сравниватель
                 self.error_collector = Template_CheckUp_JSON_from_MeterDev.CheckUp(
                     JSON_Normal=self.JSON_etalon_deconstruct,

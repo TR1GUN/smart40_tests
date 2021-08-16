@@ -17,6 +17,7 @@ times = 1
 valuesbank = xmltree.parse(path + '/values.xml').getroot()
 path_db = path
 
+
 def parse_values():
     """Итак у нас есть функция чтения знаачений - Это ваажно"""
     # Сначала читаем наш JSON
@@ -58,7 +59,8 @@ class SimulatorMeterEnergomera:
     """
      Эмулятор Счетчика ЭНЕРГОМЕРА 303\301
     """
-    # Поля котоыре нужны для составления пакетов по протоколу МЭК
+
+    # Поля которые нужны для составления пакетов по протоколу МЭК
     soh = b'\x01'
     stx = b'\x02'
     etx = b'\x03'
@@ -72,6 +74,7 @@ class SimulatorMeterEnergomera:
     lbrace = b''
     rbrace = b''
     c = b''
+    close = b'\x01B0\x03u'
     # Тип полученной команды
     type = None
     # Генерируемый ответ
@@ -99,6 +102,11 @@ class SimulatorMeterEnergomera:
     # Список ассоциаций запросов
     tags = {}
 
+    # ОЧЕНЬ ВАЖНАЯ ШТУКА - Серийник
+    serial = None
+
+    model = ''
+
     def __init__(self, request=b'\x01B0\x03u'):
         """
         Здесь инициализируем все значения с которыми можно будет работать. Это важно
@@ -106,6 +114,7 @@ class SimulatorMeterEnergomera:
         Подача параметра не обязательна
         :param request: Команда - по умолчанию стоит команда нет - Если подразумевается рабоат с обьектом класса - не подавать.
         """
+
         # Переопределяем основные поля :
         # Поле Ответа
         self.response_answer = None
@@ -163,7 +172,7 @@ class SimulatorMeterEnergomera:
         }
 
         # ЗАгружаем нашу БД архивных записей
-        self.Meter_DataBase = Meter_DataBase(path = path_db)
+        self.Meter_DataBase = Meter_DataBase(path=path_db)
 
         # Определяем наш словарь который содержит значения данных
         self.valuesbank = \
@@ -202,6 +211,8 @@ class SimulatorMeterEnergomera:
         # Читаем эти данные из xml
         self._counter = EMeter(counter_meter)
 
+        # Модель - перезаполняем поле
+        self.model = str(self._counter.model)
         # Служебные настройки - хз для чего
         self.times = 1
         self.datecheck = int(self._counter.datecheckmode)
@@ -236,12 +247,13 @@ class SimulatorMeterEnergomera:
 
         # ТЕПЕРЬ ГОТОВЫ К РАБОТЕ :
         # разобрать запрос и сгенерировать ответ
-        self.request = request
-        self._response = request
-        # Запускаем -
-        self.response_answer = self.__parse_request()
+        # self.request = request
+        # self._response = request
+        # # Запускаем -
+        # self.response_answer = self.__parse_request()
         # после того как дали ответ - записываем дату ответа
         self.record_timenow()
+
 
     # -------------------------------ОСНОВНАЯ КОМАНДА РАБОТЫ С ВИРТУАЛЬНЫМ СЧЕТЧИКОМ------------------------------------
 
@@ -258,11 +270,43 @@ class SimulatorMeterEnergomera:
         # Запускаем -
         self.response_answer = self.__parse_request()
         # после того как дали ответ - записываем дату ответа
-        self.record_timenow()
+        # self.record_timenow()
 
         return self.response_answer
 
+    # ---------------------------------------------УСТАНОВКА СЕРИЙНИКА------------------------------------------------
+    def Set_Serial(self, serial):
+        """
+        Этот метод используется для того чтоб задать серийный номер счетчика
+        :param serial:
+        :return:
+        """
+        self.serial = serial
+    # ---------------------------------------------УСТАНОВКА СЕРИЙНИКА------------------------------------------------
+    def Set_Data(self, data):
+        """
+        Этот метод используется для того чтоб задать данные в формате JSON что записываем
+        :param data:
+        :return:
+        """
+        vals = data.get('vals')
+
+        # Проверяем валидацию json
+        try:
+            element = vals[0]["tags"][0]["tag"]
+
+            # ТЕПЕРЬ НАДО ПОНЯТЬ МЫ ПОЛУЧИЛИ ЖУРНАЛЫ ИЛИ НЕТ
+            if element in ['event', 'eventId', 'journalId']:
+                # если получили журналы , то записываем их в буффер журналов
+                self.__adding_journal_values(vals)
+            # иначе - опускаем в перезапись по таймштапам
+            else:
+                self.__adding_values_from_json(vals)
+        except:
+            print('***ERROR : ВАЛИДАЦИЯ JSON НЕУСПЕШНА***')
+
     # -------------------------------СЛУЖЕБНЫЕ КОМАНДЫ РАБОТЫ С ВИРТУАЛЬНЫМ СЧЕТЧИКОМ----------------------------------
+
     # Функция загрузки параметров из values.xml
     def __load_parametrs_from_xml(self):
         """
@@ -497,11 +541,16 @@ class SimulatorMeterEnergomera:
         request = self.request
 
         # Структурируем
-        self.start = struct.pack('b', request[0])
+        try:
+            self.start = struct.pack('b', request[0])
+        except:
+            print('ERROR - Неверное число', request[0])
+            self.start = struct.pack('b', 1)
         #
         try:
             self.__parse_comand(command=self.start)
         except:
+
             # Итак - если у нас лажанула команда - то отправляем команду НЕ ПОНЕЛ
             print('*************************НЕ ПРАВИЛЬНАЯ КОМАНДА*************************\n ',
                   '*************************** ПЕРЕЗАПРАШИВАЕМ ***************************')
@@ -632,6 +681,7 @@ class SimulatorMeterEnergomera:
             # блок запроса данных - основные страдания проходят именнов этом блоке -
             # Здесь уже нельзя быть косипошей чтоб Ничего не сломать
             elif self.c == b'R':  # data request block
+
                 self.type = 'CMD'
                 tmp = self.stx
                 self.d = struct.pack('b', self._response[2])
@@ -639,24 +689,22 @@ class SimulatorMeterEnergomera:
                 # Парсим всю команду в кодирвоке энергомеры - Нужна чтоб вытащить время
                 self.comand_energomera_protocol = self._response[4:-2]
                 # Парсим просто команду, без скобок
-                self.data = self._response[4:9]
+                self.data = bytes(self._response[4:9])
                 # получение данных в первый раз
                 # Пытаемся по команде узнать что надо отвечать
                 try:  # getting data first time
-
                     # Итак , опускаем в нашу функцию парсинга времени
                     # Опускаем нашу команду в словарь со всеми командами которые учтены тут
                     self.__definion_datetime()
-
+                    # ТЕПЕРЬ ИЩЕМ НУЖНУЮ КОМАНДУ ЧТОБ ВЫЛОВИТЬ НУЖНЫЕ ЗНАЧЕНИЯ
                     self.dataargs = self.args.get(self.data, self.get_random_bytes)(self, 1)
 
                 except Exception as e:
-                    print('ОШИБКА',e)
+                    print('ОШИБКА', e)
                     self.dataargs = b''
                 self.lbrace = struct.pack('b', self._response[9])
                 self.readen_args = bytes(self._response[10:len(self._response) - 3])
                 self.rbrace = struct.pack('b', self._response[len(self._response) - 3])
-
 
                 # проверяем, нужно ли использовать дополнительные аргументы
                 if len(self.readen_args) == 0:  # check if we have to use additional arguments
@@ -669,7 +717,7 @@ class SimulatorMeterEnergomera:
                         try:
                             self.dataargs = self.args.get(self.data, self.get_random_bytes)(self, t)
                         except Exception as e:
-                            print('ОШИБКА',e)
+                            print('ОШИБКА', e)
                         tmp += bytes(self.data + self.lbrace + self.dataargs + self.rbrace + self.cr + self.lf)
                         self.answerbank['CMD'] = tmp + self.etx + calcbcc(tmp[1:] + self.etx)
                         t += 1
@@ -687,7 +735,7 @@ class SimulatorMeterEnergomera:
                         try:
                             self.dataargs = self.args.get(self.data, self.get_random_bytes)(self, t)
                         except Exception as e:
-                            print('ОШИБКА',e)
+                            print('ОШИБКА', e)
                         tmp += bytes(
                             self.data + self.lbrace + self.dataargs + self.rbrace + self.cr + self.lf)
                         self.answerbank['CMD'] = tmp + self.etx + calcbcc(tmp[1:] + self.etx)
@@ -766,7 +814,8 @@ class SimulatorMeterEnergomera:
                 # МГНОВЕННЫЕ ПОКАЗАНИЯ !!!
             }
         # Ищем нашу команду в списке выше
-        type_date = type_datetime.get(self.data)
+        data = bytes(self.data)
+        type_date = type_datetime.get(data)
 
         if type_date is not None:
             # Далее опускаем в функцию перезаписи нашего попаденца
@@ -891,7 +940,6 @@ class SimulatorMeterEnergomera:
             # values_dict = self.values_dict_with_timestamp[find_date]
             # --
 
-            # print('!!!!!!!!!ДАТА ЧТО ИИИИЩЕМ', find_date)
             values_dict = self.valuesbank.get(find_date)
             # --
             if values_dict is not None:
@@ -899,6 +947,7 @@ class SimulatorMeterEnergomera:
                 correct_values_dict = {}
                 for key in values_dict.keys():
                     correct_values_dict[type_date + str(key)] = values_dict[key]
+
 
                 # После чего обновляем наш список
                 self.valuesbank['NOW'].update(correct_values_dict)
@@ -910,125 +959,125 @@ class SimulatorMeterEnergomera:
                     {
                         # Срез по дням
                         'd':
-                        {
-                            'dA+0': None,
-                            'dA+1': None,
-                            'dA+2': None,
-                            'dA+3': None,
-                            'dA+4': None,
-                            'dA+5': None,
-                            'dA-0': None,
-                            'dA-1': None,
-                            'dA-2': None,
-                            'dA-3': None,
-                            'dA-4': None,
-                            'dA-5': None,
-                            'dR+0': None,
-                            'dR+1': None,
-                            'dR+2': None,
-                            'dR+3': None,
-                            'dR+4': None,
-                            'dR+5': None,
-                            'dR-0': None,
-                            'dR-1': None,
-                            'dR-2': None,
-                            'dR-3': None,
-                            'dR-4': None,
-                            'dR-5': None
-                        },
+                            {
+                                'dA+0': None,
+                                'dA+1': None,
+                                'dA+2': None,
+                                'dA+3': None,
+                                'dA+4': None,
+                                'dA+5': None,
+                                'dA-0': None,
+                                'dA-1': None,
+                                'dA-2': None,
+                                'dA-3': None,
+                                'dA-4': None,
+                                'dA-5': None,
+                                'dR+0': None,
+                                'dR+1': None,
+                                'dR+2': None,
+                                'dR+3': None,
+                                'dR+4': None,
+                                'dR+5': None,
+                                'dR-0': None,
+                                'dR-1': None,
+                                'dR-2': None,
+                                'dR-3': None,
+                                'dR-4': None,
+                                'dR-5': None
+                            },
                         # Срез по месяцам
                         'M':
-                        {
+                            {
 
-                            'MA+0': None,
-                            'MA+1': None,
-                            'MA+2': None,
-                            'MA+3': None,
-                            'MA+4': None,
-                            'MA+5': None,
-                            'MA-0': None,
-                            'MA-1': None,
-                            'MA-2': None,
-                            'MA-3': None,
-                            'MA-4': None,
-                            'MA-5': None,
-                            'MR+0': None,
-                            'MR+1': None,
-                            'MR+2': None,
-                            'MR+3': None,
-                            'MR+4': None,
-                            'MR+5': None,
-                            'MR-0': None,
-                            'MR-1': None,
-                            'MR-2': None,
-                            'MR-3': None,
-                            'MR-4': None,
-                            'MR-5': None
-                        },
+                                'MA+0': None,
+                                'MA+1': None,
+                                'MA+2': None,
+                                'MA+3': None,
+                                'MA+4': None,
+                                'MA+5': None,
+                                'MA-0': None,
+                                'MA-1': None,
+                                'MA-2': None,
+                                'MA-3': None,
+                                'MA-4': None,
+                                'MA-5': None,
+                                'MR+0': None,
+                                'MR+1': None,
+                                'MR+2': None,
+                                'MR+3': None,
+                                'MR+4': None,
+                                'MR+5': None,
+                                'MR-0': None,
+                                'MR-1': None,
+                                'MR-2': None,
+                                'MR-3': None,
+                                'MR-4': None,
+                                'MR-5': None
+                            },
                         # Срез по дням потребление
                         'dC':
-                        {
-                            'dCA+0': None,
-                            'dCA+1': None,
-                            'dCA+2': None,
-                            'dCA+3': None,
-                            'dCA+4': None,
-                            'dCA+5': None,
-                            'dCA-0': None,
-                            'dCA-1': None,
-                            'dCA-2': None,
-                            'dCA-3': None,
-                            'dCA-4': None,
-                            'dCA-5': None,
-                            'dCR+0': None,
-                            'dCR+1': None,
-                            'dCR+2': None,
-                            'dCR+3': None,
-                            'dCR+4': None,
-                            'dCR+5': None,
-                            'dCR-0': None,
-                            'dCR-1': None,
-                            'dCR-2': None,
-                            'dCR-3': None,
-                            'dCR-4': None,
-                            'dCR-5': None,
-                        },
+                            {
+                                'dCA+0': None,
+                                'dCA+1': None,
+                                'dCA+2': None,
+                                'dCA+3': None,
+                                'dCA+4': None,
+                                'dCA+5': None,
+                                'dCA-0': None,
+                                'dCA-1': None,
+                                'dCA-2': None,
+                                'dCA-3': None,
+                                'dCA-4': None,
+                                'dCA-5': None,
+                                'dCR+0': None,
+                                'dCR+1': None,
+                                'dCR+2': None,
+                                'dCR+3': None,
+                                'dCR+4': None,
+                                'dCR+5': None,
+                                'dCR-0': None,
+                                'dCR-1': None,
+                                'dCR-2': None,
+                                'dCR-3': None,
+                                'dCR-4': None,
+                                'dCR-5': None,
+                            },
                         # Срез по месяцам потребление
                         'MC':
-                        {
-                            'MCA+0': None,
-                            'MCA+1': None,
-                            'MCA+2': None,
-                            'MCA+3': None,
-                            'MCA+4': None,
-                            'MCA+5': None,
-                            'MCA-0': None,
-                            'MCA-1': None,
-                            'MCA-2': None,
-                            'MCA-3': None,
-                            'MCA-4': None,
-                            'MCA-5': None,
-                            'MCR+0': None,
-                            'MCR+1': None,
-                            'MCR+2': None,
-                            'MCR+3': None,
-                            'MCR+4': None,
-                            'MCR+5': None,
-                            'MCR-0': None,
-                            'MCR-1': None,
-                            'MCR-2': None,
-                            'MCR-3': None,
-                            'MCR-4': None,
-                            'MCR-5': None,
-                        },
+                            {
+                                'MCA+0': None,
+                                'MCA+1': None,
+                                'MCA+2': None,
+                                'MCA+3': None,
+                                'MCA+4': None,
+                                'MCA+5': None,
+                                'MCA-0': None,
+                                'MCA-1': None,
+                                'MCA-2': None,
+                                'MCA-3': None,
+                                'MCA-4': None,
+                                'MCA-5': None,
+                                'MCR+0': None,
+                                'MCR+1': None,
+                                'MCR+2': None,
+                                'MCR+3': None,
+                                'MCR+4': None,
+                                'MCR+5': None,
+                                'MCR-0': None,
+                                'MCR-1': None,
+                                'MCR-2': None,
+                                'MCR-3': None,
+                                'MCR-4': None,
+                                'MCR-5': None,
+                            },
                         # профили мощности первого архива электросчетчика - те что каждые пол часа
                         'DP':
-                        {
-                            'DPP+':None,
-                            'DPP-':None,
-                            'DPQ+':None,
-                            'DPQ-':None
-                        },
+                            {
+                                'DPP+': None,
+                                'DPP-': None,
+                                'DPQ+': None,
+                                'DPQ-': None
+                            },
                     }
                 # Теперь - Получаем наши значения
                 correct_values_dict = no_measurements_were_taken_dict[type_date]
@@ -1096,11 +1145,25 @@ class SimulatorMeterEnergomera:
             # Берем тэг что нам нужен
             tag = str(self.tags.get(self.data)) + str(t - 1)
             # Теперь по значению этого тэга ищем значение в нашем словаре
-            var = self.valuesbank['NOW'][tag]
+
+            # ++ Заглушка - если значения нет в наших значениях
+            var = self.valuesbank['NOW'].get(tag)
+            # if var is not None:
+            #
+            #     var = float(var) / 1000
+            #     # Теперь берем и округляем
+            #     var = float('{:.6f}'.format(var))
+            #     var = str(var)
+            # else:
+            #     var = ''
+
+            if var is  None:
+                var = 0
             var = float(var) / 1000
-                # Теперь берем и округляем
+            # Теперь берем и округляем
             var = float('{:.6f}'.format(var))
             var = str(var)
+
             # Если ломается - то идем по старому сценарию
         return var.encode()
 
@@ -1307,7 +1370,15 @@ class SimulatorMeterEnergomera:
 
         global times
         times = 1
-        return str(self._counter.snumber).encode()
+        # ЕСЛИ мы не спустили серийник сверху - то используем стоковый
+
+        if self.serial is None:
+            serial = str(self._counter.snumber).encode()
+        else:
+            serial = str(self.serial)
+            serial = serial.encode()
+
+        return serial
 
     # Номер модели
 
@@ -1317,10 +1388,9 @@ class SimulatorMeterEnergomera:
         times = 1
         # Параметр котоырй парсится из настроек - Couters
         # Подробнее смотри протокол энергомеры - Команда MODEL
-        model = str(self._counter.model)
+        # model =str(self._counter.model)
+        model = self.model
         return model.encode()
-
-
 
     # energy values - ПОКАЗАТЕЛИ ЭНЕРГИИ
     def __get_bytes_for_energy_and_set_times(self, t):  # energy values
@@ -1385,7 +1455,7 @@ class SimulatorMeterEnergomera:
     def __get_NGRAP(self, t):
         """
         Количество суточных профилей нагрузки, хранимых в счетчике при заданном времени усреднения TAVER
-         ПОКА НЕ ИСПОЛЬЗУЕТСЯ
+         ПОКА НЕ ИСПОЛЬЗУЕТСЯ -
         """
 
         NGRAP = 99
@@ -1409,8 +1479,12 @@ class SimulatorMeterEnergomera:
         else:
             isDst = 0
 
-        isDst = str(isDst)
-        return isDst.encode()
+
+
+        isDst = isDst.to_bytes(length=2, byteorder='big')
+        return isDst
+        # isDst = str(isDst)
+        # return isDst.encode()
 
     def __get_pacce(self, t):
 
@@ -1462,25 +1536,25 @@ class SimulatorMeterEnergomera:
     # текущая дата
     def __datenow(self, t):  # current date
 
-        time.sleep(self.respondtimeout)
-        global times
-        times = 1
-        if self.datecheck == 1:
-            if self.datecheckcount == 1:
-                today = date.fromtimestamp(1441043940)
-                # self.datecheckcount = 2
-            if self.datecheckcount == 2:
-                today = date.fromtimestamp(1441054800)
-                # self.datecheckcount = 3
-            if self.datecheckcount == 3:
-                today = date.fromtimestamp(1441054800)
-                # self.datecheckcount = 4
-            if self.datecheckcount == 4:
-                today = date.fromtimestamp(1441054800)
-                self.datecheckcount = 0
-        else:
-            today = date.today()
-            today = self.time_now.date()
+        # time.sleep(self.respondtimeout)
+        # global times
+        # times = 1
+        # if self.datecheck == 1:
+        #     if self.datecheckcount == 1:
+        #         today = date.fromtimestamp(1441043940)
+        #         # self.datecheckcount = 2
+        #     if self.datecheckcount == 2:
+        #         today = date.fromtimestamp(1441054800)
+        #         # self.datecheckcount = 3
+        #     if self.datecheckcount == 3:
+        #         today = date.fromtimestamp(1441054800)
+        #         # self.datecheckcount = 4
+        #     if self.datecheckcount == 4:
+        #         today = date.fromtimestamp(1441054800)
+        #         self.datecheckcount = 0
+        # else:
+        today = date.today()
+        today = self.time_now.date()
 
         self.datecheckcount += 1
 
@@ -1489,22 +1563,25 @@ class SimulatorMeterEnergomera:
     # Текущее время
     def __timenow(self, t):  # current time
 
-
         global times
         times = 1
-        time.sleep(self.respondtimeout)
-        if self.datecheck == 1:
-            now = datetime.fromtimestamp(2)
-        elif self.datecheck == 2:
-            now = datetime.fromtimestamp(1)
-        else:
+        # time.sleep(self.respondtimeout)
+        # if self.datecheck == 1:
+        #     now = datetime.fromtimestamp(2)
+        # elif self.datecheck == 2:
+        #     now = datetime.fromtimestamp(1)
+        # else:
 
             # self.time_now = datetime.now()
 
-            now = self.time_now.time()
+            # Время при инициализации
+        now = self.time_now.time()
+            # Время сейчас
             # now = datetime.now().time()
 
         # ЗАПИСЫВАЕМ ВРЕМЯ
+        # А в нашей команде его обновляем
+        self.time_now = datetime.now()
 
         return str(now.strftime("%H:%M:%S")).encode()
 

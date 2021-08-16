@@ -15,3 +15,6 @@ def get_time():
     except:
         valuesbank = 0
     return valuesbank
+
+
+

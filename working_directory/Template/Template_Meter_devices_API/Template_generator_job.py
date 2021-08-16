@@ -28,9 +28,20 @@ class GeneratorJob:
     """
     job = {}
 
-    def __init__(self, job: str, iface: str, relay_state: bool = True, count_time: int = 1,
-                 generate_random_meter_type: bool = False, address_settings:str = '192.168.202.167:777',
-                 start:int = 0, end:int = 0, set_castrom_time=False):
+    def __init__(self,
+                 # Тип работы - Тип данных что считываем
+                 job: str,
+                 # интерфейс взаимодействия
+                 iface: str,
+                 # Переключение реле
+                 relay_state: bool = True,
+                 count_time: int = 1,
+                 generate_random_meter_type: bool = False,
+                 address_settings: str = '192.168.202.167:777',
+                 start: int = 0,
+                 end: int = 0,
+                 set_castrom_time=False,
+                 address = "134256651"):
         self.job = {'job': job}
 
         # Добавляем тэг отключения реле - включения реле
@@ -51,6 +62,9 @@ class GeneratorJob:
         self.job["meters"] = GenerateMeters(job=job,
                                             generate_random_meter_type=generate_random_meter_type,
                                             iface=iface,
-                                            port=address_settings
-                                            ).meters
+                                            port=address_settings,
+                                            address=address).meters
 
+    def get_job(self):
+
+        return self.job

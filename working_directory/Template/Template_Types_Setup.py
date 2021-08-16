@@ -398,6 +398,11 @@ class SetupSSH:
 
         client.close()
 
+        print('ответ', result)
+        if result == b'':
+            result = b'None'
+
+
         return result
 
     def __invoke_shell(self, client):

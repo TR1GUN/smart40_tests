@@ -25,8 +25,6 @@ class GeneratorJSON:
         # Первое - Генерируем рандомный отрезок времени по правилам
         # Сначала генерим отрезок времени который будем юзать -
         timestamp_of_request = GeneratorTime(measure=self.measure).time
-
-        print('ONE -------->', timestamp_of_request)
         # Генерируем нужные ts лоя него
         Generate_Time = GenerateTimestamp(measure=self.measure, Time=timestamp_of_request, Count_timestamp=count_timestamp)
         # ДЕЛАЕМ НЕОБХОДИМЫЕ ПРАВКИ ДЛЯ ДЕМОНА
@@ -42,7 +40,7 @@ class GeneratorJSON:
         # Generate_Time.delta_Journal = delta_Journal
 
         timestamp_list = Generate_Time.Generate_Timestamp_list()
-        print('TWO -------->', timestamp_list)
+
         # Делаем заготовку -
 
         # Генерируем JSON

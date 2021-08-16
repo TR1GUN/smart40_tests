@@ -12,12 +12,12 @@ def Setup_(JSON , API , Type_Connect):
     :param JSON: Наш JSON что мы отправляем
     :return: JSON что пришел ответом
     """
-    # Если у нас необходим виртуальный счетчик , то врубаем его отдельным потоком
-    threading_meter = False
-    if API in ['uspd-meter_daemon','meterdev' ] :
-        threading_meter = True
-        server = threading.Thread(target=EmulatorMeter)
-        server.start()
+    # # Если у нас необходим виртуальный счетчик , то врубаем его отдельным потоком
+    # threading_meter = False
+    # if API in ['uspd-meter_daemon','meterdev' ] :
+    #     threading_meter = True
+    #     server = threading.Thread(target=EmulatorMeter)
+    #     server.start()
 
     time_start = time.time()
     print(Type_Connect)
@@ -30,16 +30,16 @@ def Setup_(JSON , API , Type_Connect):
 
     print('JSON Обрабабатывался:', time_finis - time_start)
 
-    if threading_meter:
-        server.join()
+    # if threading_meter:
+    #     server.join()
 
     return answer_JSON
 
 
-JSON = '{"method": "post", "measures": [{"measure": "ElConfig", "devices": [{"id": 1, "vals": [{"ts": 1555555555, "tags": [{"tag": "serial", "val": "1224915766"}, {"tag": "model", "val": "Test model Your ad could be here"}, {"tag": "cArrays", "val": 56}, {"tag": "isDst", "val": 1}, {"tag": "isClock", "val": 1}, {"tag": "isTrf", "val": 1}, {"tag": "isAm", "val": 1}, {"tag": "isRm", "val": 1}, {"tag": "isRp", "val": 1}, {"tag": "kI", "val": 51.0}, {"tag": "kU", "val": 23.0}, {"tag": "const", "val": -44.3798}]}]}]}]}'
+JSON ='{"job": "ElConfig", "time": {"start": 1627329600, "end": 1627333200}, "meters": [{"type": 94, "iface": "Ethernet", "address": "192.168.205.6:2002"}, {"type": 5, "password": "373737373737", "deviceidx": 1, "iface": "Hub", "address": "141227285", "uart": "9600,8n1"}]}'
 
-API = 'uspd-meter_daemon'
+API = 'meterdev'
 # type_connect = 'virtualbox'
-a = Setup_(JSON=JSON , API='meter_db_data_api' , Type_Connect='ssh')
+a = Setup_(JSON=JSON , API='meterdev' , Type_Connect='ssh')
 
 print(a)

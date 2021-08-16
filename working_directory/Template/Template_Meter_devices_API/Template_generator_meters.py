@@ -26,8 +26,15 @@ class GenerateMeters:
     # А вот тут важно - Настройки по умолчанию
     __default = False
 
-    def __init__(self, job: str, generate_random_meter_type: bool = False, iface: str = 'Ethernet',
-                                 port :str = '192.168.202.167:777', default:bool = False):
+    address = None
+
+    def __init__(self,
+                 job: str,
+                 generate_random_meter_type: bool = False,
+                 iface: str = 'Ethernet',
+                 port: str = '192.168.202.167:777',
+                 default: bool = False,
+                 address: str = "134256651"):
         """
         Конструктор массива meters
 
@@ -47,7 +54,8 @@ class GenerateMeters:
         self.__iface = iface
         self.__job = job
         self.__port = port
-        self.__default =default
+        self.__default = default
+        self.address = address
 
         self.meters = self.__generate_meter_settings()
 
@@ -69,6 +77,7 @@ class GenerateMeters:
 
         # Ставим заглушку
         settings['deviceidx'] = 0
+        settings['deviceidx'] = 0
 
         # Теперь определяем интерфейс, с упаковыванием это в meters
 
@@ -85,7 +94,7 @@ class GenerateMeters:
         # Здесь Делаем адресс
         try:
             # Итак - если настройки по умолчанию:
-            if self.__default :
+            if self.__default:
                 # По интерфейсу определяем адрес
                 address = Template_meters_settings.address_dict[iface]
             # Иначе - Ставим сюда порт что задавали
@@ -116,7 +125,13 @@ class GenerateMeters:
             # settings_two["type"] = self.__generate_hub()
             settings_two["iface"] = "Hub"
             # settings_two["address"] = '141227285'
-            settings_two["address"] = Template_meters_settings.address
+            # settings_two["address"] = Template_meters_settings.address
+
+            # Поставим адрес который спускаем сверху
+            if self.address is None :
+                settings_two["address"] = Template_meters_settings.address
+            else:
+                settings_two["address"] = self.address
             settings_two["uart"] = uart
 
             # Упаковываем это

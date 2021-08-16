@@ -6,10 +6,12 @@ import datetime
 import threading
 import time
 
+
 from working_directory.Connect.JSON_format_coding_decoding import code_JSON
 from working_directory.Template.Template_Meter_db_data_API import Template_list_ArchTypes
 from working_directory.Template.Template_Meter_devices_API import Template_list_job
 from working_directory.Template.Template_Meter_devices_API.Template_answer_json import GenerateAnswer
+from working_directory.Template.Template_Meter_devices_API.Template_generator_time import GeneratorTime
 from working_directory.Template.Template_Meter_devices_API.Template_error_handler import ErrorHeandler
 from working_directory.Template.Template_Meter_devices_API.Template_generator_job import GeneratorJob
 from working_directory.Template.Template_Setup import Setup
@@ -116,78 +118,92 @@ class RealMeter(JOB):
     # ----------------------------------------------------------------------------------------------------------------
     # -----------------------КАНАЛ ВЗАИМОДЕЙСТВИЯ - ПОСЛЕДОВАТЕЛЬНЫЙ ПОРТ---------------------------------------------
     # ----------------------------------------------------------------------------------------------------------------
-
-    def __iface_Serial_Port(self, job_type: str, iface: str = 'Iface3', type_connect: str = 'virtualbox',
-                            address_settings: str = 'Iface3'):
-        """
-            Метод для работы с РЕАЛЬНЫМ СЧЕТЧИКОМ -
-            Инерфейс подключения - Serial Port
-
-            - НЕ РАБОТАЕТ
-
-            РЕАЛИЗОВАННО :
-
-            Работает только валидация JSON
-
-            :param job_type:
-            :param iface:
-            :param docker:
-            :return:
-            """
-
-        self.job_type = job_type
-        self.type_connect = type_connect
-
-        # Итак - сначала мы генерируем наш JSON
-        self.JSON_dict = GeneratorJob(job=job_type,
-                                      iface='Iface3',
-                                      address_settings=address_settings,
-                                      set_castrom_time=self.time_dict['set_castrom_time'],
-                                      start=self.time_dict['start'],
-                                      end=self.time_dict['end'],
-                                      relay_state=True,
-                                      count_time=1,
-                                      generate_random_meter_type=False).job
-        # Запускаем
-        answer_JSON = self.Setup()
-
-        # Ищем JSON  которые завершились с ошибкой
-        if answer_JSON['res'] == 0:
-
-            # Теперь опускаем в обработчик и деконструктор
-            result = ErrorHeandler(JSON=answer_JSON, job_type=job_type)
-        else:
-            # ЕСли иначе то выводим номер ошобки и ее тип
-            result = [answer_JSON]
-
-        result = self.write_log(result=result)
-
-        return result
+    #
+    # def __iface_Serial_Port(self, job_type: str, iface: str = 'Iface3', type_connect: str = 'virtualbox',
+    #                         address_settings: str = 'Iface3'):
+    #     """
+    #         Метод для работы с РЕАЛЬНЫМ СЧЕТЧИКОМ -
+    #         Инерфейс подключения - Serial Port
+    #
+    #         - НЕ РАБОТАЕТ
+    #
+    #         РЕАЛИЗОВАННО :
+    #
+    #         Работает только валидация JSON
+    #
+    #         :param job_type:
+    #         :param iface:
+    #         :param docker:
+    #         :return:
+    #         """
+    #
+    #     self.job_type = job_type
+    #     self.type_connect = type_connect
+    #
+    #     # Итак - сначала мы генерируем наш JSON
+    #     self.JSON_dict = GeneratorJob(job=job_type,
+    #                                   iface='Iface3',
+    #                                   address_settings=address_settings,
+    #                                   set_castrom_time=self.time_dict['set_castrom_time'],
+    #                                   start=self.time_dict['start'],
+    #                                   end=self.time_dict['end'],
+    #                                   relay_state=True,
+    #                                   count_time=1,
+    #                                   generate_random_meter_type=False).job
+    #     # Запускаем
+    #     answer_JSON = self.Setup()
+    #
+    #     # Ищем JSON  которые завершились с ошибкой
+    #     if answer_JSON['res'] == 0:
+    #
+    #         # Теперь опускаем в обработчик и деконструктор
+    #         result = ErrorHeandler(JSON=answer_JSON, job_type=job_type)
+    #     else:
+    #         # ЕСли иначе то выводим номер ошобки и ее тип
+    #         result = [answer_JSON]
+    #
+    #     result = self.write_log(result=result)
+    #
+    #     return result
 
     # ----------------------------------------------------------------------------------------------------------------
     # ---------------------------------КАНАЛ ВЗАИМОДЕЙСТВИЯ - ETHERNET -----------------------------------------------
     # ----------------------------------------------------------------------------------------------------------------
 
-    def iface_Ethernet(self, job_type: str, ipconfig: str = '192.168.205.6:2002', type_connect: str = 'virtualbox'):
+    def iface_Ethernet(self, job_type: str = 'ElConfig',
+                       ipconfig: str = '192.168.205.6:2002',
+                       address: str = "134256651",
+                       start=None,
+                       end=None):
         """
         Метод для работы с РЕАЛЬНЫМ СЧЕТЧИКОМ -
         Инерфейс подключения - Ethernet
-
 
         РЕАЛИЗОВАННО :
 
         Работает только валидация JSON
 
+        :param addres:
         :param job_type: Сюда пихаем ту переменную что хотим считать
         :param ipconfig: Сюда пихаем Те сетевое расположение счетчика. По умолчанию - Энергомера 303 со стенда
-        :param docker: Нужно выставить TRUE для того чтоб провалиться во внутрь локально запущеного Docker-контейнера
-        и пускать команду через docker exec
+
 
         :return: Возвращает пустоту
 
         """
         self.job_type = job_type
-        self.type_connect = type_connect
+
+        # Для начала формируем Время
+        self.time_dict = GeneratorTime(measure=job_type).time
+        self.time_dict['set_castrom_time'] = True
+
+        if type(start) is int:
+            self.time_dict['start'] = start
+
+        if type(end) is int:
+            self.time_dict['end'] = end
+        # elif 'now' in end:
+        #    self.time_dict['end'] = int(time.mktime(datetime.datetime.now().timetuple()))
 
         # Итак - сначала мы генерируем наш JSON
         self.JSON_dict = GeneratorJob(job=job_type,
@@ -198,7 +214,10 @@ class RealMeter(JOB):
                                       end=self.time_dict['end'],
                                       relay_state=True,
                                       count_time=1,
-                                      generate_random_meter_type=False).job
+                                      generate_random_meter_type=False,
+                                      address=address).get_job()
+
+        print(self.JSON_dict)
 
         # Запускаем
         answer_JSON = self.Setup()
@@ -328,7 +347,7 @@ class VirtualMeter(JOB):
         self.time['start'] = timestamp_of_request['start']
         self.time['end'] = timestamp_of_request['end']
 
-        # print('JSON_answer_normal', JSON_answer_normal)
+
 
         # Итак - сначала мы генерируем наш JSON
         self.JSON_dict = GeneratorJob(job=job_type,
@@ -339,7 +358,8 @@ class VirtualMeter(JOB):
                                       end=self.time['end'],
                                       relay_state=True,
                                       count_time=1,
-                                      generate_random_meter_type=False).job
+                                      generate_random_meter_type=False,
+                                      address=None).get_job()
 
         # Теперь запускаем имитатор отдельным потоком
         server = threading.Thread(target=self.__EmulatorMeter)
@@ -355,7 +375,7 @@ class VirtualMeter(JOB):
         server.join()
         # Ищем JSON  которые завершились с ошибкой
 
-        # print('JSON_answer_normal\n', self.JSON_answer_normal)
+        print('JSON_answer_normal\n', self.JSON_answer_normal)
         if answer_JSON['res'] == 0:
             # Теперь опускаем в обработчик и деконструктор
             result = ErrorHeandler(JSON=answer_JSON,
@@ -366,6 +386,7 @@ class VirtualMeter(JOB):
         else:
             # ЕСли иначе то выводим номер ошобки и ее тип
             result = [answer_JSON]
+
 
         result = self.write_log(result=result)
 
@@ -427,7 +448,11 @@ JournalValues_list = [
 # -------------------------------------------------------------------------------------------------------------------
 #####################################################################################################################
 # ---------------------------------------------------------------------------------------------------------------------
+'ElConfig'
 
+# test = VirtualMeter(type_connect='ssh').iface_Ethernet(job_type='ElMomentEnergy')
+# print(test)
 
-test = VirtualMeter(type_connect='virtualbox').iface_Ethernet(job_type='ElJrnlPwr')
-print(test)
+# test = RealMeter(type_connect='ssh').iface_Ethernet(job_type='ElConfig', ipconfig="192.168.205.6:2002",
+#                                                     address="134256651")
+

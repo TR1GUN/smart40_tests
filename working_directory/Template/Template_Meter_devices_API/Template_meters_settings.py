@@ -4,6 +4,7 @@ port = '777'
 
 address = '141227285'
 
+# address = '134256651'
 # ipconfig = '192.168.202.167:777'
 
 ipconfig = '192.168.202.146:777'
@@ -12,9 +13,7 @@ ipconfig = '192.168.202.146:777'
 
 uart_tag = "9600,8n1"
 
-
-Meter_Types_Hub = {'Id' :'94' ,'Type':'MILUR IC' , 'Class':'Hub' }
-
+Meter_Types_Hub = {'Id': '94', 'Type': 'MILUR IC', 'Class': 'Hub'}
 
 uart_list = \
     [
@@ -23,7 +22,6 @@ uart_list = \
         'Iface3',
         'Iface4'
     ]
-
 
 ifaces_list = \
     [

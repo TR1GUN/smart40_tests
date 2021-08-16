@@ -136,7 +136,16 @@ def write_response(client_sock, response, cid):
 # if __name__ == '__main__':
 # run_server(port=777)
 
-from working_directory.Template.Template_Meter_devices_API.Template_socket_in_meters import SocketMeters
-server = SocketMeters(conect_port=7777)
+# from working_directory.Template.Template_Meter_devices_API.Template_socket_in_meters import SocketMeters
+# server = SocketMeters(conect_port=7777)
 
 
+NGRAP = 99
+NGRAP = str(NGRAP)
+
+print(NGRAP.encode())
+
+NGRAP = 99
+lol = NGRAP.to_bytes(length=2, byteorder='big')
+
+print(lol)

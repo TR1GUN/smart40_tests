@@ -8,6 +8,7 @@ settings = '../settings.ini'
 parser = configparser.ConfigParser()
 parser.read(os.path.join(path,settings))
 
+
 dbpath = parser['test']['dbpath']
 targetimage = (parser['test']['apiaddr'], int(parser['test']['apiport']))
 

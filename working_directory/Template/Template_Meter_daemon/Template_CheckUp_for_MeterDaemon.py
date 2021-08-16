@@ -128,7 +128,7 @@ class CheckUP:
             if (int(JSON_Element['id']) == int(database[i]['id'])) and (
                     int(JSON_Element['ts']) == int(database[i]['ts'])):
                 # Если мы нашли нужный таймштамп нужного айдишника - Продолжаем
-
+                # print(JSON_Element['ts'])
                 # здесь сравниваем уже конкретные значения нашего полученного JSON c Записью
                 error = self.__check_up_element_keys(data_base_element=database[i], JSON_element=JSON_Element)
 
@@ -165,6 +165,7 @@ class CheckUP:
         for keys in data_base_element:
             # отбрасываем ключ diff
             if keys not in ['diff', 'Valid']:
+                # print(keys)
                 # Теперь сравниваем значения
                 data_base_value = data_base_element.get(keys)
                 JSON_value = JSON_element.get(keys)
@@ -177,6 +178,8 @@ class CheckUP:
 
                     # if abs(normal_value / answer_value - 1) > epsilon:
                     if abs(JSON_value - data_base_value) > epsilon:
+                        # print('JSON_value', JSON_value)
+                        # print('data_base_value', data_base_value)
                         error_string = {
                             'Неравенство значений Ключа': str(keys),
                             'Значение ключа в БД': data_base_value,
@@ -188,6 +191,8 @@ class CheckUP:
                         error_keys.append(keys)
                 else:
                     if data_base_value != JSON_value:
+                        # print('JSON_value', JSON_value)
+                        # print('data_base_value', data_base_value)
                         error_string = {
                             'Неравенство значений Ключа': str(keys),
                             'Значение ключа JSON ': JSON_value,
@@ -201,16 +206,22 @@ class CheckUP:
             # отбрасываем ключ diff
             if keys not in ['diff', 'Valid']:
                 if keys not in error_keys:
+                    # print(keys)
+
                     # Теперь сравниваем значения
                     data_base_value = data_base_element.get(keys)
                     JSON_value = JSON_element.get(keys)
 
                     # Теперь проверяем их равнество
 
-                    if (type(JSON_value) == float) or (type(data_base_value) == float):
+                    if (type(JSON_value) == float) and (type(data_base_value) == float):
+
+
                         epsilon = 5.96e-08
                         # if abs(normal_value / answer_value - 1) > epsilon:
                         if abs(JSON_value - data_base_value) > epsilon:
+                            # print('JSON_value' ,JSON_value )
+                            # print('data_base_value', data_base_value)
                             error_string = {
                                 'Неравенство значений Ключа': str(keys),
                                 'Значение ключа в JSON ': JSON_value,
@@ -222,6 +233,8 @@ class CheckUP:
 
                     else:
                         if data_base_value != JSON_value:
+                            # print('JSON_value' ,JSON_value )
+                            # print('data_base_value', data_base_value)
                             error_string = {
                                 'Неравенство значений Ключа': str(keys),
                                 'Значение ключа в JSON ': JSON_value,
@@ -241,9 +254,10 @@ class CheckUP:
             for key in database[i].keys():
                 if key not in ['Name', 'id', 'ts', 'Valid']:
                     # ЕСЛИ ЗНАЧЕНИЕ НЕ НУЛЕВОЕ _ ВЫБРАСЫВАЕМ ОШИБКУ
+
                     if database[i][key] is not None:
                         error = [{'Не None ЗНАЧЕНИЯ КЛЮЧА ' + key: database[i][key], 'Элемент БД - ': database[i],
-                                  "ЭЛЕМЕНТ Time": database['ts']}]
+                                  "ЭЛЕМЕНТ Time": str(database[i]['ts'])}]
                         error_list = error_list + error
         return error_list
 
