@@ -1098,7 +1098,7 @@ class MeterDaemonManyMeter(MeterDaemonSingleMeter):
 deleteMeterTable()
 sleep(1)
 
-MeterDaemon_result = MeterDaemonSingleMeter('ssh').DataBase_clear(list_measure=['ElDayEnergy'],
+MeterDaemon_result = MeterDaemonSingleMeter('ssh').DataBase_clear(list_measure=['ElDayConsEnergy'],
                                                                   count_tree=2)
 print(MeterDaemon_result)
 
