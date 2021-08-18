@@ -84,9 +84,23 @@ class AssemblyDictLikeMeterData:
 
             for x in range(len(JSON['devices'][i]['vals'])):
                 JSON['devices'][i]['vals'][x]['ts'] = JSON['devices'][i]['vals'][x].pop('time')
+
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!ЗАГЛУШКА
+# !!!!!!!!!!!!!!!!!!!!!!!!!! Переводим 0 в нужные нам значения
+# !!!!!!!!!!!!!!!!!!!!!!!!!!
+
                 # Если у нас мгновенный показатель , меняем время что содержится в счетчике
+                # if self.measure in self.measure_moment_list:
+                #     JSON['devices'][i]['vals'][x]['ts'] = self.instant_time
+
                 if self.measure in self.measure_moment_list:
-                    JSON['devices'][i]['vals'][x]['ts'] = self.instant_time
+                    JSON['devices'][i]['vals'][x]['ts'] = 0
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!ЗАГЛУШКА
+# !!!!!!!!!!!!!!!!!!!!!!!!!! Переводим 0 в нужные нам значения
+# !!!!!!!!!!!!!!!!!!!!!!!!!!
+
                 if JSON['devices'][i]['vals'][x].get('diff') is not None:
                     JSON['devices'][i]['vals'][x].pop('diff')
 

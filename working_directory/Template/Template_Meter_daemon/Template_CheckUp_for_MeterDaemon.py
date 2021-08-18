@@ -37,8 +37,8 @@ class CheckUP:
             #     DataBase_after=self.database_after,
             #     DataBase_before=self.database_before)
 
-            # Теперь достраиваем JSON
-            self.JSON_deconstruct = self.__Rewrite_JSON()
+            # Теперь достраиваем JSON - Вырезано
+            # self.JSON_deconstruct = self.__Rewrite_JSON()
 
             # Исключаем
             # # Првоеряем валидность
@@ -115,21 +115,29 @@ class CheckUP:
         element_ts = None
 
         # Делаем коприю бд для проверки на нулевые значения
-        print('JSON_Element', JSON_Element)
-        print('database', database)
 
         # Верефицируем в инт тамштамп JSON
         JSON_Element['id'] = int(JSON_Element['id'])
         JSON_Element['ts'] = int(JSON_Element['ts'])
         # ТЕПЕРЬ - Если у нас мгновенный показатель - то сравниваем один Элемент несмотря на таймштамп
         if JSON_Element['ts'] == 0 :
+            # ТЕПЕРЬ - надо обезапасить себя - и берем только Те показатели что относяться к нужному deviceIDx
+            database_idx = []
+            for element in database :
+                if element.get('id') == JSON_Element['id'] :
+                    database_idx.append(element)
+            database = database_idx
+
             # Проверяем что длина состоит ТОЛЬКО ИЗ ОДНОГО мгновенного показателя
-            if len(database) == 1 :
+            if len(database) == 1:
 
                 # удаляем таймштамп
-                database[0]['ts'] = 0
+                database_checkup = deepcopy(database[0])
+                # database_checkup = database[0]
+                database_checkup['ts'] = 0
+
                 # Отправляем в сравниватель
-                error = self.__check_up_element_keys(data_base_element=database[0], JSON_element=JSON_Element)
+                error = self.__check_up_element_keys(data_base_element=database_checkup, JSON_element=JSON_Element)
                 self.database_for_checkup_NULL.remove(database[0])
                 error_list = error_list + error
     # ---->  иначе отбиваем ошибку
@@ -138,7 +146,7 @@ class CheckUP:
                                             'JSON_Element': JSON_Element,
                                             'То что записали в БД': database}]
 
-        # Иначе - Перебираем всю БД - в поисках немо , ой - в поисках нужного
+        # Иначе - Перебираем всю БД - в поисках немо , ой - в поисках нужного элемента
         else:
             for i in range(len(database)):
                 # Ищем здесь две связки - таймштамп и айди
@@ -172,7 +180,7 @@ class CheckUP:
                 error_list = error_list + [{'Не удалось найти Элемент JSON ts ': JSON_Element['ts'],
                                             'JSON_Element': JSON_Element,
                                             'То что записали в БД': database}]
-        # Теперь првоеряем что все показатели стоят в null
+        # Теперь проеряем что все показатели стоят в null
 
         return error_list
 
@@ -277,13 +285,17 @@ class CheckUP:
 # !!!!!!!!!!!!!!!!!!!!!!!!!!ЗАГЛУШКА
 # !!!!!!!!!!!!!!!!!!!!!!!!!! Переводим 0 в нужные нам значения
 # !!!!!!!!!!!!!!!!!!!!!!!!!!
-                    if key
+                    if ('A+' in key) or ('A-' in key) or ('R+' in key) or ('R-' in key) :
+                        if database[i][key] == 0.0 :
+                            database[i][key] = None
 
-
+# !!!!!!!!!!!!!!!!!!!!!!!!!!ЗАГЛУШКА
+# !!!!!!!!!!!!!!!!!!!!!!!!!! Переводим 0 в нужные нам значения
+# !!!!!!!!!!!!!!!!!!!!!!!!!!
                     # ЕСЛИ ЗНАЧЕНИЕ НЕ НАН _ ВЫБРАСЫВАЕМ ОШИБКУ
 
                     if database[i][key] is not None:
-                        print('keeey', database[i][key] )
+
                         error = [{'Не None ЗНАЧЕНИЯ КЛЮЧА ' + key: database[i][key], 'Элемент БД - ': database[i],
                                   "ЭЛЕМЕНТ Time": str(database[i]['ts'])}]
                         error_list = error_list + error

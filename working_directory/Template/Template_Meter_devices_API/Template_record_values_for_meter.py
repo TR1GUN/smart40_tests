@@ -1,13 +1,18 @@
-
 from working_directory.Connect.JSON_format_coding_decoding import code_JSON
 import write_file
+
+
 # //-------------------------------------------------------------------------------------------------------------------
 #                                   Класс Записи в директорию Виртуального счетчика
 # //-------------------------------------------------------------------------------------------------------------------
 
 
 class RecordFromEmulatorMeter:
-    '''Класс который Переводит наш JSON формат котоырй кушает наш эмулятор счетчика'''
+    """
+    Класс который Переводит наш JSON формат который кушает наш эмулятор счетчика
+    """
+
+    JSON_record = {}
 
     def __init__(self, JSON_list):
 
@@ -30,3 +35,9 @@ class RecordFromEmulatorMeter:
 
         write_file.write_file_JSON_on_Emulator(writen_text=JSON_meter_value)
 
+    def GET_Record(self):
+        """
+        метод возращает все
+        :return:
+        """
+        return self.JSON_record
