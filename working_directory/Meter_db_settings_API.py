@@ -61,10 +61,16 @@ class GET:
         JSON_Setup = Setup(JSON, API='meter_db_settings', type_connect=self.type_connect)
         answer_JSON = JSON_Setup.answer_JSON
 
+
         # Получаем время
         time_finis = time.time()
 
+        # ----------ПРИНТУЕМ---------------
         print('JSON Обрабабатывался:', time_finis - time_start)
+        # Навсякий случай печатаем JSON ответа и что отправляли
+        print('JSON\n', JSON)
+        print('answer_JSON\n', answer_JSON)
+        # ---------------------------------
 
         # Теперь пихаем это все в обработчик ошибок
         JSON_setting = error_handler(answer_JSON)
@@ -118,7 +124,12 @@ class GET:
         # Получаем время
         time_finis = time.time()
 
+        # ----------ПРИНТУЕМ---------------
         print('JSON Обрабабатывался:', time_finis - time_start)
+        # Навсякий случай печатаем JSON ответа и что отправляли
+        print('JSON\n', JSON)
+        print('answer_JSON\n', answer_JSON)
+        # ---------------------------------
 
 
         # Теперь пихаем это все в обработчик ошибок
@@ -174,7 +185,12 @@ class GET:
         # Получаем время
         time_finis = time.time()
 
+        # ----------ПРИНТУЕМ---------------
         print('JSON Обрабабатывался:', time_finis - time_start)
+        # Навсякий случай печатаем JSON ответа и что отправляли
+        print('JSON\n', JSON)
+        print('answer_JSON\n', answer_JSON)
+        # ---------------------------------
 
         # Теперь пихаем это все в обработчик ошибок
         JSON_setting = error_handler(answer_JSON)
@@ -227,7 +243,12 @@ class GET:
         # Получаем время
         time_finis = time.time()
 
+        # ----------ПРИНТУЕМ---------------
         print('JSON Обрабабатывался:', time_finis - time_start)
+        # Навсякий случай печатаем JSON ответа и что отправляли
+        print('JSON\n', JSON)
+        print('answer_JSON\n', answer_JSON)
+        # ---------------------------------
 
         # Теперь пихаем это все в обработчик ошибок
         JSON_setting = error_handler(answer_JSON)
@@ -306,8 +327,12 @@ class GET:
             #
             # print('answer_JSON\n', answer_JSON)
 
-
+            # ----------ПРИНТУЕМ---------------
             print('JSON Обрабабатывался:', time_finis - time_start)
+            # Навсякий случай печатаем JSON ответа и что отправляли
+            print('JSON\n', JSON)
+            print('answer_JSON\n', answer_JSON)
+            # ---------------------------------
 
             # Теперь пихаем это все в обработчик ошибок
             JSON_setting = error_handler(answer_JSON)
@@ -400,7 +425,12 @@ class POST:
             # Получаем время
             time_finis = time.time()
 
+            # ----------ПРИНТУЕМ---------------
             print('JSON Обрабабатывался:', time_finis - time_start)
+            # Навсякий случай печатаем JSON ответа и что отправляли
+            print('JSON\n', JSON)
+            print('answer_JSON\n', answer_JSON)
+            # ---------------------------------
 
             # Теперь пихаем это все в обработчик ошибок
             JSON_setting = error_handler(answer_JSON)
@@ -518,7 +548,13 @@ class PUT:
             # Получаем время
             time_finis = time.time()
 
-            print('JSON Обрабабатывался:', time_finis - time_start)
+            # ----------ПРИНТУЕМ---------------
+            print('JSON Обрабатывался:', time_finis - time_start)
+            # Навсякий случай печатаем JSON ответа и что отправляли
+            print('JSON\n', JSON)
+            print('answer_JSON\n', answer_JSON)
+            # ---------------------------------
+
             # Теперь пихаем это все в обработчик ошибок
             JSON_setting = error_handler(answer_JSON)
             if (type(JSON_setting) == list) or (type(JSON_setting) == tuple):
@@ -635,7 +671,12 @@ class DELETE:
             # Получаем время
             time_finis = time.time()
 
-            print('JSON Обрабабатывался:', time_finis - time_start)
+            # ----------ПРИНТУЕМ---------------
+            print('JSON Обрабатывался:', time_finis - time_start)
+            # На всякий случай печатаем JSON ответа и что отправляли
+            print('JSON\n', JSON)
+            print('answer_JSON\n', answer_JSON)
+            # ---------------------------------
             # Теперь пихаем это все в обработчик ошибок
             JSON_setting = error_handler(answer_JSON)
             if (type(JSON_setting) == list) or (type(JSON_setting) == tuple):
@@ -678,6 +719,5 @@ class DELETE:
 # meter_settings = GET().MeterTable(count_get_ids=1, count_generate_ids=1)
 # print(meter_settings)
 
-#
-# meter_settings = GET().
-# print(meter_settings)
+meter_settings = DELETE().MeterTable(count_settings_delete=1)
+print(meter_settings)

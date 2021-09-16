@@ -20,17 +20,20 @@ class AssemblyDictLikeMeterData:
     ids_meter = []
     measure_list = []
     JSON_GET = {}
+    serial = None
 
-    def __init__(self, JSON_list: list, ids_meter):
+    def __init__(self, JSON_list: list, ids_meter, serial=None):
 
         self.JSON = {
             'method': 'post',
             'res': 0,
             'measures': None
-                    }
+        }
         # Теперь берем наш Дособиратель и разбираем написанное тут
         self.ids_meter = ids_meter
         self.JSON_list = JSON_list
+        self.serial = serial
+
         # Список данных с однним таймштампов - моментные показания
         self.measure_moment_list = \
             [
@@ -85,10 +88,9 @@ class AssemblyDictLikeMeterData:
             for x in range(len(JSON['devices'][i]['vals'])):
                 JSON['devices'][i]['vals'][x]['ts'] = JSON['devices'][i]['vals'][x].pop('time')
 
-
-# !!!!!!!!!!!!!!!!!!!!!!!!!!ЗАГЛУШКА
-# !!!!!!!!!!!!!!!!!!!!!!!!!! Переводим 0 в нужные нам значения
-# !!!!!!!!!!!!!!!!!!!!!!!!!!
+                # !!!!!!!!!!!!!!!!!!!!!!!!!!ЗАГЛУШКА
+                # !!!!!!!!!!!!!!!!!!!!!!!!!! Переводим 0 в нужные нам значения
+                # !!!!!!!!!!!!!!!!!!!!!!!!!!
 
                 # Если у нас мгновенный показатель , меняем время что содержится в счетчике
                 # if self.measure in self.measure_moment_list:
@@ -97,9 +99,9 @@ class AssemblyDictLikeMeterData:
                 if self.measure in self.measure_moment_list:
                     JSON['devices'][i]['vals'][x]['ts'] = 0
 
-# !!!!!!!!!!!!!!!!!!!!!!!!!!ЗАГЛУШКА
-# !!!!!!!!!!!!!!!!!!!!!!!!!! Переводим 0 в нужные нам значения
-# !!!!!!!!!!!!!!!!!!!!!!!!!!
+                # !!!!!!!!!!!!!!!!!!!!!!!!!!ЗАГЛУШКА
+                # !!!!!!!!!!!!!!!!!!!!!!!!!! Переводим 0 в нужные нам значения
+                # !!!!!!!!!!!!!!!!!!!!!!!!!!
 
                 if JSON['devices'][i]['vals'][x].get('diff') is not None:
                     JSON['devices'][i]['vals'][x].pop('diff')
@@ -118,6 +120,11 @@ class AssemblyDictLikeMeterData:
                 if self.measure in Template_list_ArchTypes.ElectricConfig_ArchType_name_list:
                     delete_index_list = []
                     for z in range(len(JSON['devices'][i]['vals'][x]["tags"])):
+                        # Перезаписываем серийник - Если у нас спускается
+                        if JSON['devices'][i]['vals'][x]["tags"][z]["tag"] in ["serial"]:
+                            if self.serial is not None:
+                                JSON['devices'][i]['vals'][x]["tags"][z]["val"] = str(self.serial)
+
                         if JSON['devices'][i]['vals'][x]["tags"][z]["tag"] in ["VarConsDepth", "MonDepth",
                                                                                "MonConsDepth", "DayDepth",
                                                                                "DayConsDepth", "cTime", "isCons"]:

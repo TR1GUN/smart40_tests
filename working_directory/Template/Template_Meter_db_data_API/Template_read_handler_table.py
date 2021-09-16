@@ -983,7 +983,7 @@ class ReceivingDataAccordingToJSON:
                                   str(self.where_Timestamp)
 
                     # Опускаем это  в функцию обработчик
-
+                    # print(command) ----
                     result_where_DeviceIdx = sqlite.execute_selected_to_view_return_dict(
                         command_create_view=create_view,
                         command_delete_view=delete_view,

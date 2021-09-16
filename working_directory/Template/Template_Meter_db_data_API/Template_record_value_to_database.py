@@ -2,7 +2,7 @@ from working_directory.Template.Template_Meter_db_data_API.Template_read_handler
 from working_directory.Template.Template_Meter_db_data_API.Template_list_ArchTypes import \
     ElectricConfig_ArchType_name_list, \
     PulseConfig_ArchType_name_list, \
-    DigitalConfig_ArchType_name_list , \
+    DigitalConfig_ArchType_name_list, \
     ElectricQualityValues_ArchType_name_list
 from copy import deepcopy
 
@@ -19,12 +19,16 @@ class RecordValueToDataBase:
 
     JSON_deconstruct = []
     DeviceIdx_list = []
+    serial = 1545731519
 
-    def __init__(self, JSON_deconstruct: list):
+    def __init__(self, JSON_deconstruct: list, serial=None):
         self.DeviceIdx_list = []
         self.JSON_deconstruct = []
 
         self.JSON_deconstruct = JSON_deconstruct
+        if serial is not None:
+            self.serial = serial
+
         # Определяем - есть ли значения для записи
         if len(self.JSON_deconstruct) > 0:
             # ЕСЛИ ДА , ТО ОПРЕДЕЛЯЕМ ЕСТЬ ЛИ КОНФИГ
@@ -45,8 +49,8 @@ class RecordValueToDataBase:
         #                     ОЧЕНЬ ВАЖНАЯ ХРЕНЬ - ПОКА ДОБАВЛЯЕТСЯ ТОЛЬКО ЭЛЕКТРОННЫЙ КОНФИГ
         # /////////////////////////////////////////////////////////////////////////////////////////////////////////
         config_list = ElectricConfig_ArchType_name_list + \
-                        PulseConfig_ArchType_name_list + \
-                        DigitalConfig_ArchType_name_list
+                      PulseConfig_ArchType_name_list + \
+                      DigitalConfig_ArchType_name_list
 
         # config_list = ElectricConfig_ArchType_name_list
         # full_elconfig = Template_list_ArchTypes.ElecticEnergyValues_ArchType_name_list + \
@@ -68,6 +72,7 @@ class RecordValueToDataBase:
                 self.DeviceIdx_list.append(self.JSON_deconstruct[0][x]['id'])
             # После чего получаем Конфиг
             # self.JSON_deconstruct = deepcopy(self.JSON_deconstruct)
+
             # Перезаписываем с конфигом
             self.JSON_deconstruct = self.JSON_deconstruct + self.__adding_config()
 
@@ -82,7 +87,9 @@ class RecordValueToDataBase:
         Generator = GeneratorJSON(measure=ElectricConfig_ArchType_name_list,
                                   count_ts=1,
                                   count_id=list(set(self.DeviceIdx_list)),
-                                  Castrom_Value={'model': 'Автоматически добавленный конфиг'})
+                                  # count_id=1,
+                                  Castrom_Value={'model': 'Автоматически добавленный конфиг',
+                                                 'serial': str(self.serial)})
         # Получаем данные - голый скелет
         skeleton_JSON = Generator.JSON
 
@@ -92,7 +99,6 @@ class RecordValueToDataBase:
         # Теперь получаем деконструированный JSON
         JSON_deconstruct = DeconstructJSON(JSON=self.JSON_dict).JSON_deconstruct
 
-
         # JSON_Meter_Dev = GenerateDataForMeterDev(measure_list=ElectricConfig_ArchType_name_list).JSON_Meter_Dev
         #
         # JSON_dict_meterdata = AssemblyDictLikeMeterData(JSON_Meter_Dev, self.DeviceIdx_list).JSON
@@ -101,3 +107,7 @@ class RecordValueToDataBase:
 
         return JSON_deconstruct
 
+    def SET_Serial(self, serial):
+
+        # Необходимый параметр чтоб протаскивать необходимый серинийник
+        self.serial = serial

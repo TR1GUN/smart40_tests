@@ -779,21 +779,21 @@ Journal = {'event': None, 'eventId': None, }
 # print(meterdata)
 
 # -------------------------------------------------------------------------------------------------------------------
-meterdata = GET(type_connect='ssh').Сustom_measures(list_measure=['PlsMomentPulse'],
-                                                    select_count_ts=0,
-                                                    select_count_id=5,
-                                                    generate_count_ts=4,
-                                                    generate_count_id=5,
-                                                    count_tags=0,
-                                                    select_device_idx=False,
-                                                    select_meter_id=True,
-                                                    serial=False,
-                                                    select_id_all=False,
-                                                    select_last_time=False,
-                                                    out_of_bounds=True,
-                                                    )
-
-print(meterdata)
+# meterdata = GET(type_connect='ssh').Сustom_measures(list_measure=['ElMomentEnergy'],
+#                                                     select_count_ts=1,
+#                                                     select_count_id=1,
+#                                                     generate_count_ts=1,
+#                                                     generate_count_id=1,
+#                                                     count_tags=0,
+#                                                     select_device_idx=False,
+#                                                     select_meter_id=True,
+#                                                     serial=False,
+#                                                     select_id_all=False,
+#                                                     select_last_time=False,
+#                                                     out_of_bounds=True,
+#                                                     )
+#
+# print(meterdata)
 # # -------------------------------------------------------------------------------------------------------------------
 # # -------------------------------------------------------------------------------------------------------------------
 #                                                     ПРОГОНЫ - МНОГОПОТОЧНОСТЬ

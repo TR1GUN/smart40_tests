@@ -27,6 +27,7 @@ class GenerateDataForMeterDev:
         job_type = self.job_type
         JSON_answer_normal_list = []
         # Теперь что делаем - по очереди генерируем наши JSON для счетчика
+
         for i in range(len(job_type)):
 
             Answer = GeneratorJSON(measure=job_type[i], count_timestamp=count_timestamp.get(i)).JSON
@@ -34,3 +35,11 @@ class GenerateDataForMeterDev:
             JSON_answer_normal_list.append(Answer)
 
         return JSON_answer_normal_list
+
+    def _get_count_timestamp(self, job_type):
+        """
+        Здесь ищем Нужное колисчетво таймштампов
+        :param job_type:
+        :return:
+        """
+        pass

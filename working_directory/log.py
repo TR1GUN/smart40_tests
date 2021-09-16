@@ -16,7 +16,7 @@ def log(API_name: str, Error: list, JSON: dict, answer_JSON: dict , JSON_normal 
     """
     fille_name = 'Error' + API_name + ' log JSON in ' + str(int(time())) + '.txt'
 
-    if JSON_normal is None :
+    if JSON_normal is None:
         JSON = json.dumps(JSON)
         answer_JSON = json.dumps(answer_JSON)
 
@@ -29,9 +29,11 @@ def log(API_name: str, Error: list, JSON: dict, answer_JSON: dict , JSON_normal 
         JSON_normal = json.dumps(JSON_normal)
 
         writen_text = '\n JSON: \n\n' + str(JSON) + '\n\nОтвет на JSON: \n\n ' + str(answer_JSON) + \
-                      '\n\nПредпологаемый ответ на JSON: \n\n' + str(JSON_normal) + \
+                      '\n\n Предпологаемый ответ на JSON: \n\n' + str(JSON_normal) + \
                       '\n\n\nРезультат сравнения: \n\n ' + str(Error) + \
                       str('\n\n-------------------------------------------------------\n')
+
+    writen_text.encode('utf-8')
     write_file.write_file(file_name=fille_name, writen_text=writen_text)
 
     result = [{'error': 'Ошибка при сравнении. Залогировано в файле', 'file': fille_name}]

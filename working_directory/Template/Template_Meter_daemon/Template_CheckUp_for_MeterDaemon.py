@@ -92,17 +92,24 @@ class CheckUP:
 
         # ТЕПЕРЬ _ СРАВНИВАЕМ НАШ JSON и с тем что заселектили по факту.
         # Делаем коприю бд для проверки на нулевые значения
+
         self.database_for_checkup_NULL = deepcopy(DataBase_was_recording)
+
+        # print('-------',self.database_for_checkup_NULL)
+
         for i in range(len(JSON_deconstruct)):
             # сравниваем ПОЭЛЕМЕНТНО
             error = self.__checkup_json_with_database(JSON_Element=JSON_deconstruct[i],
                                                       database=DataBase_was_recording)
             error_list = error_list + error
+
+        print('Основная проверка', len(error_list))
         if len(error_list) == 0:
             # После чего очищаем нашу скоророванную БД от значений которые проверили
 
             error = self.__check_up_null_values(database=self.database_for_checkup_NULL)
             error_list = error_list + error
+        print('проверка на Null значения', len(error_list), 'Ghjdthrf')
         return error_list
 
     # ///--------------------------         ПОНИЖАЕМ УРОВЕНЬ АБСТРАКЦИИ     -------------------------------------------
@@ -120,10 +127,10 @@ class CheckUP:
         JSON_Element['id'] = int(JSON_Element['id'])
         JSON_Element['ts'] = int(JSON_Element['ts'])
         # ТЕПЕРЬ - Если у нас мгновенный показатель - то сравниваем один Элемент несмотря на таймштамп
-        if JSON_Element['ts'] == 0 :
+        if JSON_Element['ts'] == 0:
             # ТЕПЕРЬ - надо обезапасить себя - и берем только Те показатели что относяться к нужному deviceIDx
             database_idx = []
-            for element in database :
+            for element in database:
                 if element.get('id') == JSON_Element['id'] :
                     database_idx.append(element)
             database = database_idx
@@ -138,6 +145,8 @@ class CheckUP:
 
                 # Отправляем в сравниватель
                 error = self.__check_up_element_keys(data_base_element=database_checkup, JSON_element=JSON_Element)
+
+
                 self.database_for_checkup_NULL.remove(database[0])
                 error_list = error_list + error
     # ---->  иначе отбиваем ошибку
@@ -173,13 +182,17 @@ class CheckUP:
 
                 # Если не нашли нужный Элемент
             if element_id is None:
+                print('Не удалось найти Элемент JSON id ')
                 error_list = error_list + [{'Не удалось найти Элемент JSON id ': JSON_Element['id'],
                                             'JSON_Element': JSON_Element,
                                             'То что записали в БД': database}]
+
             if element_ts is None:
+                print('Не удалось найти Элемент JSON ts ', JSON_Element['ts'])
                 error_list = error_list + [{'Не удалось найти Элемент JSON ts ': JSON_Element['ts'],
                                             'JSON_Element': JSON_Element,
                                             'То что записали в БД': database}]
+
         # Теперь проеряем что все показатели стоят в null
 
         return error_list
@@ -286,13 +299,13 @@ class CheckUP:
 # !!!!!!!!!!!!!!!!!!!!!!!!!! Переводим 0 в нужные нам значения
 # !!!!!!!!!!!!!!!!!!!!!!!!!!
                     if ('A+' in key) or ('A-' in key) or ('R+' in key) or ('R-' in key) :
-                        if database[i][key] == 0.0 :
+                        if database[i][key] == 0.0:
                             database[i][key] = None
 
 # !!!!!!!!!!!!!!!!!!!!!!!!!!ЗАГЛУШКА
 # !!!!!!!!!!!!!!!!!!!!!!!!!! Переводим 0 в нужные нам значения
 # !!!!!!!!!!!!!!!!!!!!!!!!!!
-                    # ЕСЛИ ЗНАЧЕНИЕ НЕ НАН _ ВЫБРАСЫВАЕМ ОШИБКУ
+                    # ЕСЛИ ЗНАЧЕНИЕ НЕ НАН - ВЫБРАСЫВАЕМ ОШИБКУ
 
                     if database[i][key] is not None:
 

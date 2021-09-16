@@ -48,6 +48,7 @@ class GeneratorMeasures:
 
         self.count_ts = count_ts
         self.count_id = count_id
+
         self.Castrom_Value = Castrom_Value
 
         self.count_id = self.__generate_set_id()
@@ -74,7 +75,6 @@ class GeneratorMeasures:
                     # дергаем наш конфиг
                     measures_dict['measure'] = list_measure[i]
                     # генерируем данные для него
-
                     devices = GeneratorIdDevices(count_id=self.count_id,
                                                  count_ts=self.generate_ts_final,
                                                  measure=list_measure[i],
@@ -136,5 +136,7 @@ class GeneratorMeasures:
                 idx_set_list.append(idx[i]['DeviceIdx'])
 
             # После этого присваиваем новое значение
+        else:
+            idx_set_list = self.count_id
 
         return idx_set_list

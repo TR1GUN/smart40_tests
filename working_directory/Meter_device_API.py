@@ -360,6 +360,7 @@ class VirtualMeter(JOB):
                                       count_time=1,
                                       generate_random_meter_type=False,
                                       address=None).get_job()
+        print(self.JSON_dict)
 
         # Теперь запускаем имитатор отдельным потоком
         server = threading.Thread(target=self.__EmulatorMeter)
@@ -450,8 +451,8 @@ JournalValues_list = [
 # ---------------------------------------------------------------------------------------------------------------------
 'ElConfig'
 
-# test = VirtualMeter(type_connect='ssh').iface_Ethernet(job_type='ElMomentEnergy')
-# print(test)
+test = VirtualMeter(type_connect='ssh').iface_Ethernet(job_type='SetTime')
+print(test)
 
 # test = RealMeter(type_connect='ssh').iface_Ethernet(job_type='ElConfig', ipconfig="192.168.205.6:2002",
 #                                                     address="134256651")

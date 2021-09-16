@@ -54,7 +54,6 @@ class GeneratorJSON:
         self.Castrom_Value = Castrom_Value
 
 
-
         # Теперь берем и генерируем ЭТАЛОННЫЙ JSON ,без всякой шушеры
 
         self.JSON = GeneratorMeasures(measure=self.measure,

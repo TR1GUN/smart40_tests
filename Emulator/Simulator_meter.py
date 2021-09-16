@@ -199,7 +199,16 @@ class SimulatorMeterEnergomera:
                 "model": "CE303",
 
                 # БУФЕР
-                'Journal': ['ERROR - buffer empty']
+                'Journal': ['ERROR - buffer empty'],
+
+                # Показания Энергии
+                'ElectricEnergyValues': {},
+                # Показания Сети
+                'ElectricQualityValues': {},
+                # Профиль Мощности
+                'ElectricPowerValues': {},
+
+
             }
 
         # Теперь - Определяем путь до xml которая содержит конфигурацию счетчика
@@ -379,7 +388,6 @@ class SimulatorMeterEnergomera:
         for i in range(len(vals)):
             tags_dict = {}
             # Если нет
-
             # ЗАПОЛНЯЕМ НАШ СЛОВАРЬ ЗНАЧЕНИЯМИ
             for x in range(len(vals[i]["tags"])):
                 tag = vals[i]["tags"][x]["tag"]
@@ -389,7 +397,11 @@ class SimulatorMeterEnergomera:
             # а не - лучше использовать юникс тайм
             unix_time = vals[i]["time"]
             valuesbank_dict[unix_time] = tags_dict
-
+# ------------------------------------------------>
+            # Если нам попался профиль мощности - добавляем в него
+            if vals[i].get('type') in 'ElArr1ConsPower':
+                self.valuesbank['ElectricPowerValues'][unix_time] = tags_dict
+# ------------------------------------------------>
         # СТАВИМ ПОСЛЕДНЫЙ ТАЙМШТАМП В КАЧЕСТВЕ ЗНАЧЕНЯИ ПО УМОЛЧАНИЮ
         self.valuesbank['time'] = unix_time
         # ПОСЛЕДНИЙ ТАЙМШТАМП обновляем ключ NOW или с таймштампом 0
@@ -1354,10 +1366,8 @@ class SimulatorMeterEnergomera:
         if self._counter.random == '1':
             var = "%.2f" % (100 * random.random())
         else:
-
             tag = str(self.tags.get(self.data))
             # Теперь по значению этого тэга ищем значение в нашем словаре
-
             var = float(self.valuesbank['NOW'][tag]) / 1000
             var = str(var)
         return var.encode()

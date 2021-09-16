@@ -157,6 +157,7 @@ class SocketMeters:
         # Читаем запрос
         session = True
         while session:
+            timer = datetime.datetime.now()
             request = self.__read_request()
             # print('Команда', request)
             if request is None:
@@ -173,7 +174,7 @@ class SocketMeters:
                 # Формируем ответ
                 response = self.__handle_request(request)
                 self.__write_response(response)
-
+                print('Времени затрачено:',datetime.datetime.now() - timer)
     # Читаем запрос
     def __read_request(self):
 
@@ -184,7 +185,7 @@ class SocketMeters:
         """
 
         # Когда сессия появилась - выставляем заново таймаут
-        self._SET_TIMEOUT(0.5)
+        self._SET_TIMEOUT(0.3)
         # и после этого начинаем читать
 
         request = bytes()
